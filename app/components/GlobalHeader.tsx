@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import CartIcon from "./CartIcon";
+import HeaderPromotion from "./HeaderPromotion";
 import { PromotionalOffer } from "../api/promotional-offers/route";
 import { CatalogCategory } from "../api/catalog-categories/route";
 
@@ -17,7 +18,6 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
   const [scrollY, setScrollY] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const firstRowRef = useRef<HTMLDivElement>(null);
   const secondRowRef = useRef<HTMLDivElement>(null);
   const thirdRowRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -97,56 +97,13 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
   return (
     <>
       {/* First Row - Promotional Offers (Can disappear) */}
-      <div
-        ref={firstRowRef}
-        className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-blue-600 to-purple-600 text-white overflow-hidden transition-transform duration-300 ease-out"
-        style={{
-          height: "44px", // Fixed height to prevent layout shift
-          transform: `translateY(-${firstRowTransform}px)`,
-        }}
-        role="banner"
-        aria-label="Promotional offers"
-      >
-        <div className="max-w-7xl mx-auto text-center h-full flex items-center justify-center px-6">
-          {isLoading ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-pulse promotional-text text-sm">
-                Loading offers...
-              </div>
-            </div>
-          ) : offers.length > 0 ? (
-            <div className="flex items-center justify-center space-x-4">
-              <span className="promotional-text text-sm">
-                {offers[currentOfferIndex]?.text}
-              </span>
-              {offers.length > 1 && (
-                <div
-                  className="flex space-x-1"
-                  role="tablist"
-                  aria-label="Offer indicators"
-                >
-                  {offers.map((_, index) => (
-                    <button
-                      key={index}
-                      role="tab"
-                      aria-selected={index === currentOfferIndex}
-                      className={`w-2 h-2 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-white/50 ${
-                        index === currentOfferIndex ? "bg-white" : "bg-white/50"
-                      }`}
-                      onClick={() => setCurrentOfferIndex(index)}
-                      aria-label={`View offer ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="promotional-text text-sm opacity-0">
-              Placeholder
-            </div>
-          )}
-        </div>
-      </div>
+      <HeaderPromotion
+        offers={offers}
+        currentOfferIndex={currentOfferIndex}
+        isLoading={isLoading}
+        onOfferChange={setCurrentOfferIndex}
+        transform={firstRowTransform}
+      />
 
       {/* Second Row - Logo and Cart (Always Anchored at Top) */}
       <div
