@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import CartIcon from "./CartIcon";
 import HeaderPromotion from "./HeaderPromotion";
+import HeaderLogo from "./HeaderLogo";
 import { PromotionalOffer } from "../api/promotional-offers/route";
 import { CatalogCategory } from "../api/catalog-categories/route";
 
@@ -117,13 +118,8 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
         <div className="max-w-7xl mx-auto flex items-center h-full pl-2 pr-6">
           {/* Left Section - Fixed */}
           <div className="flex items-center space-x-6 flex-shrink-0">
-            <Link
-              href="/"
-              className="text-lg font-semibold text-gray-800 no-underline hover:no-underline focus:no-underline active:no-underline hover:text-gray-600 transition-colors focus:outline-none"
-              aria-label="Go to homepage"
-            >
-              Stripe Checkout Demo
-            </Link>
+            {/* Logo and Store Name */}
+            <HeaderLogo />
 
             {/* Store Location */}
             <div className="flex items-center text-sm text-gray-600">
