@@ -149,7 +149,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
           top: `${Math.max(0, 44 - firstRowTransform)}px` // Use fixed height instead of offsetHeight
         }}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-full px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-full pl-2 pr-6">
           <Link 
             href="/" 
             className="text-lg font-semibold text-gray-800 no-underline hover:no-underline focus:no-underline active:no-underline hover:text-gray-600 transition-colors focus:outline-none"
@@ -157,7 +157,31 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
           >
             Stripe Checkout Demo
           </Link>
-          <CartIcon onClick={onCartClick} />
+          <div className="flex items-center space-x-4">
+            {/* Help Icon */}
+            <button
+              className="text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-full p-1"
+              aria-label="Help and support"
+              onClick={() => {}}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+              </svg>
+            </button>
+
+            {/* My Account Icon */}
+            <button
+              className="text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-full p-1"
+              aria-label="My Account"
+              onClick={() => {}}
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+            </button>
+
+            <CartIcon onClick={onCartClick} />
+          </div>
         </div>
       </div>
 
