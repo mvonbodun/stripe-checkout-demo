@@ -40,7 +40,7 @@ export default function RootLayout({
               <MiniCart open={isMiniCartOpen} onClose={() => setIsMiniCartOpen(false)} />
             </>
           )}
-          <main className="flex-1" style={{ marginTop: isCheckoutPage ? '0' : '156px' }}>
+          <main className={`flex-1 ${isCheckoutPage ? '' : 'mt-[204px] md:mt-[148px]'}`}>
             {children}
           </main>
           <footer className="bg-gray-50 border-t px-6 py-4 text-center text-gray-500 text-sm">
