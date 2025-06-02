@@ -151,7 +151,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
       {/* Second Row - Logo and Cart (Always Anchored at Top) */}
       <div
         ref={secondRowRef}
-        className="fixed left-0 right-0 z-50 bg-white border-b shadow-sm"
+        className="fixed left-0 right-0 z-50 bg-white shadow-sm"
         style={{
           height: "56px", // Fixed height to match third row
           top: `${Math.max(0, 44 - firstRowTransform)}px`, // Use fixed height instead of offsetHeight
@@ -273,9 +273,9 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
       {/* Third Row - Categories (Can slide under second row) */}
       <div
         ref={thirdRowRef}
-        className="fixed left-0 right-0 z-30 bg-gray-50 border-b transition-transform duration-300 ease-out"
+        className="fixed left-0 right-0 z-30 bg-gray-100 transition-transform duration-300 ease-out"
         style={{
-          height: "56px", // Fixed height to prevent layout shift
+          height: "48px", // Reduced height from 56px to 48px
           top: `${Math.max(0, 44 - firstRowTransform) + 56}px`, // Use fixed heights (44 + 56)
           transform: `translateY(-${thirdRowTransform}px)`,
         }}
@@ -295,7 +295,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
                 <Link
                   key={category.id}
                   href={`/category/${category.slug}`}
-                  className="header-nav text-sm text-gray-700 hover:text-blue-600 transition-colors whitespace-nowrap py-2 px-3 rounded-md hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:bg-white/80"
+                  className="header-nav text-base text-gray-700 hover:text-blue-600 transition-colors whitespace-nowrap py-2 px-3 rounded-md hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:bg-white/80"
                   title={category.description || category.name}
                 >
                   {category.name}
