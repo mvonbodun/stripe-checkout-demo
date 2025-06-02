@@ -196,7 +196,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
 
       {/* Mobile Layout - Fourth Row: Store Location */}
       <div
-        className="md:hidden fixed left-0 right-0 z-30 bg-gray-50 border-t border-gray-200"
+        className="md:hidden fixed left-0 right-0 z-30 bg-gray-50 border-t border-b border-gray-200"
         style={{
           height: "48px",
           top: `${Math.max(0, 44 - firstRowTransform) + 56 + 56}px`, // Position below third row
