@@ -1,7 +1,6 @@
 
 'use client';
 
-import Link from 'next/link';
 import { useCart } from './cart-context';
 import ProductCard from './components/ProductCard';
 
@@ -25,9 +24,7 @@ const PRODUCTS = [
 ];
 
 export default function Home() {
-  const { state: cart, dispatch } = useCart();
-
-  const itemCount = cart.line_items.reduce((sum: number, item: typeof cart.line_items[number]) => sum + item.quantity, 0);
+  const { dispatch } = useCart();
 
   const addToCart = (product: typeof PRODUCTS[0]) => {
     dispatch({
@@ -48,11 +45,6 @@ export default function Home() {
   return (
     <div className="max-w-2xl mx-auto py-10">
       <main>
-        <h1 className="text-3xl font-bold mb-6">Stripe Checkout Demo</h1>
-        <div className="mb-4 flex gap-4">
-          <Link href="/checkout" className="btn btn-primary">Go to Checkout</Link>
-          <span className="text-gray-700">Cart: {itemCount} item{itemCount !== 1 ? 's' : ''}</span>
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {PRODUCTS.map(product => (
             <ProductCard 
