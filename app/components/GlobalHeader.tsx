@@ -189,7 +189,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
           top: `${Math.max(0, 44 - firstRowTransform) + 56}px`, // Position below second row
         }}
       >
-        <div className="max-w-7xl mx-auto h-full px-4 flex items-center">
+        <div className="max-w-7xl mx-auto h-full px-3 flex items-center">
           <HeaderSearchBar className="mx-0" />
         </div>
       </div>
@@ -202,7 +202,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
           top: `${Math.max(0, 44 - firstRowTransform) + 56 + 56}px`, // Position below third row
         }}
       >
-        <div className="max-w-7xl mx-auto h-full px-4 flex items-center">
+        <div className="max-w-7xl mx-auto h-full pl-2 pr-6 flex items-center">
           <HeaderStoreLocation />
         </div>
       </div>
