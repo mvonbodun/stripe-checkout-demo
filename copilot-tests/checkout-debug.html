@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Debug Test</title>
+</head>
+<body>
+    <h1>Checkout Debug Test</h1>
+    <p>Use this page to debug the checkout functionality</p>
+    
+    <h2>Steps to test checkout issue:</h2>
+    <ol>
+        <li>Go to <a href="http://localhost:3001" target="_blank">Home Page</a></li>
+        <li>Add items to cart using the + buttons</li>
+        <li>Click on cart icon to open mini-cart</li>
+        <li>Click "Checkout" to go to checkout page</li>
+        <li>Enter email in LinkAuthenticationElement</li>
+        <li>Observe if AddressElement disappears</li>
+    </ol>
+    
+    <h2>Alternative: Add test items via console</h2>
+    <button onclick="addTestItems()">Add Test Items to Cart</button>
+    
+    <h2>Console Commands:</h2>
+    <pre>
+// Add test items to cart
+window.dispatchEvent(new CustomEvent('addToCart', { 
+  detail: {
+    product_id: 1,
+    name: "Test Product",
+    price: 29.99,
+    quantity: 1,
+    image: "/next.svg",
+    attributes: ["Test"],
+    taxcode: "txcd_99999999"
+  }
+}));
+    </pre>
+    
+    <script>
+    function addTestItems() {
+        // Try to add items via localStorage first
+        const testCart = {
+            line_items: [
+                {
+                    product_id: 1,
+                    name: "Test Product 1",
+                    price: 29.99,
+                    quantity: 1,
+                    image: "/next.svg",
+                    attributes: ["Size: M"],
+                    taxcode: "txcd_99999999"
+                },
+                {
+                    product_id: 2,
+                    name: "Test Product 2", 
+                    price: 49.99,
+                    quantity: 1,
+                    image: "/vercel.svg",
+                    attributes: ["Size: L"],
+                    taxcode: "txcd_99999999"
+                }
+            ],
+            order_subtotal: 79.98,
+            order_tax_total: 0,
+            order_shipping_total: 0,
+            order_shipping_tax_total: 0,
+            order_grand_total: 79.98,
+            payment_intent: null,
+            shipping_method_id: null,
+            shipping_method_name: null
+        };
+        
+        try {
+            localStorage.setItem('cart', JSON.stringify(testCart));
+            alert('Test items added to cart! Refresh the page and go to checkout.');
+        } catch (error) {
+            console.error('Error adding test items:', error);
+            alert('Error adding test items. Check console for details.');
+        }
+    }
+    </script>
+</body>
+</html>

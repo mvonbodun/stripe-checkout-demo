@@ -1,0 +1,31 @@
+{
+  "currency": "usd",
+  "line_items": [
+    {
+      "amount": 5000,
+      "reference": "4abd7f14-9d8c-4b61-8aa0-b483757b4120",
+      "quantity": 2,
+      "tax_code": "txcd_99999999",
+      "tax_behavior": "exclusive"
+    },
+    {
+      "amount": 12000,
+      "reference": "987c0c3d-21db-4f3f-a035-019536c0bb94",
+      "quantity": 2,
+      "tax_code": "txcd_99999999",
+      "tax_behavior": "exclusive"
+    }
+  ],
+  "shipping_cost": { "amount": 1299 },
+  "customer_details": {
+    "address": {
+      "city": "Spring",
+      "country": "US",
+      "line1": "67 Heritage Hill Circle",
+      "line2": null,
+      "postal_code": "77381",
+      "state": "TX"
+    },
+    "address_source": "shipping"
+  }
+}

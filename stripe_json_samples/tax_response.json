@@ -1,0 +1,49 @@
+{
+    "id": "taxcalc_1RSPonRlgFrbOsNHYqrPQn4q",
+    "object": "tax.calculation",
+    "amount_total": 11908,
+    "currency": "usd",
+    "customer": null,
+    "customer_details": {
+        "address": {
+            "city": "Spring",
+            "country": "US",
+            "line1": "67 Heritage Hill Circle",
+            "line2": "",
+            "postal_code": "77381",
+            "state": "TX"
+        },
+        "address_source": "shipping",
+        "ip_address": null,
+        "tax_ids": [],
+        "taxability_override": "none"
+    },
+    "expires_at": 1755898885,
+    "livemode": false,
+    "ship_from_details": null,
+    "shipping_cost": {
+        "amount": 0,
+        "amount_tax": 0,
+        "tax_behavior": "exclusive",
+        "tax_code": "txcd_92010001"
+    },
+    "tax_amount_exclusive": 908,
+    "tax_amount_inclusive": 0,
+    "tax_breakdown": [
+        {
+            "amount": 908,
+            "inclusive": false,
+            "tax_rate_details": {
+                "country": "US",
+                "flat_amount": null,
+                "percentage_decimal": "8.25",
+                "rate_type": "percentage",
+                "state": "TX",
+                "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 11000
+        }
+    ],
+    "tax_date": 1748122885
+}

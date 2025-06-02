@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Shipping Tax Distribution</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        .test-title {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            border-left: 4px solid #007bff;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Shipping Tax Distribution Test</h1>
+        <p>This test verifies that shipping tax is properly distributed proportionally across line items.</p>
+        
+        <div class="test-section">
+            <h2 class="test-title">Test 1: Basic Proportional Distribution</h2>
+            <p>Test that shipping tax is distributed proportionally based on line item subtotals.</p>
+            
+            <div>
+                <h4>Scenario:</h4>
+                <ul>
+                    <li>Item 1: $20 (40% of $50 total)</li>
+                    <li>Item 2: $30 (60% of $50 total)</li>
+                    <li>Shipping Tax: $5.00</li>
+                </ul>
+                
+                <h4>Expected Results:</h4>
+                <ul>
+                    <li>Item 1 shipping tax: $2.00 (40% of $5.00)</li>
+                    <li>Item 2 shipping tax: $3.00 (60% of $5.00)</li>
+                </ul>
+            </div>
+            
+            <button onclick="testBasicDistribution()">Run Test 1</button>
+            <div id="test1-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 2: Edge Case - Zero Shipping Tax</h2>
+            <p>Test that zero shipping tax is handled correctly.</p>
+            
+            <button onclick="testZeroShippingTax()">Run Test 2</button>
+            <div id="test2-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 3: Rounding Accuracy</h2>
+            <p>Test that shipping tax rounding works correctly with decimal values.</p>
+            
+            <div>
+                <h4>Scenario:</h4>
+                <ul>
+                    <li>Item 1: $10.33</li>
+                    <li>Item 2: $15.67</li>
+                    <li>Shipping Tax: $2.10</li>
+                </ul>
+            </div>
+            
+            <button onclick="testRounding()">Run Test 3</button>
+            <div id="test3-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test 4: Multi-item with Different Quantities</h2>
+            <p>Test proportional distribution with items of different quantities.</p>
+            
+            <div>
+                <h4>Scenario:</h4>
+                <ul>
+                    <li>Item 1: $10 × 2 = $20 subtotal</li>
+                    <li>Item 2: $15 × 1 = $15 subtotal</li>
+                    <li>Item 3: $25 × 1 = $25 subtotal</li>
+                    <li>Total: $60, Shipping Tax: $4.80</li>
+                </ul>
+            </div>
+            
+            <button onclick="testMultiItem()">Run Test 4</button>
+            <div id="test4-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">Test API Integration</h2>
+            <p>Test the actual API with a realistic scenario to verify the full flow.</p>
+            
+            <button onclick="testAPIIntegration()">Test API Integration</button>
+            <div id="api-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate the shipping tax distribution algorithm
+        function distributeShippingTax(lineItems, shippingTaxAmount) {
+            const orderSubtotal = lineItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            if (orderSubtotal <= 0) return lineItems;
+            
+            return lineItems.map(item => {
+                const lineSubtotal = item.price * item.quantity;
+                const proportion = lineSubtotal / orderSubtotal;
+                const lineShippingTax = Math.round(proportion * shippingTaxAmount * 100) / 100;
+                
+                return {
+                    ...item,
+                    lineShippingTax,
+                    proportion: proportion.toFixed(4)
+                };
+            });
+        }
+
+        function showResult(testId, success, message, details = null) {
+            const resultDiv = document.getElementById(testId);
+            resultDiv.style.display = 'block';
+            resultDiv.className = success ? 'result success' : 'result error';
+            resultDiv.innerHTML = `
+                <strong>${success ? '✓ PASS' : '✗ FAIL'}</strong>: ${message}
+                ${details ? `<pre>${details}</pre>` : ''}
+            `;
+        }
+
+        function testBasicDistribution() {
+            const lineItems = [
+                { id: '1', name: 'Item 1', price: 20, quantity: 1 },
+                { id: '2', name: 'Item 2', price: 30, quantity: 1 }
+            ];
+            const shippingTax = 5.00;
+            
+            const result = distributeShippingTax(lineItems, shippingTax);
+            
+            const item1Tax = result[0].lineShippingTax;
+            const item2Tax = result[1].lineShippingTax;
+            const totalDistributed = item1Tax + item2Tax;
+            
+            const expected1 = 2.00; // 40% of $5.00
+            const expected2 = 3.00; // 60% of $5.00
+            
+            const success = Math.abs(item1Tax - expected1) < 0.01 && 
+                          Math.abs(item2Tax - expected2) < 0.01 &&
+                          Math.abs(totalDistributed - shippingTax) < 0.01;
+            
+            const details = `
+Results:
+- Item 1: $${item1Tax.toFixed(2)} (expected $${expected1.toFixed(2)})
+- Item 2: $${item2Tax.toFixed(2)} (expected $${expected2.toFixed(2)})
+- Total distributed: $${totalDistributed.toFixed(2)} (expected $${shippingTax.toFixed(2)})
+- Proportions: ${result[0].proportion}, ${result[1].proportion}
+            `;
+            
+            showResult('test1-result', success, 
+                success ? 'Proportional distribution works correctly!' : 'Distribution failed!', 
+                details);
+        }
+
+        function testZeroShippingTax() {
+            const lineItems = [
+                { id: '1', name: 'Item 1', price: 20, quantity: 1 },
+                { id: '2', name: 'Item 2', price: 30, quantity: 1 }
+            ];
+            const shippingTax = 0.00;
+            
+            const result = distributeShippingTax(lineItems, shippingTax);
+            
+            const success = result.every(item => item.lineShippingTax === 0);
+            
+            const details = `
+Results:
+- Item 1 shipping tax: $${result[0].lineShippingTax.toFixed(2)}
+- Item 2 shipping tax: $${result[1].lineShippingTax.toFixed(2)}
+            `;
+            
+            showResult('test2-result', success, 
+                success ? 'Zero shipping tax handled correctly!' : 'Zero shipping tax failed!', 
+                details);
+        }
+
+        function testRounding() {
+            const lineItems = [
+                { id: '1', name: 'Item 1', price: 10.33, quantity: 1 },
+                { id: '2', name: 'Item 2', price: 15.67, quantity: 1 }
+            ];
+            const shippingTax = 2.10;
+            
+            const result = distributeShippingTax(lineItems, shippingTax);
+            
+            const item1Tax = result[0].lineShippingTax;
+            const item2Tax = result[1].lineShippingTax;
+            const totalDistributed = item1Tax + item2Tax;
+            
+            // Check that values are properly rounded to 2 decimals
+            const success = Number.isInteger(item1Tax * 100) && 
+                          Number.isInteger(item2Tax * 100) &&
+                          Math.abs(totalDistributed - shippingTax) < 0.02; // Allow small rounding difference
+            
+            const details = `
+Results:
+- Order subtotal: $${(10.33 + 15.67).toFixed(2)}
+- Item 1 proportion: ${result[0].proportion}
+- Item 1 shipping tax: $${item1Tax.toFixed(2)}
+- Item 2 proportion: ${result[1].proportion}
+- Item 2 shipping tax: $${item2Tax.toFixed(2)}
+- Total distributed: $${totalDistributed.toFixed(2)}
+- Difference from expected: $${Math.abs(totalDistributed - shippingTax).toFixed(2)}
+            `;
+            
+            showResult('test3-result', success, 
+                success ? 'Rounding works correctly!' : 'Rounding failed!', 
+                details);
+        }
+
+        function testMultiItem() {
+            const lineItems = [
+                { id: '1', name: 'Item 1', price: 10, quantity: 2 }, // $20
+                { id: '2', name: 'Item 2', price: 15, quantity: 1 }, // $15
+                { id: '3', name: 'Item 3', price: 25, quantity: 1 }  // $25
+            ];
+            const shippingTax = 4.80;
+            
+            const result = distributeShippingTax(lineItems, shippingTax);
+            
+            // Expected: $20/$60 = 33.33%, $15/$60 = 25%, $25/$60 = 41.67%
+            // So: $1.60, $1.20, $2.00
+            
+            const totalDistributed = result.reduce((sum, item) => sum + item.lineShippingTax, 0);
+            
+            const success = Math.abs(totalDistributed - shippingTax) < 0.02;
+            
+            const details = `
+Results:
+- Total order: $${lineItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)}
+- Item 1 (${lineItems[0].quantity}x$${lineItems[0].price}): $${result[0].lineShippingTax.toFixed(2)} (${result[0].proportion})
+- Item 2 (${lineItems[1].quantity}x$${lineItems[1].price}): $${result[1].lineShippingTax.toFixed(2)} (${result[1].proportion})
+- Item 3 (${lineItems[2].quantity}x$${lineItems[2].price}): $${result[2].lineShippingTax.toFixed(2)} (${result[2].proportion})
+- Total distributed: $${totalDistributed.toFixed(2)}
+            `;
+            
+            showResult('test4-result', success, 
+                success ? 'Multi-item distribution works correctly!' : 'Multi-item distribution failed!', 
+                details);
+        }
+
+        async function testAPIIntegration() {
+            const testPayload = {
+                shipping_address: {
+                    line1: '67 Heritage Hill Circle',
+                    city: 'Spring',
+                    state: 'TX',
+                    postal_code: '77381',
+                    country: 'US'
+                },
+                cart: [
+                    {
+                        id: 'test-item-1',
+                        name: 'Premium T-Shirt',
+                        price: 29.99,
+                        quantity: 2,
+                        taxcode: 'txcd_99999999'
+                    },
+                    {
+                        id: 'test-item-2',
+                        name: 'Coffee Mug',
+                        price: 15.99,
+                        quantity: 1,
+                        taxcode: 'txcd_99999999'
+                    }
+                ],
+                shipping_cost: 12.99
+            };
+
+            try {
+                const response = await fetch('/api/calculate-tax', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testPayload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                }
+
+                const data = await response.json();
+                
+                const hasShippingTax = data.calculation.shipping_cost && 
+                                     data.calculation.shipping_cost.amount_tax > 0;
+                
+                const success = data.calculation && data.calculation.line_items && hasShippingTax;
+                
+                const details = `
+API Response:
+- Calculation ID: ${data.calculation.id}
+- Line items count: ${data.calculation.line_items.data.length}
+- Shipping cost amount: $${((data.calculation.shipping_cost?.amount || 0) / 100).toFixed(2)}
+- Shipping tax amount: $${((data.calculation.shipping_cost?.amount_tax || 0) / 100).toFixed(2)}
+- Total tax (exclusive): $${(data.tax_amount / 100).toFixed(2)}
+
+Line Item Details:
+${data.calculation.line_items.data.map((item, index) => 
+    `- Item ${index + 1} (${item.reference}): Tax $${(item.amount_tax / 100).toFixed(2)}`
+).join('\n')}
+                `;
+
+                showResult('api-result', success, 
+                    success ? 'API integration successful with shipping tax!' : 'API integration incomplete!', 
+                    details);
+                    
+            } catch (error) {
+                showResult('api-result', false, `API test failed: ${error.message}`);
+            }
+        }
+
+        // Auto-run basic test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Shipping tax distribution test page loaded');
+        });
+    </script>
+</body>
+</html>
