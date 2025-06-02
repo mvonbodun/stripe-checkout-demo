@@ -2,8 +2,8 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useCart } from './cart-context';
+import ProductCard from './components/ProductCard';
 
 const PRODUCTS = [
   {
@@ -55,17 +55,11 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {PRODUCTS.map(product => (
-            <div key={product.product_id} className="border rounded p-4 flex flex-col items-center">
-              <Image src={product.image} alt={product.name} className="mb-2 rounded" width={120} height={120} />
-              <div className="font-bold text-lg mb-1">{product.name}</div>
-              <div className="mb-2 text-gray-600">${product.price.toFixed(2)}</div>
-              <button
-                className="btn btn-secondary"
-                onClick={() => addToCart(product)}
-              >
-                Add to Cart
-              </button>
-            </div>
+            <ProductCard 
+              key={product.product_id}
+              product={product}
+              onAddToCart={addToCart}
+            />
           ))}
         </div>
       </main>
