@@ -92,12 +92,12 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/30 flex justify-end pointer-events-auto"
+      className="fixed inset-0 z-50 bg-black/30 flex md:justify-end pointer-events-auto"
       ref={overlayRef} 
       onClick={handleOverlayClick}
     >
       <aside 
-        className="bg-white w-[28vw] min-w-[320px] max-w-[420px] h-full shadow-lg flex flex-col relative animate-slide-in"
+        className="bg-white w-full md:w-[28vw] md:min-w-[320px] md:max-w-[420px] h-full shadow-lg flex flex-col relative animate-slide-in"
         role="dialog" 
         aria-modal="true"
       >
