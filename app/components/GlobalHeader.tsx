@@ -1,10 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import CartIcon from "./CartIcon";
 import HeaderPromotion from "./HeaderPromotion";
 import HeaderLogo from "./HeaderLogo";
+import HeaderStoreLocation from "./HeaderStoreLocation";
+import HeaderSearchBar from "./HeaderSearchBar";
+import HelpIcon from "./HelpIcon";
+import MyAccountIcon from "./MyAccountIcon";
+import HeaderCategoriesNavigation from "./HeaderCategoriesNavigation";
 import { PromotionalOffer } from "../api/promotional-offers/route";
 import { CatalogCategory } from "../api/catalog-categories/route";
 
@@ -122,102 +126,16 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
             <HeaderLogo />
 
             {/* Store Location */}
-            <div className="flex items-center text-sm text-gray-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-                />
-              </svg>
-              <span className="font-medium">My Store:</span>
-              <span className="ml-1">Spring, TX</span>
-            </div>
+            <HeaderStoreLocation />
           </div>
 
           {/* Center Section - Expandable Search */}
-          <div className="flex-grow mx-6">
-            <div className="relative max-w-md mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.3-4.3"></path>
-                </svg>
-              </div>
-              <input
-                type="search"
-                placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
-              />
-            </div>
-          </div>
+          <HeaderSearchBar />
 
           {/* Right Section - Fixed */}
           <div className="flex items-center space-x-4 flex-shrink-0">
-            {/* Help Icon */}
-            <button
-              className="text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-full p-1"
-              aria-label="Help and support"
-              onClick={() => {}}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-8 h-8"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                />
-              </svg>
-            </button>
-
-            {/* My Account Icon */}
-            <button
-              className="text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-full p-1"
-              aria-label="My Account"
-              onClick={() => {}}
-            >
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-            </button>
-
+            <HelpIcon />
+            <MyAccountIcon />
             <CartIcon onClick={onCartClick} />
           </div>
         </div>
@@ -235,28 +153,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
         role="navigation"
         aria-label="Product categories"
       >
-        <div className="max-w-7xl mx-auto h-full px-6">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-pulse header-nav text-sm text-gray-500">
-                Loading categories...
-              </div>
-            </div>
-          ) : (
-            <nav className="flex items-center justify-center space-x-2 md:space-x-8 overflow-x-auto scrollbar-hide h-full">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/category/${category.slug}`}
-                  className="header-nav text-base text-gray-700 hover:text-blue-600 transition-colors whitespace-nowrap py-2 px-3 rounded-md hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:bg-white/80"
-                  title={category.description || category.name}
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </nav>
-          )}
-        </div>
+        <HeaderCategoriesNavigation categories={categories} isLoading={isLoading} />
       </div>
     </>
   );
