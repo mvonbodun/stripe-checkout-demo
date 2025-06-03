@@ -21,6 +21,22 @@ const PRODUCTS = [
 		attributes: ['Size 10'],
 		taxcode: 'txcd_99999999',
 	},
+	{
+		product_id: 3,
+		name: 'Shorts',
+		price: 40.0,
+		image: 'https://placehold.co/120x120',
+		attributes: ['Size 32'],
+		taxcode: 'txcd_99999999',
+	},
+	{
+		product_id: 4,
+		name: 'Hat',
+		price: 15.0,
+		image: 'https://placehold.co/120x120',
+		attributes: ['Size Large'],
+		taxcode: 'txcd_99999999',
+	},
 ];
 
 const HERO_DATA: HeroData[] = [
