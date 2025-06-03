@@ -14,8 +14,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
+  const [mobileHeaderProgress, setMobileHeaderProgress] = useState(0);
   const pathname = usePathname();
   const isCheckoutPage = pathname === '/checkout' || pathname === '/order-confirmation';
+
+  // Calculate dynamic mobile margin based on header hide progress
+  const calculateMobileMargin = () => {
+    const baseMobileMargin = 204; // Base mobile margin in px
+    const adjustedMargin = baseMobileMargin * (1 - mobileHeaderProgress);
+    return `${adjustedMargin}px`;
+  };
 
   return (
     <html lang="en">
@@ -36,11 +44,17 @@ export default function RootLayout({
           ) : (
             // Enhanced global header with three sections
             <>
-              <GlobalHeader onCartClick={() => setIsMiniCartOpen(true)} />
+              <GlobalHeader 
+                onCartClick={() => setIsMiniCartOpen(true)} 
+                onMobileHeaderProgressChange={setMobileHeaderProgress}
+              />
               <MiniCart open={isMiniCartOpen} onClose={() => setIsMiniCartOpen(false)} />
             </>
           )}
-          <main className={`flex-1 ${isCheckoutPage ? '' : 'mt-[204px] md:mt-[148px]'}`}>
+          <main 
+            className={`flex-1 ${isCheckoutPage ? '' : 'md:mt-[148px]'}`}
+            style={!isCheckoutPage ? { marginTop: calculateMobileMargin() } : {}}
+          >
             {children}
           </main>
           <footer className="bg-gray-50 border-t px-6 py-4 text-center text-gray-500 text-sm">

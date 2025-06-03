@@ -15,15 +15,17 @@ import { CatalogCategory } from "../api/catalog-categories/route";
 
 interface GlobalHeaderProps {
   onCartClick: () => void;
+  onMobileHeaderProgressChange?: (progress: number) => void;
 }
 
-const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
+const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick, onMobileHeaderProgressChange }) => {
   const [offers, setOffers] = useState<PromotionalOffer[]>([]);
   const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const secondRowRef = useRef<HTMLDivElement>(null);
   const thirdRowRef = useRef<HTMLDivElement>(null);
@@ -92,8 +94,38 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
     };
   }, [handleScroll]);
 
+  // Handle mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Set initial state
+    handleResize();
+    
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Calculate scroll-based visibility
   const thirdRowHeight = 56; // Use fixed height instead of dynamic measurement
+
+  // Mobile header hiding logic - starts after ~20px scroll once promotional header disappears
+  const mobileHideStart = 20; // Start hiding after promotional header begins to disappear
+  const mobileHideDistance = 80; // Smooth transition over 80px of scroll
+  
+  // Calculate mobile row transforms
+  const mobileHideProgress = Math.max(0, Math.min(1, (scrollY - mobileHideStart) / mobileHideDistance));
+  const mobileSecondRowTransform = isMobile ? mobileHideProgress * 56 * 2 : 0; // Double the transform for complete hiding
+  const mobileThirdRowTransform = mobileHideProgress * 56 * 2; // Double the transform for complete hiding
+  const mobileFourthRowTransform = mobileHideProgress * 48 * 2; // Double the transform for complete hiding
+
+  // Notify parent about mobile header state changes
+  useEffect(() => {
+    if (onMobileHeaderProgressChange && isMobile) {
+      onMobileHeaderProgressChange(mobileHideProgress);
+    }
+  }, [mobileHideProgress, onMobileHeaderProgressChange, isMobile]);
 
   // Third row starts disappearing immediately on scroll
   const thirdRowTransform = Math.min(scrollY, thirdRowHeight);
@@ -115,10 +147,11 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
       {/* Second Row - Logo and Cart (Always Anchored at Top) */}
       <div
         ref={secondRowRef}
-        className="fixed left-0 right-0 z-50 bg-white shadow-sm"
+        className="fixed left-0 right-0 z-50 bg-white shadow-sm transition-transform duration-300 ease-out"
         style={{
           height: "56px", // Fixed height to match third row
           top: `${Math.max(0, 44 - firstRowTransform)}px`, // Use fixed height instead of offsetHeight
+          transform: isMobile ? `translateY(-${mobileSecondRowTransform}px)` : 'translateY(0)',
         }}
       >
         <div className="max-w-7xl mx-auto flex items-center h-full pl-2 pr-6">
@@ -183,10 +216,11 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
 
       {/* Mobile Layout - Third Row: Search Bar (Full Width) */}
       <div
-        className="md:hidden fixed left-0 right-0 z-30 bg-white border-t border-gray-200"
+        className="md:hidden fixed left-0 right-0 z-30 bg-white border-t border-gray-200 transition-transform duration-300 ease-out"
         style={{
           height: "56px",
-          top: `${Math.max(0, 44 - firstRowTransform) + 56}px`, // Position below second row
+          top: `${Math.max(0, 44 - firstRowTransform) + 56 - mobileSecondRowTransform}px`, // Position below second row, accounting for transforms
+          transform: `translateY(-${mobileThirdRowTransform}px)`,
         }}
       >
         <div className="max-w-7xl mx-auto h-full px-3 flex items-center">
@@ -196,10 +230,11 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick }) => {
 
       {/* Mobile Layout - Fourth Row: Store Location */}
       <div
-        className="md:hidden fixed left-0 right-0 z-30 bg-gray-50 border-t border-b border-gray-200"
+        className="md:hidden fixed left-0 right-0 z-30 bg-gray-50 border-t border-b border-gray-200 transition-transform duration-300 ease-out"
         style={{
           height: "48px",
-          top: `${Math.max(0, 44 - firstRowTransform) + 56 + 56}px`, // Position below third row
+          top: `${Math.max(0, 44 - firstRowTransform) + 56 + 56 - mobileSecondRowTransform - mobileThirdRowTransform}px`, // Position below third row, accounting for transforms
+          transform: `translateY(-${mobileFourthRowTransform}px)`,
         }}
       >
         <div className="max-w-7xl mx-auto h-full pl-2 pr-6 flex items-center">
