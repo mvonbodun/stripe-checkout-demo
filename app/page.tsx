@@ -69,8 +69,11 @@ const HERO_DATA: HeroData[] = [
 	},
 ];
 
+import { useMiniCartUI } from './mini-cart-ui-context';
+
 export default function Home() {
 	const { dispatch } = useCart();
+	const { openMiniCart } = useMiniCartUI();
 
 	const addToCart = (product: typeof PRODUCTS[0]) => {
 		dispatch({
@@ -86,6 +89,7 @@ export default function Home() {
 				line_grand_total: 0, // Will be calculated in reducer
 			},
 		});
+		openMiniCart();
 	};
 
 	return (

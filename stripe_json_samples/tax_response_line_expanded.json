@@ -1,14 +1,14 @@
 {
-  "id": "taxcalc_1RTscrRlgFrbOsNHQC0NQa88",
+  "id": "taxcalc_1RUDrxRlgFrbOsNHuBGjfqJs",
   "object": "tax.calculation",
-  "amount_total": 19809,
+  "amount_total": 10607,
   "currency": "usd",
   "customer": null,
   "customer_details": {
     "address": {
       "city": "Spring",
       "country": "US",
-      "line1": "67 Heritage Hill Circle",
+      "line1": "63 Heritage Hill Circle",
       "line2": "",
       "postal_code": "77381",
       "state": "TX"
@@ -18,24 +18,24 @@
     "tax_ids": [],
     "taxability_override": "none"
   },
-  "expires_at": 1756247949,
+  "expires_at": 1756329609,
   "line_items": {
     "object": "list",
     "data": [
       {
-        "id": "tax_li_SOfyEBAjfqs0xi",
+        "id": "tax_li_SP1v6VFOWWHc69",
         "object": "tax.calculation_line_item",
-        "amount": 5000,
-        "amount_tax": 413,
+        "amount": 2500,
+        "amount_tax": 206,
         "livemode": false,
         "metadata": {},
         "product": null,
-        "quantity": 2,
-        "reference": "e7fdbbdb-fd74-445f-a3e1-2ccd5c29d77e",
+        "quantity": 1,
+        "reference": "b29d15c1-0d23-441c-9eb8-772ed955c393",
         "tax_behavior": "exclusive",
         "tax_breakdown": [
           {
-            "amount": 313,
+            "amount": 156,
             "jurisdiction": {
               "country": "US",
               "display_name": "Texas",
@@ -49,7 +49,7 @@
               "tax_type": "sales_tax"
             },
             "taxability_reason": "standard_rated",
-            "taxable_amount": 5000
+            "taxable_amount": 2500
           },
           {
             "amount": 0,
@@ -65,7 +65,7 @@
             "taxable_amount": 0
           },
           {
-            "amount": 50,
+            "amount": 25,
             "jurisdiction": {
               "country": "US",
               "display_name": "The Woodlands Township",
@@ -79,10 +79,10 @@
               "tax_type": "sales_tax"
             },
             "taxability_reason": "standard_rated",
-            "taxable_amount": 5000
+            "taxable_amount": 2500
           },
           {
-            "amount": 50,
+            "amount": 25,
             "jurisdiction": {
               "country": "US",
               "display_name": "The Woodlands Township Economical Development Zone",
@@ -96,25 +96,25 @@
               "tax_type": "sales_tax"
             },
             "taxability_reason": "standard_rated",
-            "taxable_amount": 5000
+            "taxable_amount": 2500
           }
         ],
         "tax_code": "txcd_99999999"
       },
       {
-        "id": "tax_li_SOfy8Jq4zAnCy4",
+        "id": "tax_li_SP1vuYDD4Uj4Wv",
         "object": "tax.calculation_line_item",
-        "amount": 12000,
-        "amount_tax": 989,
+        "amount": 6000,
+        "amount_tax": 495,
         "livemode": false,
         "metadata": {},
         "product": null,
-        "quantity": 2,
-        "reference": "2012e693-744b-493b-bf37-8be3bbb631a5",
+        "quantity": 1,
+        "reference": "f785991a-abf0-432c-8d63-06e5df619842",
         "tax_behavior": "exclusive",
         "tax_breakdown": [
           {
-            "amount": 749,
+            "amount": 375,
             "jurisdiction": {
               "country": "US",
               "display_name": "Texas",
@@ -128,7 +128,7 @@
               "tax_type": "sales_tax"
             },
             "taxability_reason": "standard_rated",
-            "taxable_amount": 12000
+            "taxable_amount": 6000
           },
           {
             "amount": 0,
@@ -144,7 +144,7 @@
             "taxable_amount": 0
           },
           {
-            "amount": 120,
+            "amount": 60,
             "jurisdiction": {
               "country": "US",
               "display_name": "The Woodlands Township",
@@ -158,10 +158,10 @@
               "tax_type": "sales_tax"
             },
             "taxability_reason": "standard_rated",
-            "taxable_amount": 12000
+            "taxable_amount": 6000
           },
           {
-            "amount": 120,
+            "amount": 60,
             "jurisdiction": {
               "country": "US",
               "display_name": "The Woodlands Township Economical Development Zone",
@@ -175,7 +175,7 @@
               "tax_type": "sales_tax"
             },
             "taxability_reason": "standard_rated",
-            "taxable_amount": 12000
+            "taxable_amount": 6000
           }
         ],
         "tax_code": "txcd_99999999"
@@ -183,21 +183,21 @@
     ],
     "has_more": false,
     "total_count": 2,
-    "url": "/v1/tax/calculations/taxcalc_1RTscrRlgFrbOsNHQC0NQa88/line_items"
+    "url": "/v1/tax/calculations/taxcalc_1RUDrxRlgFrbOsNHuBGjfqJs/line_items"
   },
   "livemode": false,
   "ship_from_details": null,
   "shipping_cost": {
     "amount": 1299,
-    "amount_tax": 108,
+    "amount_tax": 107,
     "tax_behavior": "exclusive",
     "tax_code": "txcd_92010001"
   },
-  "tax_amount_exclusive": 1510,
+  "tax_amount_exclusive": 808,
   "tax_amount_inclusive": 0,
   "tax_breakdown": [
     {
-      "amount": 1510,
+      "amount": 808,
       "inclusive": false,
       "tax_rate_details": {
         "country": "US",
@@ -208,8 +208,8 @@
         "tax_type": "sales_tax"
       },
       "taxability_reason": "standard_rated",
-      "taxable_amount": 18299
+      "taxable_amount": 9799
     }
   ],
-  "tax_date": 1748471949
+  "tax_date": 1748553609
 }

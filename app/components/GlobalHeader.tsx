@@ -14,11 +14,13 @@ import { PromotionalOffer } from "../api/promotional-offers/route";
 import { CatalogCategory } from "../api/catalog-categories/route";
 
 interface GlobalHeaderProps {
-  onCartClick: () => void;
   onMobileHeaderProgressChange?: (progress: number) => void;
 }
 
-const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick, onMobileHeaderProgressChange }) => {
+import { useMiniCartUI } from '../mini-cart-ui-context';
+
+const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChange }) => {
+  const { openMiniCart } = useMiniCartUI();
   const [offers, setOffers] = useState<PromotionalOffer[]>([]);
   const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
@@ -173,7 +175,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick, onMobileHeader
             <div className="flex items-center space-x-4 flex-shrink-0">
               <HelpIcon />
               <MyAccountIcon />
-              <CartIcon onClick={onCartClick} />
+              <CartIcon onClick={openMiniCart} />
             </div>
           </div>
 
@@ -193,7 +195,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onCartClick, onMobileHeader
 
             {/* Right - Cart */}
             <div className="flex-shrink-0">
-              <CartIcon onClick={onCartClick} />
+              <CartIcon onClick={openMiniCart} />
             </div>
           </div>
         </div>
