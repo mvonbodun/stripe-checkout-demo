@@ -235,7 +235,7 @@ const ExpressCheckout: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
-  const { dispatch } = useCart();
+  const { state: cart, dispatch } = useCart();
 
   const handleExpressCheckout = async (event: {
     billingDetails?: {
@@ -277,6 +277,33 @@ const ExpressCheckout: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         alert(`Payment failed: ${result.error.message}`);
       } else if (result.paymentIntent && (result.paymentIntent.status === 'succeeded' || result.paymentIntent.status === 'requires_capture')) {
         console.log('Express checkout payment succeeded. Payment status:', result.paymentIntent.status);
+        
+        // Store completed order data before clearing cart (same as checkout page)
+        const completedOrder = {
+          id: result.paymentIntent.id,
+          status: result.paymentIntent.status,
+          amount: result.paymentIntent.amount,
+          currency: result.paymentIntent.currency,
+          items: cart.line_items,
+          subtotal: cart.order_subtotal,
+          tax: cart.order_tax_total,
+          shipping: cart.order_shipping_total,
+          shipping_tax: cart.order_shipping_tax_total,
+          total: cart.order_grand_total,
+          timestamp: new Date().toISOString(),
+          email: event.billingDetails?.email || 'Express Pay User',
+          address: event.billingDetails?.address || null,
+          expressPaymentType: 'express', // Mark as express checkout
+          shipping_method_id: cart.shipping_method_id,
+          shipping_method_name: cart.shipping_method_name
+        };
+        
+        try {
+          localStorage.setItem('completed-order', JSON.stringify(completedOrder));
+        } catch (error) {
+          console.error('Error saving completed order:', error);
+        }
+        
         dispatch({ type: 'CLEAR_CART' });
         onClose();
         router.push('/order-confirmation');
