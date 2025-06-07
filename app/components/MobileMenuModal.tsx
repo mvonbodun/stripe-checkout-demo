@@ -66,7 +66,7 @@ const MobileMenuModal: React.FC<MobileMenuModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="bg-white w-full h-full flex flex-direction-column overflow-y-auto animate-slide-in"
+        className="bg-white w-full h-full flex flex-col overflow-y-auto animate-slide-in"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
