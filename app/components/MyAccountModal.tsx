@@ -151,13 +151,16 @@ const MyAccountModal: React.FC<MyAccountModalProps> = ({ open, onClose }) => {
           ) : (
             /* Logged Out State */
             <div className="space-y-6">
-              {/* Sign In Button */}
-              <div className="pt-2">
+              {/* Sign In and Create Account Buttons */}
+              <div className="pt-2 flex gap-3">
                 <button 
                   onClick={() => setIsLoggedIn(true)}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium"
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium"
                 >
                   Sign In
+                </button>
+                <button className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors font-medium">
+                  Create Account
                 </button>
               </div>
 
@@ -179,16 +182,6 @@ const MyAccountModal: React.FC<MyAccountModalProps> = ({ open, onClose }) => {
                     <span className="text-gray-700 text-sm">Help & Support</span>
                   </a>
                 </div>
-              </div>
-
-              {/* Create Account */}
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-600 text-center mb-3">
-                  Don&apos;t have an account?
-                </p>
-                <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors font-medium">
-                  Create Account
-                </button>
               </div>
             </div>
           )}
