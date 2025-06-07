@@ -35,6 +35,11 @@ const mockOffers: PromotionalOffer[] = [
 
 export async function GET() {
   try {
+    // Add a small delay only in development for testing loading states
+    if (process.env.NODE_ENV === 'development') {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from potential longer delay
+    }
+    
     // Filter only active offers and sort by priority
     const activeOffers = mockOffers
       .filter(offer => offer.active)

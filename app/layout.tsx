@@ -6,7 +6,10 @@ import { CartProvider } from './cart-context';
 import MiniCart from './components/MiniCart';
 import { MiniCartUIProvider, useMiniCartUI } from './mini-cart-ui-context';
 import { MyAccountUIProvider, useMyAccountUI } from './my-account-ui-context';
+import { MobileMenuUIProvider, useMobileMenuUI } from './mobile-menu-ui-context';
+import { CategoriesProvider, useCategories } from './categories-context';
 import MyAccountModal from './components/MyAccountModal';
+import MobileMenuModal from './components/MobileMenuModal';
 import GlobalHeader from './components/GlobalHeader';
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -19,6 +22,12 @@ function MiniCartWithContext() {
 function MyAccountModalWithContext() {
   const { isMyAccountOpen, closeMyAccount } = useMyAccountUI();
   return <MyAccountModal open={isMyAccountOpen} onClose={closeMyAccount} />;
+}
+
+function MobileMenuModalWithContext() {
+  const { isMobileMenuOpen, closeMobileMenu } = useMobileMenuUI();
+  const { categories } = useCategories();
+  return <MobileMenuModal open={isMobileMenuOpen} onClose={closeMobileMenu} categories={categories} />;
 }
 
 export default function RootLayout({
@@ -41,8 +50,10 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         <CartProvider>
-          <MiniCartUIProvider>
-            <MyAccountUIProvider>
+          <CategoriesProvider>
+            <MiniCartUIProvider>
+              <MyAccountUIProvider>
+                <MobileMenuUIProvider>
               {isCheckoutPage ? (
                 // Checkout and order-confirmation header - centered text only
                 <header className="bg-white border-b px-6 py-4 shadow-sm">
@@ -63,6 +74,7 @@ export default function RootLayout({
                   />
                   <MiniCartWithContext />
                   <MyAccountModalWithContext />
+                  <MobileMenuModalWithContext />
                 </>
               )}
               <main 
@@ -74,8 +86,10 @@ export default function RootLayout({
               <footer className="bg-gray-50 border-t px-6 py-4 text-center text-gray-500 text-sm">
                 &copy; {new Date().getFullYear()} Stripe Checkout Demo. All rights reserved.
               </footer>
-            </MyAccountUIProvider>
-          </MiniCartUIProvider>
+                </MobileMenuUIProvider>
+              </MyAccountUIProvider>
+            </MiniCartUIProvider>
+          </CategoriesProvider>
         </CartProvider>
       </body>
     </html>

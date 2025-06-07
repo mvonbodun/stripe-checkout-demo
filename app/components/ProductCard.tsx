@@ -23,7 +23,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         alt={product.name} 
         className="mb-2 rounded" 
         width={120} 
-        height={120} 
+        height={120}
+        priority={false} // Don't prioritize all product images
+        loading="lazy" // Lazy load for better mobile performance
+        placeholder="blur"
+        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
       />
       <div className="font-bold text-lg mb-1">{product.name}</div>
       <div className="mb-2 text-gray-600">${product.price.toFixed(2)}</div>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Menu Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Mobile Hamburger Menu Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Manual Test Instructions</h2>
+        <p>To test the mobile hamburger menu:</p>
+        <ol>
+            <li>Open the main application at <a href="http://localhost:3001" target="_blank">http://localhost:3001</a></li>
+            <li>Resize your browser window to mobile size (< 768px width) OR use browser dev tools mobile view</li>
+            <li>Look for the hamburger menu icon (three lines) in the header</li>
+            <li>Click the hamburger menu icon</li>
+            <li>Verify the full-screen modal opens with:</li>
+            <ul>
+                <li>Header with "X" button (left) and "Menu" title (center)</li>
+                <li>"My Account" row with user icon</li>
+                <li>"Get Help" row with help icon</li>
+                <li>"Track Your Order" row with location icon</li>
+                <li>"Categories" section with category list</li>
+            </ul>
+            <li>Test navigation by clicking each menu item</li>
+            <li>Test closing the menu with the X button, ESC key, or clicking outside</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Automated Test (Run in Browser Console)</h2>
+        <p>Copy and paste this code into the browser console on the main application page:</p>
+        <textarea rows="10" cols="80" readonly>
+// Mobile Menu Test Script
+function testMobileMenu() {
+    console.log('🔧 Testing Mobile Hamburger Menu...');
+    
+    // Test if hamburger button exists
+    const hamburgerButton = document.querySelector('[aria-label="Open mobile menu"]');
+    if (hamburgerButton) {
+        console.log('✅ Hamburger button found');
+        
+        // Simulate click
+        hamburgerButton.click();
+        
+        setTimeout(() => {
+            // Check if modal opened
+            const modal = document.querySelector('[role="dialog"][aria-modal="true"]');
+            if (modal) {
+                console.log('✅ Mobile menu modal opened');
+                
+                // Check for required elements
+                const closeButton = modal.querySelector('[aria-label="Close menu"]');
+                const myAccountButton = modal.querySelector('button:has(span:contains("My Account"))');
+                const helpButton = modal.querySelector('button:has(span:contains("Get Help"))');
+                const trackOrderButton = modal.querySelector('button:has(span:contains("Track Your Order"))');
+                
+                console.log('Close button:', closeButton ? '✅' : '❌');
+                console.log('My Account button:', myAccountButton ? '✅' : '❌');
+                console.log('Get Help button:', helpButton ? '✅' : '❌');
+                console.log('Track Order button:', trackOrderButton ? '✅' : '❌');
+                
+                // Test close
+                if (closeButton) {
+                    closeButton.click();
+                    setTimeout(() => {
+                        const modalStillOpen = document.querySelector('[role="dialog"][aria-modal="true"]');
+                        console.log('Menu closes properly:', !modalStillOpen ? '✅' : '❌');
+                    }, 300);
+                }
+            } else {
+                console.log('❌ Mobile menu modal did not open');
+            }
+        }, 300);
+    } else {
+        console.log('❌ Hamburger button not found - make sure you are in mobile view');
+    }
+}
+
+// Run the test
+testMobileMenu();
+        </textarea>
+        <br>
+        <button class="test-button" onclick="copyToClipboard()">Copy Test Script</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Results</h2>
+        <div class="status info">
+            <strong>✅ Success Criteria:</strong>
+            <ul>
+                <li>Hamburger menu button appears in mobile view</li>
+                <li>Clicking opens full-screen modal with slide-in animation</li>
+                <li>Modal has proper header with X button and centered "Menu" title</li>
+                <li>All menu items (My Account, Get Help, Track Order) are present with icons</li>
+                <li>Categories section displays available categories</li>
+                <li>Navigation works (clicking items navigates to correct pages)</li>
+                <li>Modal closes with X button, ESC key, or outside click</li>
+                <li>No console errors related to nested buttons</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard() {
+            const textarea = document.querySelector('textarea');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Test script copied to clipboard! Paste it in the browser console on the main app page.');
+        }
+    </script>
+</body>
+</html>

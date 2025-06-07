@@ -11,46 +11,38 @@ import MyAccountIcon from "./MyAccountIcon";
 import HamburgerMenu from "./HamburgerMenu";
 import HeaderCategoriesNavigation from "./HeaderCategoriesNavigation";
 import { PromotionalOffer } from "../api/promotional-offers/route";
-import { CatalogCategory } from "../api/catalog-categories/route";
 
 interface GlobalHeaderProps {
   onMobileHeaderProgressChange?: (progress: number) => void;
 }
 
 import { useMiniCartUI } from '../mini-cart-ui-context';
+import { useMobileMenuUI } from '../mobile-menu-ui-context';
+import { useCategories } from '../categories-context';
 
 const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChange }) => {
   const { openMiniCart } = useMiniCartUI();
+  const { isMobileMenuOpen, openMobileMenu, closeMobileMenu } = useMobileMenuUI();
+  const { categories, isLoading: categoriesLoading } = useCategories();
   const [offers, setOffers] = useState<PromotionalOffer[]>([]);
-  const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   const secondRowRef = useRef<HTMLDivElement>(null);
   const thirdRowRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch promotional offers and categories
+  // Fetch promotional offers only (categories are handled by context)
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
-        const [offersResponse, categoriesResponse] = await Promise.all([
-          fetch("/api/promotional-offers"),
-          fetch("/api/catalog-categories"),
-        ]);
+        const offersResponse = await fetch("/api/promotional-offers");
 
         if (offersResponse.ok) {
           const offersData = await offersResponse.json();
           setOffers(offersData);
-        }
-
-        if (categoriesResponse.ok) {
-          const categoriesData = await categoriesResponse.json();
-          setCategories(categoriesData);
         }
       } catch (error) {
         console.error("Error fetching header data:", error);
@@ -73,7 +65,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChang
     }
   }, [offers.length]);
 
-  // Debounced scroll handler for better performance
+  // Debounced scroll handler for better performance, especially on mobile
   const handleScroll = useCallback(() => {
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
@@ -81,8 +73,8 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChang
 
     scrollTimeoutRef.current = setTimeout(() => {
       setScrollY(window.scrollY);
-    }, 10); // Small delay for smooth performance
-  }, []);
+    }, isMobile ? 16 : 10); // Longer delay on mobile for better performance
+  }, [isMobile]);
 
   // Handle scroll events
   useEffect(() => {
@@ -184,8 +176,9 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChang
             {/* Left - Hamburger Menu */}
             <HamburgerMenu 
               isOpen={isMobileMenuOpen} 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => isMobileMenuOpen ? closeMobileMenu() : openMobileMenu()}
               className="flex-shrink-0"
+              ariaLabel="Open mobile menu"
             />
 
             {/* Center - Logo */}
@@ -213,7 +206,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChang
         role="navigation"
         aria-label="Product categories"
       >
-        <HeaderCategoriesNavigation categories={categories} isLoading={isLoading} />
+        <HeaderCategoriesNavigation categories={categories} isLoading={categoriesLoading} />
       </div>
 
       {/* Mobile Layout - Third Row: Search Bar (Full Width) */}

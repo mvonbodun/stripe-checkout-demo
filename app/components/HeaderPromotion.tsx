@@ -18,6 +18,9 @@ const HeaderPromotion: React.FC<HeaderPromotionProps> = ({
   onOfferChange,
   transform,
 }) => {
+  // Provide immediate fallback content to avoid long loading states
+  const defaultOffer = "Free Shipping on Orders Over $75";
+  
   return (
     <div
       className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-blue-600 to-purple-600 text-white overflow-hidden transition-transform duration-300 ease-out"
@@ -31,8 +34,8 @@ const HeaderPromotion: React.FC<HeaderPromotionProps> = ({
       <div className="max-w-7xl mx-auto text-center h-full flex items-center justify-center px-6">
         {isLoading ? (
           <div className="flex items-center justify-center">
-            <div className="animate-pulse promotional-text text-sm">
-              Loading offers...
+            <div className="promotional-text text-sm">
+              {defaultOffer}
             </div>
           </div>
         ) : offers.length > 0 ? (
@@ -62,8 +65,8 @@ const HeaderPromotion: React.FC<HeaderPromotionProps> = ({
             )}
           </div>
         ) : (
-          <div className="promotional-text text-sm opacity-0">
-            Placeholder
+          <div className="promotional-text text-sm">
+            {defaultOffer}
           </div>
         )}
       </div>
