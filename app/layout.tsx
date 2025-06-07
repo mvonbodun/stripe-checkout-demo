@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { CartProvider } from './cart-context';
 import MiniCart from './components/MiniCart';
 import { MiniCartUIProvider, useMiniCartUI } from './mini-cart-ui-context';
+import { MyAccountUIProvider, useMyAccountUI } from './my-account-ui-context';
+import MyAccountModal from './components/MyAccountModal';
 import GlobalHeader from './components/GlobalHeader';
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -12,6 +14,11 @@ import { usePathname } from 'next/navigation';
 function MiniCartWithContext() {
   const { isMiniCartOpen, closeMiniCart } = useMiniCartUI();
   return <MiniCart open={isMiniCartOpen} onClose={closeMiniCart} />;
+}
+
+function MyAccountModalWithContext() {
+  const { isMyAccountOpen, closeMyAccount } = useMyAccountUI();
+  return <MyAccountModal open={isMyAccountOpen} onClose={closeMyAccount} />;
 }
 
 export default function RootLayout({
@@ -35,37 +42,40 @@ export default function RootLayout({
       <body className="flex flex-col min-h-screen">
         <CartProvider>
           <MiniCartUIProvider>
-            {isCheckoutPage ? (
-              // Checkout and order-confirmation header - centered text only
-              <header className="bg-white border-b px-6 py-4 shadow-sm">
-                <div className="max-w-7xl mx-auto flex items-center justify-center">
-                  <Link 
-                    href="/" 
-                    className="font-bold text-xl text-gray-800 no-underline hover:no-underline focus:no-underline active:no-underline hover:text-gray-600 transition-colors"
-                  >
-                    Stripe Checkout Demo
-                  </Link>
-                </div>
-              </header>
-            ) : (
-              // Enhanced global header with three sections
-              <>
-                <GlobalHeader 
-                  onMobileHeaderProgressChange={setMobileHeaderProgress}
-                />
-                <MiniCartWithContext />
-              </>
-            )}
-            <main 
-              className={`flex-1 ${isCheckoutPage ? '' : 'md:mt-[148px]'}`}
-              style={!isCheckoutPage ? { marginTop: calculateMobileMargin() } : {}}
-            >
-              {children}
-            </main>
+            <MyAccountUIProvider>
+              {isCheckoutPage ? (
+                // Checkout and order-confirmation header - centered text only
+                <header className="bg-white border-b px-6 py-4 shadow-sm">
+                  <div className="max-w-7xl mx-auto flex items-center justify-center">
+                    <Link 
+                      href="/" 
+                      className="font-bold text-xl text-gray-800 no-underline hover:no-underline focus:no-underline active:no-underline hover:text-gray-600 transition-colors"
+                    >
+                      Stripe Checkout Demo
+                    </Link>
+                  </div>
+                </header>
+              ) : (
+                // Enhanced global header with three sections
+                <>
+                  <GlobalHeader 
+                    onMobileHeaderProgressChange={setMobileHeaderProgress}
+                  />
+                  <MiniCartWithContext />
+                  <MyAccountModalWithContext />
+                </>
+              )}
+              <main 
+                className={`flex-1 ${isCheckoutPage ? '' : 'md:mt-[148px]'}`}
+                style={!isCheckoutPage ? { marginTop: calculateMobileMargin() } : {}}
+              >
+                {children}
+              </main>
+              <footer className="bg-gray-50 border-t px-6 py-4 text-center text-gray-500 text-sm">
+                &copy; {new Date().getFullYear()} Stripe Checkout Demo. All rights reserved.
+              </footer>
+            </MyAccountUIProvider>
           </MiniCartUIProvider>
-          <footer className="bg-gray-50 border-t px-6 py-4 text-center text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} Stripe Checkout Demo. All rights reserved.
-          </footer>
         </CartProvider>
       </body>
     </html>

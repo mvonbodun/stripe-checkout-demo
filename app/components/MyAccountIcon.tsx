@@ -1,19 +1,21 @@
+"use client";
 import React from "react";
+import { useMyAccountUI } from "../my-account-ui-context";
 
 interface MyAccountIconProps {
-  onClick?: () => void;
   className?: string;
 }
 
 const MyAccountIcon: React.FC<MyAccountIconProps> = ({
-  onClick = () => {},
   className = "",
 }) => {
+  const { openMyAccount } = useMyAccountUI();
+
   return (
     <button
       className={`text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-full p-1 ${className}`}
       aria-label="My Account"
-      onClick={onClick}
+      onClick={openMyAccount}
     >
       <svg
         className="w-8 h-8"
