@@ -10,6 +10,18 @@ interface ExpressCheckoutEvent {
   billingDetails?: {
     name?: string;
     email?: string;
+    phone?: string;
+    address?: {
+      city?: string;
+      country?: string;
+      line1?: string;
+      line2?: string | null;
+      postal_code?: string;
+      state?: string;
+    };
+  };
+  shippingAddress?: {
+    name?: string;
     address?: {
       city?: string;
       country?: string;
@@ -35,6 +47,7 @@ interface CompletedOrder {
   total: number;
   timestamp: string;
   email?: string;
+  phone?: string;
   address?: {
     city?: string;
     country?: string;
@@ -42,6 +55,17 @@ interface CompletedOrder {
     line2?: string | null;
     postal_code?: string;
     state?: string;
+  } | null;
+  shippingAddress?: {
+    name?: string;
+    address?: {
+      city?: string;
+      country?: string;
+      line1?: string;
+      line2?: string | null;
+      postal_code?: string;
+      state?: string;
+    };
   } | null;
   expressPaymentType?: string;
   shipping_method_id?: string | null;
@@ -59,6 +83,9 @@ interface ExpressCheckoutComponentProps {
       applePay?: 'buy' | 'check-out' | 'donate' | 'plain';
       googlePay?: 'buy' | 'checkout' | 'donate' | 'plain';
     };
+    emailRequired?: boolean;
+    phoneNumberRequired?: boolean;
+    shippingAddressRequired?: boolean;
   };
 }
 
@@ -73,6 +100,9 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
       applePay: 'buy',
       googlePay: 'buy',
     },
+    emailRequired: true,
+    phoneNumberRequired: true,
+    shippingAddressRequired: true,
   }
 }) => {
   const stripe = useStripe();
@@ -105,6 +135,7 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
               billing_details: {
                 name: event.billingDetails?.name,
                 email: event.billingDetails?.email,
+                phone: event.billingDetails?.phone,
                 address: event.billingDetails?.address,
               },
             },
@@ -137,7 +168,9 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
             total: cart.order_grand_total,
             timestamp: new Date().toISOString(),
             email: event.billingDetails?.email || 'Express Pay User',
+            phone: event.billingDetails?.phone,
             address: event.billingDetails?.address || null,
+            shippingAddress: event.shippingAddress || null,
             expressPaymentType: 'express',
             shipping_method_id: cart.shipping_method_id,
             shipping_method_name: cart.shipping_method_name
@@ -163,8 +196,10 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
           shipping_tax: cart.order_shipping_tax_total,
           total: cart.order_grand_total,
           timestamp: new Date().toISOString(),
-          email: event.expressPaymentType === 'apple_pay' ? 'Apple Pay User' : 'Express Pay User',
-          address: null,
+          email: event.billingDetails?.email || (event.expressPaymentType === 'apple_pay' ? 'Apple Pay User' : 'Express Pay User'),
+          phone: event.billingDetails?.phone,
+          address: event.billingDetails?.address || null,
+          shippingAddress: event.shippingAddress || null,
           expressPaymentType: event.expressPaymentType,
           shipping_method_id: cart.shipping_method_id,
           shipping_method_name: cart.shipping_method_name
