@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import React from 'react';
 import Image from 'next/image';
-import { useCart } from '../cart-context';
+import { useCart, AddressType } from '../cart-context';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, AddressElement, useStripe, useElements, LinkAuthenticationElement, PaymentElement } from '@stripe/react-stripe-js';
 import ExpressCheckoutComponent from '../components/ExpressCheckoutComponent';
@@ -14,7 +14,7 @@ import { buildTaxCalculationPayload, calculateTax, updateCartTaxTotals, clearCar
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-import type { Cart } from '../cart-context';
+import type { Cart, Address } from '../cart-context';
 
 // Helper to generate payload for payment intent APIs
 function getPaymentIntentPayload({
@@ -357,6 +357,29 @@ const CheckoutForm = React.memo(function CheckoutForm({
             // Update address completion state for Pay button validation
             setAddressComplete(event.complete && !!event.value);
             setAddress(event.value.address);
+            
+            // Store shipping address in cart context when complete
+            if (event.complete && event.value?.address && event.value?.name) {
+              const shippingAddress: Address = {
+                addressType: AddressType.SHIPPING,
+                name: event.value.name,
+                address: {
+                  line1: event.value.address.line1,
+                  line2: event.value.address.line2,
+                  city: event.value.address.city,
+                  state: event.value.address.state,
+                  postal_code: event.value.address.postal_code,
+                  country: event.value.address.country,
+                },
+                phone: event.value.phone,
+              };
+              
+              console.log("💾 Storing shipping address in cart context:", shippingAddress);
+              dispatch({ type: 'UPDATE_SHIPPING_ADDRESS', shipping_address: shippingAddress });
+            } else if (!event.complete) {
+              // Clear shipping address if address becomes incomplete
+              dispatch({ type: 'UPDATE_SHIPPING_ADDRESS', shipping_address: null });
+            }
             
             // Only calculate tax if the address is complete and has required fields
             if (event.complete && event.value?.address) {

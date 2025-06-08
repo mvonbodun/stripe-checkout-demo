@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useCart, type CartItem } from '../cart-context';
+import { useCart, type CartItem, type Address, AddressType } from '../cart-context';
 import { useRouter } from 'next/navigation';
 
 // Types for the express checkout events
@@ -112,6 +112,26 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
 
   const handleExpressCheckout = async (event: ExpressCheckoutEvent) => {
     console.log('Express checkout confirmed:', event);
+    
+    // Store shipping address in cart context if provided
+    if (event.shippingAddress) {
+      const shippingAddress: Address = {
+        addressType: AddressType.SHIPPING,
+        name: event.shippingAddress.name,
+        address: {
+          line1: event.shippingAddress.address?.line1,
+          line2: event.shippingAddress.address?.line2,
+          city: event.shippingAddress.address?.city,
+          state: event.shippingAddress.address?.state,
+          postal_code: event.shippingAddress.address?.postal_code,
+          country: event.shippingAddress.address?.country,
+        },
+        // Note: Express checkout shipping address doesn't include phone
+      };
+      
+      console.log("💾 Storing express checkout shipping address in cart context:", shippingAddress);
+      dispatch({ type: 'UPDATE_SHIPPING_ADDRESS', shipping_address: shippingAddress });
+    }
     
     if (!stripe || !elements) {
       const errorMsg = 'Stripe has not loaded yet';

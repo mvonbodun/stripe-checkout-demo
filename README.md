@@ -185,3 +185,5 @@ This project is for demonstration purposes. Please check Stripe's terms of servi
 For questions about Stripe integration, refer to the [Stripe Documentation](https://docs.stripe.com/).
 
 For Next.js questions, check the [Next.js Documentation](https://nextjs.org/docs).
+
+Review the Stripe create_express_checkout_element API documentation at https://docs.stripe.com/js/elements_object/create_express_checkout_element.  We are setting the shippingAddressRequired to true so the end user can set the shipping address in the alternative payment like Apple Pay.  We need to listen to the event for shippingAddressRequired - "create", "click", or "shippingaddresschange", capture the shipping address and update the cart-context with the shipping address, then call the API to calcuate tax based on the new shipping address and using the first shipping method returned from the 
