@@ -7,6 +7,42 @@ import { useRouter } from 'next/navigation';
 import { buildTaxCalculationPayload, calculateTax, updateCartTaxTotals } from '../utils/taxCalculation';
 import type { ShippingMethod } from '../api/shipping-methods/route';
 
+/**
+ * Express Checkout Component for Stripe
+ * 
+ * Supports Express Checkout (Apple Pay, Google Pay, etc.) with optional predefined shipping rates.
+ * 
+ * Usage Examples:
+ * 
+ * 1. Basic usage with dynamic shipping calculation:
+ * <ExpressCheckoutComponent mode="checkout" />
+ * 
+ * 2. With predefined shipping rates:
+ * <ExpressCheckoutComponent 
+ *   mode="checkout"
+ *   shippingRates={[
+ *     { id: "standard", displayName: "Standard Shipping", amount: 599 }, // $5.99
+ *     { id: "express", displayName: "Express Shipping", amount: 1299 }   // $12.99
+ *   ]}
+ * />
+ * 
+ * 3. With restricted shipping countries:
+ * <ExpressCheckoutComponent 
+ *   mode="mini-cart"
+ *   allowedShippingCountries={["US", "CA", "MX"]}
+ *   shippingRates={[
+ *     { id: "standard", displayName: "Standard Shipping", amount: 799 }
+ *   ]}
+ * />
+ */
+
+// Types for shipping rates (based on Stripe's Express Checkout Element options)
+interface ShippingRate {
+  id: string;           // Unique identifier for the shipping rate
+  displayName: string;  // Human-readable name (e.g., "Standard Shipping", "Next Day Air")
+  amount: number;       // Amount in cents (e.g., 599 for $5.99)
+}
+
 // Types for the express checkout events
 interface ExpressCheckoutEvent {
   billingDetails?: {
@@ -80,6 +116,8 @@ interface ExpressCheckoutComponentProps {
   onSuccess?: (order: CompletedOrder) => void;
   onError?: (error: string) => void;
   onClose?: () => void; // For mini-cart to close the modal
+  allowedShippingCountries?: string[]; // Array of allowed shipping country codes (e.g., ["US"])
+  shippingRates?: ShippingRate[]; // Array of predefined shipping rates for Express Checkout Element (optional - can be calculated dynamically)
   options?: {
     buttonType?: {
       applePay?: 'buy' | 'check-out' | 'donate' | 'plain';
@@ -97,6 +135,8 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
   onSuccess,
   onError,
   onClose,
+  allowedShippingCountries = ['US'], // Default to US only
+  shippingRates, // Optional array of predefined shipping rates - if not provided, rates will be calculated dynamically via onShippingAddressChange
   options = {
     buttonType: {
       applePay: 'buy',
@@ -295,6 +335,13 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
       const missingFields = [];
       if (!shippingAddress.country) missingFields.push('country');
       
+      // Validate that the country is in the allowed shipping countries list
+      if (shippingAddress.country && !allowedShippingCountries.includes(shippingAddress.country)) {
+        console.log(`⚠️ Shipping to ${shippingAddress.country} is not allowed. Allowed countries: ${allowedShippingCountries.join(', ')}`);
+        event.reject();
+        return;
+      }
+      
       // For US addresses, postal code is required by Stripe Tax API
       if (shippingAddress.country === 'US' && !shippingAddress.postal_code) {
         missingFields.push('postal_code');
@@ -432,7 +479,10 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
       <ExpressCheckoutElement 
         onConfirm={handleExpressCheckout}
         onShippingAddressChange={handleShippingAddressChange}
-        options={options}
+        options={{
+          ...options,
+          ...(shippingRates && { shippingRates })
+        }}
       />
     </div>
   );
