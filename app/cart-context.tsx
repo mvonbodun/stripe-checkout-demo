@@ -1,6 +1,27 @@
 'use client';
 import React, { createContext, useContext, useReducer, ReactNode, useEffect, useState } from 'react';
 
+// Address type enum for billing or shipping
+export enum AddressType {
+  BILLING = 'billing',
+  SHIPPING = 'shipping'
+}
+
+// Address type that matches Stripe AddressElement structure
+export type Address = {
+  addressType: AddressType;
+  name?: string;
+  address: {
+    line1?: string;
+    line2?: string | null;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+  };
+  phone?: string;
+};
+
 export type CartItem = {
   id: string;
   product_id: number;
@@ -28,6 +49,7 @@ export type Cart = {
   payment_intent?: string | null;
   shipping_method_id?: string | null;
   shipping_method_name?: string | null;
+  shipping_address?: Address | null;
 };
 
 type CartState = Cart;
@@ -43,6 +65,7 @@ type CartAction =
   | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: number; shipping_tax_total: number }
   | { type: 'UPDATE_PAYMENT_INTENT'; payment_intent: string | null }
   | { type: 'UPDATE_SHIPPING_METHOD'; shipping_method_id: string; shipping_method_name: string; shipping_method_cost: number }
+  | { type: 'UPDATE_SHIPPING_ADDRESS'; shipping_address: Address | null }
   | { type: 'LOAD_FROM_STORAGE'; cart: CartState };
 
 const initialCart: CartState = {
@@ -56,6 +79,7 @@ const initialCart: CartState = {
   payment_intent: null,
   shipping_method_id: null,
   shipping_method_name: null,
+  shipping_address: null,
 };
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -229,7 +253,15 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         payment_intent: null,
         shipping_method_id: null,
         shipping_method_name: null,
+        shipping_address: null,
       };
+    case 'UPDATE_SHIPPING_ADDRESS': {
+      // Update the shipping_address field
+      return {
+        ...state,
+        shipping_address: action.shipping_address,
+      };
+    }
     default:
       return state;
   }
