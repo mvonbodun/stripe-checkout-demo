@@ -4,6 +4,8 @@ import React from 'react';
 import { ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart, type CartItem, type Address, AddressType } from '../cart-context';
 import { useRouter } from 'next/navigation';
+import { buildTaxCalculationPayload, calculateTax, updateCartTaxTotals } from '../utils/taxCalculation';
+import type { ShippingMethod } from '../api/shipping-methods/route';
 
 // Types for the express checkout events
 interface ExpressCheckoutEvent {
@@ -257,10 +259,179 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
     }
   };
 
+  // Handler for shipping address changes
+  const handleShippingAddressChange = async (event: {
+    name: string;
+    address: {
+      line1?: string;
+      line2?: string | null;
+      city?: string;
+      state?: string;
+      postal_code?: string;
+      country?: string;
+    };
+    resolve: (resolveDetails?: {
+      lineItems?: Array<{ name: string; amount: number; }>;
+      shippingRates?: Array<{ id: string; amount: number; displayName: string; }>;
+    }) => void;
+    reject: () => void;
+  }) => {
+    console.log('🏠 Express Checkout shipping address changed:', event);
+    console.log('📍 Detailed address data:', JSON.stringify(event.address, null, 2));
+    
+    try {
+      // Extract shipping address from event
+      const shippingAddress = event.address;
+      
+      // Validate required address fields before proceeding
+      if (!shippingAddress) {
+        console.log('⚠️ No shipping address provided, skipping processing');
+        event.reject();
+        return;
+      }
+      
+      // Check for required fields for tax calculation
+      // Note: line1 may be anonymized/missing per Stripe's privacy features
+      const missingFields = [];
+      if (!shippingAddress.country) missingFields.push('country');
+      
+      // For US addresses, postal code is required by Stripe Tax API
+      if (shippingAddress.country === 'US' && !shippingAddress.postal_code) {
+        missingFields.push('postal_code');
+      }
+      
+      if (missingFields.length > 0) {
+        console.log(`⚠️ Incomplete shipping address, missing required fields: ${missingFields.join(', ')}. Skipping processing.`);
+        console.log('📍 Received address:', shippingAddress);
+        event.reject();
+        return;
+      }
+      
+      console.log('✅ Address validation passed for tax calculation (line1 not required for anonymized addresses)');
+
+      // Update cart context with shipping address
+      const addressObj: Address = {
+        addressType: AddressType.SHIPPING,
+        name: event.name || 'Express Pay User',
+        address: {
+          line1: shippingAddress.line1,
+          line2: shippingAddress.line2,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          postal_code: shippingAddress.postal_code,
+          country: shippingAddress.country,
+        },
+      };
+      
+      console.log("💾 Updating cart with new shipping address:", addressObj);
+      dispatch({ type: 'UPDATE_SHIPPING_ADDRESS', shipping_address: addressObj });
+
+      // Fetch shipping methods
+      console.log('🚚 Fetching shipping methods for express checkout...');
+      const shippingResponse = await fetch('/api/shipping-methods', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cart,
+          shippingAddress: shippingAddress
+        })
+      });
+
+      if (!shippingResponse.ok) {
+        throw new Error('Failed to fetch shipping methods');
+      }
+
+      const shippingData = await shippingResponse.json();
+      console.log('📦 Shipping methods received:', shippingData);
+
+      // Auto-select cheapest shipping method
+      if (shippingData.shippingMethods && shippingData.shippingMethods.length > 0) {
+        const cheapestMethod = shippingData.shippingMethods.reduce((min: ShippingMethod, method: ShippingMethod) => 
+          method.shipping_method_cost < min.shipping_method_cost ? method : min
+        );
+        
+        console.log('💰 Auto-selecting cheapest shipping method:', cheapestMethod);
+        
+        // Update cart with shipping method
+        dispatch({
+          type: 'UPDATE_SHIPPING_METHOD',
+          shipping_method_id: cheapestMethod.shipping_method_id,
+          shipping_method_name: cheapestMethod.shipping_method_name,
+          shipping_method_cost: cheapestMethod.shipping_method_cost
+        });
+
+        // Calculate tax with new shipping
+        // Note: We manually construct the updated cart data since React state updates are asynchronous
+        console.log('🧮 Calculating tax with shipping cost...');
+        const updatedCart = {
+          ...cart,
+          shipping_method_id: cheapestMethod.shipping_method_id,
+          shipping_method_name: cheapestMethod.shipping_method_name,
+          shipping_method_cost: cheapestMethod.shipping_method_cost
+        };
+        
+        const taxPayload = buildTaxCalculationPayload({
+          shippingAddress: shippingAddress,
+          cart: updatedCart,
+          shippingCost: cheapestMethod.shipping_method_cost
+        });
+
+        const taxResponse = await calculateTax(taxPayload);
+        console.log('💰 Tax calculation response:', taxResponse);
+
+        // Update cart tax totals
+        updateCartTaxTotals(taxResponse, updatedCart, dispatch);
+
+        // Resolve the event with updated totals for Stripe
+        // The Express Checkout Element expects lineItems and shippingRates
+        const lineItems = cart.line_items.map(item => ({
+          name: `${item.name} x${item.quantity}`,
+          amount: Math.round((item.price * item.quantity + (item.line_tax_total || 0) + (item.line_shipping_total || 0) + (item.line_shipping_tax_total || 0)) * 100)
+        }));
+
+        const shippingRates = [{
+          id: cheapestMethod.shipping_method_id,
+          displayName: cheapestMethod.shipping_method_name,
+          amount: Math.round(cheapestMethod.shipping_method_cost * 100)
+        }];
+
+        console.log('✅ Resolving Express Checkout with new totals:', { 
+          lineItems: lineItems.length,
+          shippingRates: shippingRates.length
+        });
+
+        // Resolve the address change event with updated pricing
+        event.resolve({
+          lineItems,
+          shippingRates
+        });
+      }
+
+    } catch (error) {
+      console.error('❌ Error processing shipping address change:', error);
+      
+      // Log additional details for debugging
+      if (error instanceof Error) {
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error stack:', error.stack);
+        
+        // Check if this is a tax calculation error
+        if (error.message.includes('HTTP 400')) {
+          console.error('❌ Tax calculation failed due to invalid address data');
+          console.error('📍 Address that caused the error:', JSON.stringify(event.address, null, 2));
+        }
+      }
+      
+      // Reject the address change if there's an error
+      event.reject();
+    }
+  };
+
   return (
     <div className="mt-4">
       <ExpressCheckoutElement 
         onConfirm={handleExpressCheckout}
+        onShippingAddressChange={handleShippingAddressChange}
         options={options}
       />
     </div>

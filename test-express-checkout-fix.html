@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Checkout Shipping Address Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .console-log {
+            background: #f5f5f5;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a87;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .warning {
+            color: orange;
+        }
+    </style>
+</head>
+<body>
+    <h1>Express Checkout Shipping Address Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Overview</h2>
+        <p>This test verifies that the Express Checkout shipping address change no longer causes a 400 error when calling the tax calculation API.</p>
+        
+        <h3>Steps to Test:</h3>
+        <ol>
+            <li>Click "Add Test Items to Cart" to populate the cart</li>
+            <li>Go to the checkout page</li>
+            <li>Try to use Express Checkout (Apple Pay/Google Pay)</li>
+            <li>Change the shipping address during the Express Checkout flow</li>
+            <li>Monitor the console for any 400 errors</li>
+        </ol>
+        
+        <button onclick="addTestItems()">Add Test Items to Cart</button>
+        <button onclick="goToCheckout()">Go to Checkout</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console" class="console-log">Console output will appear here...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results">
+            <p>No tests run yet.</p>
+        </div>
+    </div>
+
+    <script>
+        // Override console.log to display in the page
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function logToPage(message, type = 'log') {
+            const consoleElement = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'warn' ? 'warning' : '';
+            consoleElement.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToPage(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToPage(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logToPage(args.join(' '), 'warn');
+        };
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = 'Console cleared...\n';
+        }
+
+        async function addTestItems() {
+            console.log('🧪 Adding test items to cart...');
+            
+            try {
+                // Add some test items to the cart
+                const testItems = [
+                    {
+                        id: 'test-1',
+                        name: 'Test Product 1',
+                        price: 29.99,
+                        quantity: 2,
+                        image: '/test-image.jpg',
+                        taxcode: 'txcd_99999999'
+                    },
+                    {
+                        id: 'test-2', 
+                        name: 'Test Product 2',
+                        price: 15.00,
+                        quantity: 1,
+                        image: '/test-image.jpg',
+                        taxcode: 'txcd_99999999'
+                    }
+                ];
+
+                // Store items in localStorage (simulating cart context)
+                localStorage.setItem('test-cart-items', JSON.stringify(testItems));
+                
+                console.log('✅ Test items added to cart:', testItems);
+                
+                // Navigate to the main page to add items properly
+                window.location.href = '/';
+                
+            } catch (error) {
+                console.error('❌ Error adding test items:', error);
+            }
+        }
+
+        function goToCheckout() {
+            console.log('🚀 Navigating to checkout page...');
+            window.location.href = '/checkout';
+        }
+
+        // Monitor for fetch requests to the tax calculation API
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            const url = args[0];
+            const options = args[1];
+            
+            if (typeof url === 'string' && url.includes('/api/calculate-tax')) {
+                console.log('🧮 Tax calculation API call detected:', {
+                    url,
+                    method: options?.method,
+                    body: options?.body ? JSON.parse(options.body) : null
+                });
+                
+                return originalFetch.apply(this, args)
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error(`❌ Tax calculation failed with status ${response.status}`);
+                            return response.text().then(text => {
+                                console.error('❌ Error response:', text);
+                                throw new Error(`HTTP ${response.status}: ${text}`);
+                            });
+                        } else {
+                            console.log('✅ Tax calculation successful');
+                            return response.json().then(data => {
+                                console.log('💰 Tax calculation response:', data);
+                                return new Response(JSON.stringify(data), {
+                                    status: response.status,
+                                    statusText: response.statusText,
+                                    headers: response.headers
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Tax calculation error:', error);
+                        throw error;
+                    });
+            }
+            
+            return originalFetch.apply(this, args);
+        };
+
+        console.log('🧪 Express Checkout Fix Test page loaded');
+        console.log('📝 Instructions:');
+        console.log('1. Add test items to cart');
+        console.log('2. Go to checkout page');
+        console.log('3. Test Express Checkout shipping address change');
+        console.log('4. Monitor console for 400 errors');
+    </script>
+</body>
+</html>

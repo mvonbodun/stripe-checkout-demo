@@ -19,9 +19,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Country is required' }, { status: 400 });
     }
     
-    if (!line1) {
-      return NextResponse.json({ error: 'Address line 1 is required' }, { status: 400 });
-    }
+    // Note: line1 is not required for Express Checkout anonymized addresses
+    // Stripe may anonymize addresses for privacy, removing line1 during shipping address change events
     
     // For US addresses, postal code is required by Stripe Tax API
     if (country === 'US' && !postal_code) {
@@ -46,14 +45,16 @@ export async function POST(req: Request) {
     }));
 
     // Prepare shipping address for Stripe Tax API
+    // Note: line1 may be missing from Express Checkout anonymized addresses
     const shipping_address_obj = {
-      city,
-      country,
-      line1,
-      line2,
-      postal_code,
-      state,
+      country, // Required field
+      city: city || undefined,
+      line1: line1 || undefined,
+      line2: line2 || undefined,
+      postal_code: postal_code || undefined,
+      state: state || undefined,
     };
+    
     console.log("✅ Validated shipping address:", JSON.stringify(shipping_address_obj));
 
     const taxRequest = {

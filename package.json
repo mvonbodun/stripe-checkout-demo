@@ -15,6 +15,7 @@
     "@tailwindcss/postcss": "^4.1.7",
     "daisyui": "^5.0.35",
     "next": "15.3.2",
+    "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "stripe": "^18.1.0",
