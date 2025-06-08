@@ -4,7 +4,8 @@ import { useCart } from '../cart-context';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import ExpressCheckoutComponent from './ExpressCheckoutComponent';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -209,7 +210,25 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
               {/* Express Checkout Section */}
               {clientSecret && !isCreatingPaymentIntent ? (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
-                  <ExpressCheckout onClose={onClose} />
+                  <div className="mt-4">
+                    <div className="text-sm mb-2 text-gray-400 text-center">Express Checkout</div>
+                    <ExpressCheckoutComponent
+                      mode="mini-cart"
+                      onClose={onClose}
+                      onError={(error) => {
+                        console.error('Mini-cart express checkout error:', error);
+                        alert(error);
+                      }}
+                    />
+                    <div className="flex items-center my-4">
+                      <hr className="flex-grow border-t border-gray-300" />
+                      <span className="mx-4 text-sm text-gray-400">OR</span>
+                      <hr className="flex-grow border-t border-gray-300" />
+                    </div>
+                    <div className="text-sm text-gray-500 text-center">
+                      Use the checkout page for more payment options
+                    </div>
+                  </div>
                 </Elements>
               ) : (
                 /* Loading skeleton that matches ExpressCheckout button height */
@@ -226,108 +245,6 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
           )}
         </div>
       </aside>
-    </div>
-  );
-};
-
-// Express Checkout Component  
-const ExpressCheckout: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const router = useRouter();
-  const { state: cart, dispatch } = useCart();
-
-  const handleExpressCheckout = async (event: {
-    billingDetails?: {
-      name?: string;
-      email?: string;
-      address?: {
-        city?: string;
-        country?: string;
-        line1?: string;
-        line2?: string | null;
-        postal_code?: string;
-        state?: string;
-      };
-    };
-  }) => {
-    if (!stripe || !elements) {
-      console.error('Stripe has not loaded yet');
-      return;
-    }
-
-    try {
-      // Confirm the payment using the express checkout event
-      const result = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          payment_method_data: {
-            billing_details: {
-              name: event.billingDetails?.name,
-              email: event.billingDetails?.email,
-              address: event.billingDetails?.address,
-            },
-          },
-        },
-        redirect: 'if_required',
-      });
-
-      if (result.error) {
-        console.error('Express checkout error:', result.error);
-        alert(`Payment failed: ${result.error.message}`);
-      } else if (result.paymentIntent && (result.paymentIntent.status === 'succeeded' || result.paymentIntent.status === 'requires_capture')) {
-        console.log('Express checkout payment succeeded. Payment status:', result.paymentIntent.status);
-        
-        // Store completed order data before clearing cart (same as checkout page)
-        const completedOrder = {
-          id: result.paymentIntent.id,
-          status: result.paymentIntent.status,
-          amount: result.paymentIntent.amount,
-          currency: result.paymentIntent.currency,
-          items: cart.line_items,
-          subtotal: cart.order_subtotal,
-          tax: cart.order_tax_total,
-          shipping: cart.order_shipping_total,
-          shipping_tax: cart.order_shipping_tax_total,
-          total: cart.order_grand_total,
-          timestamp: new Date().toISOString(),
-          email: event.billingDetails?.email || 'Express Pay User',
-          address: event.billingDetails?.address || null,
-          expressPaymentType: 'express', // Mark as express checkout
-          shipping_method_id: cart.shipping_method_id,
-          shipping_method_name: cart.shipping_method_name
-        };
-        
-        try {
-          localStorage.setItem('completed-order', JSON.stringify(completedOrder));
-        } catch (error) {
-          console.error('Error saving completed order:', error);
-        }
-        
-        dispatch({ type: 'CLEAR_CART' });
-        onClose();
-        router.push('/order-confirmation');
-      } else {
-        console.log('Express checkout requires further action');
-        alert('Payment processing requires further action.');
-      }
-    } catch (error) {
-      console.error('Express checkout processing error:', error);
-      alert('An error occurred during express checkout');
-    }
-  };
-
-  return (
-    <div className="mt-4">
-      <ExpressCheckoutElement 
-        onConfirm={handleExpressCheckout}
-        options={{
-          buttonType: {
-            applePay: 'buy',
-            googlePay: 'buy',
-          },
-        }}
-      />
     </div>
   );
 };

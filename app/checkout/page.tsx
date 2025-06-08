@@ -5,7 +5,8 @@ import React from 'react';
 import Image from 'next/image';
 import { useCart } from '../cart-context';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, AddressElement, useStripe, useElements, LinkAuthenticationElement, PaymentElement, ExpressCheckoutElement } from '@stripe/react-stripe-js';
+import { Elements, AddressElement, useStripe, useElements, LinkAuthenticationElement, PaymentElement } from '@stripe/react-stripe-js';
+import ExpressCheckoutComponent from '../components/ExpressCheckoutComponent';
 import type { PaymentRequest } from '@stripe/stripe-js';
 import { useRouter } from 'next/navigation';
 import ShippingMethods from '../components/ShippingMethods';
@@ -296,51 +297,18 @@ const CheckoutForm = React.memo(function CheckoutForm({
         {prbAvailable && paymentRequest && (
         <>
           <div className="text-sm mb-2 p-2 text-gray-400 text-center">Express Checkout</div>
-          <ExpressCheckoutElement onConfirm={async (event) => {
-            console.log('Express checkout confirmed:', event);
-            setProcessingPayment(true);
-            onProcessingStateChange?.(true);
-            
-            // Simulate the same flow as regular checkout
-            try {
-              // Store completed order data before clearing cart
-              const completedOrder = {
-                id: `express_${Date.now()}`, // Temporary ID for express checkout
-                status: 'succeeded',
-                amount: Math.round(cart.order_grand_total * 100),
-                currency: 'usd',
-                items: cart.line_items,
-                subtotal: cart.order_subtotal,
-                tax: cart.order_tax_total,
-                shipping: cart.order_shipping_total,
-                shipping_tax: cart.order_shipping_tax_total,
-                total: cart.order_grand_total,
-                timestamp: new Date().toISOString(),
-                email: event.expressPaymentType === 'apple_pay' ? 'Apple Pay User' : 'Express Pay User',
-                address: null,
-                expressPaymentType: event.expressPaymentType,
-                shipping_method_id: cart.shipping_method_id,
-                shipping_method_name: cart.shipping_method_name
-              };
-              
-              try {
-                localStorage.setItem('completed-order', JSON.stringify(completedOrder));
-              } catch (error) {
-                console.error('Error saving completed order:', error);
-              }
-              
-              // You would handle the express checkout confirmation here
-              // For now, we'll redirect to order confirmation after a brief delay
-              setTimeout(() => {
-                dispatch({ type: 'CLEAR_CART' });
-                router.push('/order-confirmation');
-              }, 2000);
-            } catch (error) {
+          <ExpressCheckoutComponent
+            mode="checkout"
+            onProcessingStateChange={(isProcessing) => {
+              setProcessingPayment(isProcessing);
+              onProcessingStateChange?.(isProcessing);
+            }}
+            onError={(error) => {
               console.error('Express checkout error:', error);
               setProcessingPayment(false);
               onProcessingStateChange?.(false);
-            }
-          }} />
+            }}
+          />
           <div className="flex items-center my-4">
             <hr className="flex-grow border-t border-gray-300" />
             <span className="mx-4 text-sm text-gray-400">OR</span>
