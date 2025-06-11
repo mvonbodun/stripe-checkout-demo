@@ -1,13 +1,9 @@
 'use client';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useCart } from '../cart-context';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
 import ExpressCheckoutComponent from './ExpressCheckoutComponent';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface MiniCartProps {
   open: boolean;
@@ -18,8 +14,6 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const { state, dispatch } = useCart();
   const router = useRouter();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isCreatingPaymentIntent, setIsCreatingPaymentIntent] = useState(false);
 
   // Trap focus and block scroll when open
   useEffect(() => {
@@ -32,42 +26,6 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
       document.body.style.overflow = '';
     };
   }, [open]);
-
-  // Create payment intent when mini-cart opens and has items
-  useEffect(() => {
-    if (open && state.line_items.length > 0 && !clientSecret && !isCreatingPaymentIntent) {
-      setIsCreatingPaymentIntent(true);
-      
-      const payload = {
-        amount: Math.round(state.order_grand_total * 100), // in cents
-        cart: state.line_items.map((item) => ({
-          id: String(item.product_id),
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-          taxcode: item.taxcode ?? '',
-          attributes: item.attributes ?? []
-        })),
-        tax_calculation_id: null
-      };
-
-      fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setClientSecret(data.clientSecret);
-          dispatch({ type: 'UPDATE_PAYMENT_INTENT', payment_intent: data.paymentIntentId });
-          setIsCreatingPaymentIntent(false);
-        })
-        .catch(err => {
-          console.error("Error creating payment intent for mini-cart:", err);
-          setIsCreatingPaymentIntent(false);
-        });
-    }
-  }, [open, state.line_items, state.order_grand_total, clientSecret, isCreatingPaymentIntent, dispatch]);
 
   // Close on overlay click
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -208,39 +166,25 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
               </button>
               
               {/* Express Checkout Section */}
-              {clientSecret && !isCreatingPaymentIntent ? (
-                <Elements stripe={stripePromise} options={{ clientSecret }}>
-                  <div className="mt-4">
-                    <div className="text-sm mb-2 text-gray-400 text-center">Express Checkout</div>
-                    <ExpressCheckoutComponent
-                      mode="mini-cart"
-                      onClose={onClose}
-                      onError={(error) => {
-                        console.error('Mini-cart express checkout error:', error);
-                        alert(error);
-                      }}
-                    />
-                    <div className="flex items-center my-4">
-                      <hr className="flex-grow border-t border-gray-300" />
-                      <span className="mx-4 text-sm text-gray-400">OR</span>
-                      <hr className="flex-grow border-t border-gray-300" />
-                    </div>
-                    <div className="text-sm text-gray-500 text-center">
-                      Use the checkout page for more payment options
-                    </div>
-                  </div>
-                </Elements>
-              ) : (
-                /* Loading skeleton that matches ExpressCheckout button height */
-                <div className="mt-4">
-                  <div className="h-[44px] bg-gray-100 rounded animate-pulse flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-gray-500 text-xs">
-                      <div className="w-3 h-3 border border-gray-400 border-t-gray-600 rounded-full animate-spin"></div>
-                      <span>Loading payment options...</span>
-                    </div>
-                  </div>
+              <div className="mt-4">
+                <div className="text-sm mb-2 text-gray-400 text-center">Express Checkout</div>
+                <ExpressCheckoutComponent
+                  mode="mini-cart"
+                  onClose={onClose}
+                  onError={(error) => {
+                    console.error('Mini-cart express checkout error:', error);
+                    alert(error);
+                  }}
+                />
+                <div className="flex items-center my-4">
+                  <hr className="flex-grow border-t border-gray-300" />
+                  <span className="mx-4 text-sm text-gray-400">OR</span>
+                  <hr className="flex-grow border-t border-gray-300" />
                 </div>
-              )}
+                <div className="text-sm text-gray-500 text-center">
+                  Use the checkout page for more payment options
+                </div>
+              </div>
             </>
           )}
         </div>

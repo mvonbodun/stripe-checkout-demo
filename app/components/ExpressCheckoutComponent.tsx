@@ -1,11 +1,14 @@
 'use client';
 
 import React from 'react';
-import { ExpressCheckoutElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { ExpressCheckoutElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { useCart, type CartItem, type Address, AddressType } from '../cart-context';
 import { useRouter } from 'next/navigation';
 import { buildTaxCalculationPayload, calculateTax, updateCartTaxTotals } from '../utils/taxCalculation';
 import type { ShippingMethod } from '../api/shipping-methods/route';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 /**
  * Express Checkout Component for Stripe
@@ -130,6 +133,50 @@ interface ExpressCheckoutComponentProps {
 }
 
 const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
+  mode,
+  onProcessingStateChange,
+  onSuccess,
+  onError,
+  onClose,
+  allowedShippingCountries = ['US'], // Default to US only
+  shippingRates, // Optional array of predefined shipping rates - if not provided, rates will be calculated dynamically via onShippingAddressChange
+  options = {
+    buttonType: {
+      applePay: 'buy',
+      googlePay: 'buy',
+    },
+    emailRequired: true,
+    phoneNumberRequired: true,
+    shippingAddressRequired: true,
+  }
+}) => {
+  const { state: cart } = useCart();
+
+  // Task #2: Set Elements options with mode: 'payment', currency: 'usd', amount from cart
+  const elementsOptions = {
+    mode: 'payment' as const,
+    currency: 'usd' as const,
+    amount: Math.round(cart.order_grand_total * 100), // Convert to cents
+  };
+
+  return (
+    <Elements stripe={stripePromise} options={elementsOptions}>
+      <ExpressCheckoutInner
+        mode={mode}
+        onProcessingStateChange={onProcessingStateChange}
+        onSuccess={onSuccess}
+        onError={onError}
+        onClose={onClose}
+        allowedShippingCountries={allowedShippingCountries}
+        shippingRates={shippingRates}
+        options={options}
+      />
+    </Elements>
+  );
+};
+
+// Inner component that uses Stripe hooks (must be inside Elements provider)
+const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
   mode,
   onProcessingStateChange,
   onSuccess,
