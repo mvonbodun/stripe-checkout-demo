@@ -157,6 +157,7 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
     mode: 'payment' as const,
     currency: 'usd' as const,
     amount: Math.round(cart.order_grand_total * 100), // Convert to cents
+    captureMethod: 'manual' as const, // Must match the PaymentIntent capture_method
   };
 
   return (
@@ -236,9 +237,30 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
       let completedOrder: CompletedOrder;
 
       if (mode === 'mini-cart') {
-        // Mini-cart mode: Use real Stripe payment confirmation
+        // Mini-cart mode: Create PaymentIntent and confirm payment
+        console.log('Creating PaymentIntent for Express Checkout...');
+        
+        // Create PaymentIntent on the server
+        const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: Math.round(cart.order_grand_total * 100), // Convert to cents
+            cart: cart.line_items,
+          }),
+        });
+
+        if (!paymentIntentResponse.ok) {
+          throw new Error('Failed to create PaymentIntent');
+        }
+
+        const { clientSecret } = await paymentIntentResponse.json();
+        console.log('PaymentIntent created, confirming payment...');
+
+        // Confirm payment using the client secret
         const result = await stripe.confirmPayment({
           elements,
+          clientSecret,
           confirmParams: {
             payment_method_data: {
               billing_details: {
@@ -248,6 +270,7 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
                 address: event.billingDetails?.address,
               },
             },
+            return_url: `${window.location.origin}/order-confirmation`,
           },
           redirect: 'if_required',
         });
@@ -280,7 +303,7 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
             phone: event.billingDetails?.phone,
             address: event.billingDetails?.address || null,
             shippingAddress: event.shippingAddress || null,
-            expressPaymentType: 'express',
+            expressPaymentType: event.expressPaymentType || 'express',
             shipping_method_id: cart.shipping_method_id,
             shipping_method_name: cart.shipping_method_name
           };
