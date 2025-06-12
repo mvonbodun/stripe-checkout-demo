@@ -236,91 +236,61 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
     try {
       let completedOrder: CompletedOrder;
 
-      if (mode === 'mini-cart') {
-        // Mini-cart mode: Create PaymentIntent and confirm payment
-        console.log('Creating PaymentIntent for Express Checkout...');
-        
-        // Create PaymentIntent on the server
-        const paymentIntentResponse = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: Math.round(cart.order_grand_total * 100), // Convert to cents
-            cart: cart.line_items,
-          }),
-        });
+      // Create PaymentIntent and confirm payment (same logic for both mini-cart and checkout modes)
+      console.log('Creating PaymentIntent for Express Checkout...');
+      
+      // Create PaymentIntent on the server
+      const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: Math.round(cart.order_grand_total * 100), // Convert to cents
+          cart: cart.line_items,
+        }),
+      });
 
-        if (!paymentIntentResponse.ok) {
-          throw new Error('Failed to create PaymentIntent');
-        }
+      if (!paymentIntentResponse.ok) {
+        throw new Error('Failed to create PaymentIntent');
+      }
 
-        const { clientSecret } = await paymentIntentResponse.json();
-        console.log('PaymentIntent created, confirming payment...');
+      const { clientSecret } = await paymentIntentResponse.json();
+      console.log('PaymentIntent created, confirming payment...');
 
-        // Confirm payment using the client secret
-        const result = await stripe.confirmPayment({
-          elements,
-          clientSecret,
-          confirmParams: {
-            payment_method_data: {
-              billing_details: {
-                name: event.billingDetails?.name,
-                email: event.billingDetails?.email,
-                phone: event.billingDetails?.phone,
-                address: event.billingDetails?.address,
-              },
+      // Confirm payment using the client secret
+      const result = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          payment_method_data: {
+            billing_details: {
+              name: event.billingDetails?.name,
+              email: event.billingDetails?.email,
+              phone: event.billingDetails?.phone,
+              address: event.billingDetails?.address,
             },
-            return_url: `${window.location.origin}/order-confirmation`,
           },
-          redirect: 'if_required',
-        });
+          return_url: `${window.location.origin}/order-confirmation`,
+        },
+        redirect: 'if_required',
+      });
 
-        if (result.error) {
-          console.error('Express checkout error:', result.error);
-          const errorMsg = `Payment failed: ${result.error.message}`;
-          onError?.(errorMsg);
-          onProcessingStateChange?.(false);
-          return;
-        }
+      if (result.error) {
+        console.error('Express checkout error:', result.error);
+        const errorMsg = `Payment failed: ${result.error.message}`;
+        onError?.(errorMsg);
+        onProcessingStateChange?.(false);
+        return;
+      }
 
-        if (result.paymentIntent && (result.paymentIntent.status === 'succeeded' || result.paymentIntent.status === 'requires_capture')) {
-          console.log('Express checkout payment succeeded. Payment status:', result.paymentIntent.status);
-          
-          // Create order data from successful payment
-          completedOrder = {
-            id: result.paymentIntent.id,
-            status: result.paymentIntent.status,
-            amount: result.paymentIntent.amount,
-            currency: result.paymentIntent.currency,
-            items: cart.line_items,
-            subtotal: cart.order_subtotal,
-            tax: cart.order_tax_total,
-            shipping: cart.order_shipping_total,
-            shipping_tax: cart.order_shipping_tax_total,
-            total: cart.order_grand_total,
-            timestamp: new Date().toISOString(),
-            email: event.billingDetails?.email || 'Express Pay User',
-            phone: event.billingDetails?.phone,
-            address: event.billingDetails?.address || null,
-            shippingAddress: event.shippingAddress || null,
-            expressPaymentType: event.expressPaymentType || 'express',
-            shipping_method_id: cart.shipping_method_id,
-            shipping_method_name: cart.shipping_method_name
-          };
-        } else {
-          console.log('Express checkout requires further action');
-          const errorMsg = 'Payment processing requires further action.';
-          onError?.(errorMsg);
-          onProcessingStateChange?.(false);
-          return;
-        }
-      } else {
-        // Checkout mode: Simulate express checkout (as in original implementation)
+      if (result.paymentIntent && (result.paymentIntent.status === 'succeeded' || result.paymentIntent.status === 'requires_capture')) {
+        console.log('Express checkout payment succeeded. Payment status:', result.paymentIntent.status);
+        
+        // Create order data from successful payment
         completedOrder = {
-          id: `express_${Date.now()}`, // Temporary ID for express checkout
-          status: 'succeeded',
-          amount: Math.round(cart.order_grand_total * 100),
-          currency: 'usd',
+          id: result.paymentIntent.id,
+          status: result.paymentIntent.status,
+          amount: result.paymentIntent.amount,
+          currency: result.paymentIntent.currency,
           items: cart.line_items,
           subtotal: cart.order_subtotal,
           tax: cart.order_tax_total,
@@ -328,14 +298,20 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
           shipping_tax: cart.order_shipping_tax_total,
           total: cart.order_grand_total,
           timestamp: new Date().toISOString(),
-          email: event.billingDetails?.email || (event.expressPaymentType === 'apple_pay' ? 'Apple Pay User' : 'Express Pay User'),
+          email: event.billingDetails?.email || 'Express Pay User',
           phone: event.billingDetails?.phone,
           address: event.billingDetails?.address || null,
           shippingAddress: event.shippingAddress || null,
-          expressPaymentType: event.expressPaymentType,
+          expressPaymentType: event.expressPaymentType || 'express',
           shipping_method_id: cart.shipping_method_id,
           shipping_method_name: cart.shipping_method_name
         };
+      } else {
+        console.log('Express checkout requires further action');
+        const errorMsg = 'Payment processing requires further action.';
+        onError?.(errorMsg);
+        onProcessingStateChange?.(false);
+        return;
       }
 
       // Store completed order data
@@ -351,15 +327,13 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
       // Clear cart and handle navigation
       dispatch({ type: 'CLEAR_CART' });
       
+      // Close mini-cart modal if in mini-cart mode
       if (mode === 'mini-cart') {
-        onClose?.(); // Close mini-cart modal
-        router.push('/order-confirmation');
-      } else {
-        // Checkout mode: redirect after delay (as in original implementation)
-        setTimeout(() => {
-          router.push('/order-confirmation');
-        }, 2000);
+        onClose?.();
       }
+      
+      // Navigate to order confirmation (same for both modes)
+      router.push('/order-confirmation');
 
     } catch (error) {
       console.error('Express checkout processing error:', error);
