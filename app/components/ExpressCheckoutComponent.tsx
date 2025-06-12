@@ -528,7 +528,7 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
         onShippingAddressChange={handleShippingAddressChange}
         options={{
           ...options,
-          ...(shippingRates && { shippingRates })
+          shippingRates: shippingRates || []
         }}
       />
     </div>
