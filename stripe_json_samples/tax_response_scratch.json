@@ -1,31 +1,215 @@
 {
+  "id": "taxcalc_1RZ2ZhRlgFrbOsNHZUUVhqbV",
+  "object": "tax.calculation",
+  "amount_total": 5954,
   "currency": "usd",
-  "line_items": [
-    {
-      "amount": 10000,
-      "reference": "f44232d7-7bc3-4fa5-a565-6a626f1b226b",
-      "quantity": 4,
-      "tax_code": "txcd_99999999",
-      "tax_behavior": "exclusive"
-    },
-    {
-      "amount": 18000,
-      "reference": "1d8f0e6a-678a-4904-a77c-090367645e9a",
-      "quantity": 3,
-      "tax_code": "txcd_99999999",
-      "tax_behavior": "exclusive"
-    }
-  ],
-  "shipping_cost": { "amount": 0 },
+  "customer": null,
   "customer_details": {
     "address": {
       "city": "Spring",
       "country": "US",
-      "line1": "67 Heritage Hill Circle",
+      "line1": null,
       "line2": null,
       "postal_code": "77381",
       "state": "TX"
     },
-    "address_source": "shipping"
-  }
+    "address_source": "shipping",
+    "ip_address": null,
+    "tax_ids": [],
+    "taxability_override": "none"
+  },
+  "expires_at": 1757477833,
+  "line_items": {
+    "object": "list",
+    "data": [
+      {
+        "id": "tax_li_SU0aERgxQdrmDn",
+        "object": "tax.calculation_line_item",
+        "amount": 1500,
+        "amount_tax": 124,
+        "livemode": false,
+        "metadata": {},
+        "product": null,
+        "quantity": 1,
+        "reference": "5b6ac25c-dce9-46e5-bd95-ea7e145d8c57",
+        "tax_behavior": "exclusive",
+        "tax_breakdown": [
+          {
+            "amount": 94,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "Texas",
+              "level": "state",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": {
+              "display_name": "Sales Tax",
+              "percentage_decimal": "6.25",
+              "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 1500
+          },
+          {
+            "amount": 0,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "Montgomery",
+              "level": "county",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": null,
+            "taxability_reason": "not_subject_to_tax",
+            "taxable_amount": 0
+          },
+          {
+            "amount": 15,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "The Woodlands Township",
+              "level": "district",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": {
+              "display_name": "Sales Tax",
+              "percentage_decimal": "1.0",
+              "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 1500
+          },
+          {
+            "amount": 15,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "The Woodlands Township Economical Development Zone",
+              "level": "district",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": {
+              "display_name": "Sales Tax",
+              "percentage_decimal": "1.0",
+              "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 1500
+          }
+        ],
+        "tax_code": "txcd_99999999"
+      },
+      {
+        "id": "tax_li_SU0asdNwfOvirx",
+        "object": "tax.calculation_line_item",
+        "amount": 4000,
+        "amount_tax": 330,
+        "livemode": false,
+        "metadata": {},
+        "product": null,
+        "quantity": 1,
+        "reference": "02c2e415-421c-4f51-a72e-9f5a1db8a3ad",
+        "tax_behavior": "exclusive",
+        "tax_breakdown": [
+          {
+            "amount": 250,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "Texas",
+              "level": "state",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": {
+              "display_name": "Sales Tax",
+              "percentage_decimal": "6.25",
+              "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 4000
+          },
+          {
+            "amount": 0,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "Montgomery",
+              "level": "county",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": null,
+            "taxability_reason": "not_subject_to_tax",
+            "taxable_amount": 0
+          },
+          {
+            "amount": 40,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "The Woodlands Township",
+              "level": "district",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": {
+              "display_name": "Sales Tax",
+              "percentage_decimal": "1.0",
+              "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 4000
+          },
+          {
+            "amount": 40,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "The Woodlands Township Economical Development Zone",
+              "level": "district",
+              "state": "TX"
+            },
+            "sourcing": "origin",
+            "tax_rate_details": {
+              "display_name": "Sales Tax",
+              "percentage_decimal": "1.0",
+              "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 4000
+          }
+        ],
+        "tax_code": "txcd_99999999"
+      }
+    ],
+    "has_more": false,
+    "total_count": 2,
+    "url": "/v1/tax/calculations/taxcalc_1RZ2ZhRlgFrbOsNHZUUVhqbV/line_items"
+  },
+  "livemode": false,
+  "ship_from_details": null,
+  "shipping_cost": {
+    "amount": 0,
+    "amount_tax": 0,
+    "tax_behavior": "exclusive",
+    "tax_code": "txcd_92010001"
+  },
+  "tax_amount_exclusive": 454,
+  "tax_amount_inclusive": 0,
+  "tax_breakdown": [
+    {
+      "amount": 454,
+      "inclusive": false,
+      "tax_rate_details": {
+        "country": "US",
+        "flat_amount": null,
+        "percentage_decimal": "8.25",
+        "rate_type": "percentage",
+        "state": "TX",
+        "tax_type": "sales_tax"
+      },
+      "taxability_reason": "standard_rated",
+      "taxable_amount": 5500
+    }
+  ],
+  "tax_date": 1749701833
 }

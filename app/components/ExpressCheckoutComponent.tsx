@@ -521,15 +521,19 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
           amount: Math.round(item.line_subtotal * 100) // ONLY product cost (price * quantity)
         }));
 
-        const shippingRates = [{
-          id: cheapestMethod.shipping_method_id,
-          displayName: cheapestMethod.shipping_method_name,
-          amount: Math.round(cheapestMethod.shipping_method_cost * 100)
-        }];
+        // Include ALL shipping methods, sorted from cheapest to most expensive
+        const shippingRates = shippingData.shippingMethods
+          .sort((a: ShippingMethod, b: ShippingMethod) => a.shipping_method_cost - b.shipping_method_cost)
+          .map((method: ShippingMethod) => ({
+            id: method.shipping_method_id,
+            displayName: method.shipping_method_name,
+            amount: Math.round(method.shipping_method_cost * 100)
+          }));
 
         console.log('✅ Resolving Express Checkout with new totals:', { 
           lineItems: lineItems.length,
-          shippingRates: shippingRates.length
+          shippingRates: shippingRates.length,
+          availableShippingOptions: shippingRates.map((rate: { displayName: string; amount: number }) => `${rate.displayName}: $${rate.amount/100}`)
         });
 
         // Resolve the address change event with updated pricing
