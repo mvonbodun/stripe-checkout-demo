@@ -176,14 +176,6 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
                     alert(error);
                   }}
                 />
-                <div className="flex items-center my-4">
-                  <hr className="flex-grow border-t border-gray-300" />
-                  <span className="mx-4 text-sm text-gray-400">OR</span>
-                  <hr className="flex-grow border-t border-gray-300" />
-                </div>
-                <div className="text-sm text-gray-500 text-center">
-                  Use the checkout page for more payment options
-                </div>
               </div>
             </>
           )}
