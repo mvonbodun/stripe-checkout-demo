@@ -504,22 +504,25 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
           grandTotal: newGrandTotal
         });
 
-        // Update Elements with the new amount to fix the timing issue
-        if (elements) {
-          await elements.update({
-            amount: Math.round(newGrandTotal * 100) // Convert to cents
-          });
-          console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
-        }
-
         // Resolve the event with updated totals for Stripe
         // The Express Checkout Element expects lineItems and shippingRates
-        // IMPORTANT: lineItems should ONLY contain product costs (no tax, no shipping)
-        // Tax and shipping are handled separately by the Elements amount
-        const lineItems = cart.line_items.map(item => ({
-          name: `${item.name} x${item.quantity}`,
-          amount: Math.round(item.line_subtotal * 100) // ONLY product cost (price * quantity)
-        }));
+        const lineItems = [
+          // Product line items
+          ...cart.line_items.map(item => ({
+            name: `${item.name} x${item.quantity}`,
+            amount: Math.round(item.line_subtotal * 100) // Product cost (price * quantity)
+          })),
+          // Shipping line item
+          {
+            name: 'Shipping',
+            amount: Math.round(updatedCart.order_shipping_total * 100) // Convert to cents
+          },
+          // Tax line item (sum of order tax + shipping tax)
+          {
+            name: 'Tax',
+            amount: Math.round((newTaxTotal + newShippingTaxTotal) * 100) // Convert to cents
+          }
+        ];
 
         // Include ALL shipping methods, sorted from cheapest to most expensive
         const shippingRates = shippingData.shippingMethods
@@ -541,6 +544,15 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
           lineItems,
           shippingRates
         });
+
+        // Update Elements with the new amount to fix the timing issue
+        if (elements) {
+          await elements.update({
+            amount: Math.round(newGrandTotal * 100) // Convert to cents
+          });
+          console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
+        }
+
       }
 
     } catch (error) {
@@ -671,12 +683,23 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
 
       // Resolve the event with updated totals for Stripe
       // The Express Checkout Element expects lineItems and shippingRates
-      // IMPORTANT: lineItems should ONLY contain product costs (no tax, no shipping)
-      // Tax and shipping are handled separately by the Elements amount
-      const lineItems = cart.line_items.map(item => ({
-        name: `${item.name} x${item.quantity}`,
-        amount: Math.round(item.line_subtotal * 100) // ONLY product cost (price * quantity)
-      }));
+      const lineItems = [
+        // Product line items
+        ...cart.line_items.map(item => ({
+          name: `${item.name} x${item.quantity}`,
+          amount: Math.round(item.line_subtotal * 100) // Product cost (price * quantity)
+        })),
+        // Shipping line item
+        {
+          name: 'Shipping',
+          amount: Math.round(updatedCart.order_shipping_total * 100) // Convert to cents
+        },
+        // Tax line item (sum of order tax + shipping tax)
+        {
+          name: 'Tax',
+          amount: Math.round((newTaxTotal + newShippingTaxTotal) * 100) // Convert to cents
+        }
+      ];
 
       // For shipping rate change, we need to provide the available shipping rates
       // In most cases, this would be the same rates that were originally provided
