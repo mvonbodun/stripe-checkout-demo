@@ -720,12 +720,50 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
     }
   };
 
+  // Handler for Express Checkout cancellation
+  const handleExpressCheckoutCancel = async () => {
+    console.log('🚫 Express Checkout cancelled by user');
+    
+    if (!elements) {
+      console.log('⚠️ Elements not available for cancel handler');
+      return;
+    }
+
+    try {
+      // Reset Elements amount back to cart subtotal only (no shipping or tax)
+      // This represents the base product cost before any Express Checkout calculations
+      const baseAmount = Math.round(cart.order_subtotal * 100); // Convert to cents
+      
+      console.log('🔄 Resetting Elements amount to cart subtotal:', {
+        order_subtotal: cart.order_subtotal,
+        amount_in_cents: baseAmount
+      });
+
+      // Update Elements with the base cart subtotal amount
+      await elements.update({
+        amount: baseAmount
+      });
+
+      console.log('✅ Elements amount reset to cart subtotal successfully');
+
+    } catch (error) {
+      console.error('❌ Error resetting Elements amount on cancel:', error);
+      
+      // Log additional details for debugging
+      if (error instanceof Error) {
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error stack:', error.stack);
+      }
+    }
+  };
+
   return (
     <div className="mt-4">
       <ExpressCheckoutElement 
         onConfirm={handleExpressCheckout}
         onShippingAddressChange={handleShippingAddressChange}
         onShippingRateChange={handleShippingRateChange}
+        onCancel={handleExpressCheckoutCancel}
         options={{
           ...options,
           shippingRates: shippingRates || []
