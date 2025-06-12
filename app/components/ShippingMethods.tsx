@@ -116,6 +116,17 @@ export default function ShippingMethods({
   // Load shipping methods when shipping address changes
   useEffect(() => {
     const loadShippingMethods = async () => {
+      // Guard: Don't fetch shipping methods if cart is empty or being cleared
+      // This prevents API calls during checkout processing when cart gets cleared
+      if (!cart.line_items || cart.line_items.length === 0 || !cart.order_subtotal || cart.order_subtotal <= 0) {
+        console.log('🚚 Skipping shipping methods fetch - cart is empty or being cleared');
+        setAvailableMethods([]);
+        setError(null);
+        setFreeShippingMessage(null);
+        lastFetchRef.current = null;
+        return;
+      }
+
       if (!shippingAddress || !shippingAddress.postal_code) {
         setAvailableMethods([]);
         setError(null);
