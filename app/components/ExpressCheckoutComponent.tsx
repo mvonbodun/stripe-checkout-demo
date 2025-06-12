@@ -476,11 +476,49 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
         // Update cart tax totals
         updateCartTaxTotals(taxResponse, updatedCart, dispatch);
 
+        // Calculate the new grand total manually to update Elements immediately
+        // (React state updates are asynchronous, so we need to calculate this now)
+        let newTaxTotal = 0;
+        let newShippingTaxTotal = 0;
+
+        // Calculate line item tax totals
+        if (taxResponse.calculation?.line_items?.data) {
+          taxResponse.calculation.line_items.data.forEach((taxLineItem) => {
+            newTaxTotal += taxLineItem.amount_tax / 100; // Convert from cents to dollars
+          });
+        }
+
+        // Calculate shipping tax total
+        if (taxResponse.calculation?.shipping_cost?.amount_tax) {
+          newShippingTaxTotal = taxResponse.calculation.shipping_cost.amount_tax / 100; // Convert from cents to dollars
+        }
+
+        // Calculate new grand total: subtotal + tax + shipping + shipping_tax
+        const newGrandTotal = updatedCart.order_subtotal + newTaxTotal + updatedCart.order_shipping_total + newShippingTaxTotal;
+        
+        console.log('💰 Calculated new totals:', {
+          subtotal: updatedCart.order_subtotal,
+          tax: newTaxTotal,
+          shipping: updatedCart.order_shipping_total,
+          shippingTax: newShippingTaxTotal,
+          grandTotal: newGrandTotal
+        });
+
+        // Update Elements with the new amount to fix the timing issue
+        if (elements) {
+          await elements.update({
+            amount: Math.round(newGrandTotal * 100) // Convert to cents
+          });
+          console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
+        }
+
         // Resolve the event with updated totals for Stripe
         // The Express Checkout Element expects lineItems and shippingRates
+        // IMPORTANT: lineItems should ONLY contain product costs (no tax, no shipping)
+        // Tax and shipping are handled separately by the Elements amount
         const lineItems = cart.line_items.map(item => ({
           name: `${item.name} x${item.quantity}`,
-          amount: Math.round((item.price * item.quantity + (item.line_tax_total || 0) + (item.line_shipping_total || 0) + (item.line_shipping_tax_total || 0)) * 100)
+          amount: Math.round(item.line_subtotal * 100) // ONLY product cost (price * quantity)
         }));
 
         const shippingRates = [{

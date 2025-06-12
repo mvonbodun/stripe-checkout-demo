@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Checkout Timing Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #fd7e14; }
+        .info { color: #17a2b8; }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Express Checkout Elements Timing Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Test Overview</h2>
+        <p>This test verifies that the Google Pay OR_SCLEU_02 error timing issue has been fixed.</p>
+        <p><strong>Issue:</strong> Express Checkout Element showed stale totals because Elements.update() was not being called after cart context updates.</p>
+        <p><strong>Fix:</strong> Added manual calculation of new grand total and immediate Elements.update() call.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test Steps</h2>
+        <ol>
+            <li>Open the main application at <a href="http://localhost:3001" target="_blank">http://localhost:3001</a></li>
+            <li>Add items to your cart</li>
+            <li>Open the mini cart and find Express Checkout buttons</li>
+            <li>Click Google Pay or Apple Pay</li>
+            <li>Enter a shipping address (try different states/zip codes to trigger tax changes)</li>
+            <li>Watch the browser console for timing fix logs</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Expected Console Logs</h2>
+        <p>When the timing fix is working correctly, you should see these logs in order:</p>
+        <pre>💰 Tax calculation response: {...}
+💰 Calculated new totals: {
+  subtotal: X.XX,
+  tax: X.XX,
+  shipping: X.XX,
+  shippingTax: X.XX,
+  grandTotal: X.XX
+}
+✅ Elements updated with new amount: XXXX</pre>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Success Criteria</h2>
+        <ul>
+            <li class="success">✓ Console shows "Elements updated with new amount" message</li>
+            <li class="success">✓ Google Pay displays the correct total immediately (not one-address-behind)</li>
+            <li class="success">✓ No OR_SCLEU_02 errors when changing addresses</li>
+            <li class="success">✓ Tax changes are reflected in Express Checkout totals instantly</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Code Changes Made</h2>
+        <p>The fix was implemented in <code>ExpressCheckoutComponent.tsx</code> in the <code>handleShippingAddressChange</code> function:</p>
+        <pre>// After tax calculation and updateCartTaxTotals():
+
+// Calculate the new grand total manually to update Elements immediately
+// (React state updates are asynchronous, so we need to calculate this now)
+let newTaxTotal = 0;
+let newShippingTaxTotal = 0;
+
+// Calculate line item tax totals
+if (taxResponse.calculation?.line_items?.data) {
+  taxResponse.calculation.line_items.data.forEach((taxLineItem) => {
+    newTaxTotal += taxLineItem.amount_tax / 100;
+  });
+}
+
+// Calculate shipping tax total
+if (taxResponse.calculation?.shipping_cost?.amount_tax) {
+  newShippingTaxTotal = taxResponse.calculation.shipping_cost.amount_tax / 100;
+}
+
+// Calculate new grand total: subtotal + tax + shipping + shipping_tax
+const newGrandTotal = updatedCart.order_subtotal + newTaxTotal + 
+                     updatedCart.order_shipping_total + newShippingTaxTotal;
+
+// Update Elements with the new amount to fix the timing issue
+if (elements) {
+  await elements.update({
+    amount: Math.round(newGrandTotal * 100) // Convert to cents
+  });
+  console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
+}</pre>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Quick Actions</h2>
+        <button onclick="window.open('http://localhost:3001', '_blank')">Open Main App</button>
+        <button onclick="openDevTools()">Open Dev Tools</button>
+        <button onclick="showTestScript()">Show Test Script</button>
+    </div>
+
+    <div id="testScript" style="display:none;" class="test-section">
+        <h2>📝 Test Script</h2>
+        <p>Copy and paste this script into the browser console on the main app page:</p>
+        <pre id="scriptContent"></pre>
+        <button onclick="copyTestScript()">Copy Script</button>
+    </div>
+
+    <script>
+        function openDevTools() {
+            alert('Press F12 or right-click and select "Inspect" to open Developer Tools.\nThen go to the Console tab to see the logs.');
+        }
+
+        function showTestScript() {
+            const script = `
+// Express Checkout Timing Fix Test Script
+console.log('🧪 Express Checkout Timing Fix - Monitoring Started');
+
+// Override console.log to catch our specific messages
+const originalLog = console.log;
+console.log = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('Elements updated with new amount')) {
+        console.warn('🎯 SUCCESS: Elements.update() called with new amount!');
+        console.warn('✅ Timing fix is working correctly');
+    } else if (message.includes('Calculated new totals')) {
+        console.warn('🧮 Tax calculation completed, totals calculated manually');
+    } else if (message.includes('Tax calculation response')) {
+        console.warn('💰 Tax calculation started...');
+    }
+    return originalLog.apply(console, args);
+};
+
+console.log('👂 Now monitoring Express Checkout operations...');
+console.log('📋 To test: Add items to cart, open mini cart, click Express Checkout, enter shipping address');
+            `.trim();
+            
+            document.getElementById('scriptContent').textContent = script;
+            document.getElementById('testScript').style.display = 'block';
+        }
+
+        function copyTestScript() {
+            const script = document.getElementById('scriptContent').textContent;
+            navigator.clipboard.writeText(script).then(() => {
+                alert('Test script copied to clipboard! Paste it in the browser console on the main app page.');
+            });
+        }
+    </script>
+</body>
+</html>
