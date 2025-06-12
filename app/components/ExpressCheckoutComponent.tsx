@@ -152,6 +152,14 @@ const ExpressCheckoutComponent: React.FC<ExpressCheckoutComponentProps> = ({
 }) => {
   const { state: cart } = useCart();
 
+  // Guard: Don't render Express Checkout if cart is empty or total is invalid
+  // This prevents the "amount must be greater than 0" error during checkout processing
+  // when the cart gets cleared before navigation completes
+  if (!cart.order_grand_total || cart.order_grand_total <= 0 || cart.line_items.length === 0) {
+    console.log('🚫 ExpressCheckoutComponent: Cart is empty or invalid, not rendering Express Checkout');
+    return null;
+  }
+
   // Task #2: Set Elements options with mode: 'payment', currency: 'usd', amount from cart
   const elementsOptions = {
     mode: 'payment' as const,
