@@ -563,11 +563,169 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
     }
   };
 
+  // Handler for shipping rate changes
+  const handleShippingRateChange = async (event: {
+    shippingRate: {
+      id: string;
+      amount: number;
+      displayName: string;
+    };
+    resolve: (resolveDetails: {
+      lineItems?: Array<{ name: string; amount: number; }>;
+      shippingRates?: Array<{ id: string; amount: number; displayName: string; }>;
+    }) => void;
+    reject: () => void;
+  }) => {
+    console.log('🚚 Express Checkout shipping rate changed:', event);
+    console.log('📦 Selected shipping rate:', JSON.stringify(event.shippingRate, null, 2));
+    
+    try {
+      const selectedRate = event.shippingRate;
+      
+      // Validate the selected shipping rate
+      if (!selectedRate || !selectedRate.id) {
+        console.log('⚠️ No valid shipping rate selected, skipping processing');
+        event.reject();
+        return;
+      }
+      
+      // Convert amount from cents to dollars for our cart system
+      const shippingCostInDollars = selectedRate.amount / 100;
+      
+      console.log(`💰 Updating cart with selected shipping method: ${selectedRate.displayName} ($${shippingCostInDollars})`);
+      
+      // Update cart with the selected shipping method
+      dispatch({
+        type: 'UPDATE_SHIPPING_METHOD',
+        shipping_method_id: selectedRate.id,
+        shipping_method_name: selectedRate.displayName,
+        shipping_method_cost: shippingCostInDollars
+      });
+
+      // Calculate tax with new shipping cost
+      // Note: We manually construct the updated cart data since React state updates are asynchronous
+      console.log('🧮 Calculating tax with new shipping cost...');
+      const updatedCart = {
+        ...cart,
+        shipping_method_id: selectedRate.id,
+        shipping_method_name: selectedRate.displayName,
+        shipping_method_cost: shippingCostInDollars,
+        order_shipping_total: shippingCostInDollars
+      };
+      
+      // Build tax calculation payload with the updated cart and shipping address from current cart
+      const shippingAddress = cart.shipping_address?.address;
+      if (!shippingAddress) {
+        console.log('⚠️ No shipping address available, cannot calculate tax for shipping rate change');
+        event.reject();
+        return;
+      }
+      
+      const taxPayload = buildTaxCalculationPayload({
+        shippingAddress: shippingAddress,
+        cart: updatedCart,
+        shippingCost: shippingCostInDollars
+      });
+
+      const taxResponse = await calculateTax(taxPayload);
+      console.log('💰 Tax calculation response:', taxResponse);
+
+      // Update cart tax totals
+      updateCartTaxTotals(taxResponse, updatedCart, dispatch);
+
+      // Calculate the new grand total manually to update Elements immediately
+      // (React state updates are asynchronous, so we need to calculate this now)
+      let newTaxTotal = 0;
+      let newShippingTaxTotal = 0;
+
+      // Calculate line item tax totals
+      if (taxResponse.calculation?.line_items?.data) {
+        taxResponse.calculation.line_items.data.forEach((taxLineItem) => {
+          newTaxTotal += taxLineItem.amount_tax / 100; // Convert from cents to dollars
+        });
+      }
+
+      // Calculate shipping tax total
+      if (taxResponse.calculation?.shipping_cost?.amount_tax) {
+        newShippingTaxTotal = taxResponse.calculation.shipping_cost.amount_tax / 100; // Convert from cents to dollars
+      }
+
+      // Calculate new grand total: subtotal + tax + shipping + shipping_tax
+      const newGrandTotal = updatedCart.order_subtotal + newTaxTotal + updatedCart.order_shipping_total + newShippingTaxTotal;
+      
+      console.log('💰 Calculated new totals:', {
+        subtotal: updatedCart.order_subtotal,
+        tax: newTaxTotal,
+        shipping: updatedCart.order_shipping_total,
+        shippingTax: newShippingTaxTotal,
+        grandTotal: newGrandTotal
+      });
+
+      // Update Elements with the new amount to fix the timing issue
+      if (elements) {
+        await elements.update({
+          amount: Math.round(newGrandTotal * 100) // Convert to cents
+        });
+        console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
+      }
+
+      // Resolve the event with updated totals for Stripe
+      // The Express Checkout Element expects lineItems and shippingRates
+      // IMPORTANT: lineItems should ONLY contain product costs (no tax, no shipping)
+      // Tax and shipping are handled separately by the Elements amount
+      const lineItems = cart.line_items.map(item => ({
+        name: `${item.name} x${item.quantity}`,
+        amount: Math.round(item.line_subtotal * 100) // ONLY product cost (price * quantity)
+      }));
+
+      // For shipping rate change, we need to provide the available shipping rates
+      // In most cases, this would be the same rates that were originally provided
+      // Since the user is selecting from existing options, we reconstruct based on available methods
+      const shippingRates = [{
+        id: selectedRate.id,
+        displayName: selectedRate.displayName,
+        amount: selectedRate.amount
+      }];
+
+      console.log('✅ Resolving Express Checkout shipping rate change with new totals:', { 
+        lineItems: lineItems.length,
+        shippingRates: shippingRates.length,
+        selectedRate: selectedRate.displayName,
+        newGrandTotal: newGrandTotal
+      });
+
+      // Resolve the shipping rate change event with updated pricing
+      event.resolve({
+        lineItems,
+        shippingRates
+      });
+
+    } catch (error) {
+      console.error('❌ Error processing shipping rate change:', error);
+      
+      // Log additional details for debugging
+      if (error instanceof Error) {
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error stack:', error.stack);
+        
+        // Check if this is a tax calculation error
+        if (error.message.includes('HTTP 400')) {
+          console.error('❌ Tax calculation failed during shipping rate change');
+          console.error('📦 Shipping rate that caused the error:', JSON.stringify(event.shippingRate, null, 2));
+        }
+      }
+      
+      // Reject the shipping rate change if there's an error
+      event.reject();
+    }
+  };
+
   return (
     <div className="mt-4">
       <ExpressCheckoutElement 
         onConfirm={handleExpressCheckout}
         onShippingAddressChange={handleShippingAddressChange}
+        onShippingRateChange={handleShippingRateChange}
         options={{
           ...options,
           shippingRates: shippingRates || []
