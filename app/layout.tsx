@@ -26,8 +26,7 @@ function MyAccountModalWithContext() {
 
 function MobileMenuModalWithContext() {
   const { isMobileMenuOpen, closeMobileMenu } = useMobileMenuUI();
-  const { categories } = useCategories();
-  return <MobileMenuModal open={isMobileMenuOpen} onClose={closeMobileMenu} categories={categories} />;
+  return <MobileMenuModal open={isMobileMenuOpen} onClose={closeMobileMenu} />;
 }
 
 export default function RootLayout({
