@@ -9,10 +9,8 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
-  // Get the primary image or use a placeholder
-  const primaryImage = product.images && product.images.length > 0 
-    ? product.images.find(img => img.order === 1) || product.images[0]
-    : null;
+  // Use placeholder image since the mock data has non-existent image paths
+  const placeholderImage = `https://placehold.co/120x120/e5e7eb/6b7280?text=${encodeURIComponent(product.name.split(' ').slice(0, 2).join(' '))}`;
 
   // Format pricing display
   const hasComparePrice = product.compareAtPrice && product.compareAtPrice > product.basePrice;
@@ -24,23 +22,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
     <div className="border rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-200">
       {/* Product Image */}
       <div className="relative mb-3 w-full h-32 flex items-center justify-center">
-        {primaryImage ? (
-          <Image 
-            src={primaryImage.url} 
-            alt={primaryImage.altText || product.name} 
-            className="rounded object-cover" 
-            width={120} 
-            height={120}
-            priority={false}
-            loading="lazy"
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-          />
-        ) : (
-          <div className="w-32 h-32 bg-gray-200 rounded flex items-center justify-center">
-            <span className="text-gray-400 text-sm">No Image</span>
-          </div>
-        )}
+        <Image 
+          src={placeholderImage}
+          alt={product.name} 
+          className="rounded object-cover" 
+          width={120} 
+          height={120}
+          priority={false}
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+        />
         
         {/* Discount Badge */}
         {hasComparePrice && (

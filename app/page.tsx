@@ -46,6 +46,9 @@ export default function Home() {
 	const { openMiniCart } = useMiniCartUI();
 
 	const addToCart = (product: Product) => {
+		// Create placeholder image for cart item
+		const placeholderImage = `https://placehold.co/100x100/e5e7eb/6b7280?text=${encodeURIComponent(product.name.split(' ').slice(0, 2).join(' '))}`;
+		
 		dispatch({
 			type: 'ADD_ITEM',
 			item: {
@@ -53,7 +56,7 @@ export default function Home() {
 				product_id: parseInt(product.id), // Convert string ID to number for cart compatibility
 				name: product.name,
 				attributes: product.features?.slice(0, 3) || [], // Use features as attributes
-				image: product.images?.[0]?.url || undefined,
+				image: placeholderImage, // Use placeholder instead of non-existent image
 				price: product.basePrice,
 				quantity: 1,
 				taxcode: getValidTaxCode(product.taxCode), // Use utility function for tax code validation

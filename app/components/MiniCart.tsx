@@ -80,7 +80,7 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
                   <div className="grid grid-cols-[100px_1fr] gap-4 min-h-[100px] relative">
                     {/* Column 1: Thumbnail */}
                     <div className="flex-shrink-0">
-                      {item.image && (
+                      {item.image ? (
                         <Image 
                           src={item.image} 
                           alt={item.name} 
@@ -88,6 +88,12 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
                           height={100} 
                           className="rounded object-cover" 
                         />
+                      ) : (
+                        <div className="w-[100px] h-[100px] bg-gray-200 rounded flex items-center justify-center">
+                          <span className="text-gray-400 text-xs text-center px-1">
+                            {item.name.split(' ').slice(0, 2).join(' ')}
+                          </span>
+                        </div>
                       )}
                     </div>
                     
