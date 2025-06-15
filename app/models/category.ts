@@ -405,3 +405,7 @@ export const findCategoryBySlug = (slug: string): Category | undefined => {
 export const findCategoryById = (id: string): Category | undefined => {
   return mockCategories.find(cat => cat.id === id);
 };
+
+export const getAllCategories = (): Category[] => {
+  return mockCategories;
+};

@@ -1,8 +1,9 @@
 'use client';
 
-import { notFound } from 'next/navigation';
-import { Category, mockCategories, findCategoryBySlug } from '../../models/category';
 import { use } from 'react';
+import { notFound } from 'next/navigation';
+import { findCategoryBySlug, getAllCategories } from '../../models/category';
+import Breadcrumb, { buildCategoryBreadcrumbs } from '../../components/Breadcrumb';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -18,8 +19,8 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  // Get breadcrumb path for navigation
-  const breadcrumbParts = category.path.split(' > ');
+  const allCategories = getAllCategories();
+  const breadcrumbs = buildCategoryBreadcrumbs(category, allCategories);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -27,39 +28,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
-          <nav className="flex mb-4" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-2 text-sm text-gray-500">
-              <li>
-                <a href="/" className="hover:text-gray-700">
-                  Home
-                </a>
-              </li>
-              {breadcrumbParts.map((part, index) => (
-                <li key={index} className="flex items-center">
-                  <svg
-                    className="flex-shrink-0 h-4 w-4 mx-2 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span
-                    className={
-                      index === breadcrumbParts.length - 1
-                        ? 'text-gray-900 font-medium'
-                        : 'hover:text-gray-700'
-                    }
-                  >
-                    {part}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          </nav>
+          <Breadcrumb items={breadcrumbs} className="mb-4" />
 
           {/* Category Header */}
           <div className="flex items-start justify-between">
