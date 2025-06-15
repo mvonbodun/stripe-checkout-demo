@@ -122,7 +122,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                 onMouseLeave={handleMouseLeave}
               >
                 <Link
-                  href={`/category/${category.slug}`}
+                  href={`/c/${category.slug}`}
                   className={`
                     header-nav text-base font-medium text-gray-700 hover:text-blue-600 
                     transition-all duration-200 whitespace-nowrap py-4 px-3 
@@ -164,7 +164,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                       {activeCategory.children.map((level2Category) => (
                         <div key={level2Category.id} className="space-y-4">
                           <Link
-                            href={`/category/${level2Category.slug}`}
+                            href={`/c/${level2Category.slug}`}
                             className="block text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
                           >
                             {level2Category.name}
@@ -176,7 +176,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                               {level2Category.children.map((level3Category) => (
                                 <li key={level3Category.id}>
                                   <Link
-                                    href={`/category/${level3Category.slug}`}
+                                    href={`/c/${level3Category.slug}`}
                                     className="block text-sm text-gray-600 hover:text-blue-600 transition-colors py-1"
                                   >
                                     {level3Category.name}
