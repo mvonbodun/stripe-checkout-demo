@@ -76,11 +76,11 @@ export default function Home() {
 				heroes={HERO_DATA}
 				autoRotate={true}
 				rotationInterval={6000}
-				className="mb-12"
+				className="mb-4"
 			/>
 
 			{/* Products Section */}
-			<div className="max-w-2xl mx-auto py-10">
+			<div className="max-w-2xl mx-auto py-4">
 				<main>
 					<div
 						id="products"

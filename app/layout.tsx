@@ -78,7 +78,7 @@ export default function RootLayout({
                 </>
               )}
               <main 
-                className={`flex-1 ${isCheckoutPage ? '' : 'md:mt-[148px]'}`}
+                className={`flex-1 ${isCheckoutPage ? '' : 'md:mt-[128px]'}`}
                 style={!isCheckoutPage ? { marginTop: calculateMobileMargin() } : {}}
               >
                 {children}
