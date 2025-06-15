@@ -1,10 +1,12 @@
 'use client';
 
 import { useCart } from './cart-context';
-import ProductCard from './components/ProductCard';
+import { useMiniCartUI } from './mini-cart-ui-context';
+import FeaturedProductsCarousel from './components/FeaturedProductsCarousel';
 import Hero, { HeroData } from './components/Hero';
 import { mockProducts, Product } from './models/product';
 import { getValidTaxCode } from './models/common';
+import { useState, useEffect } from 'react';
 
 const HERO_DATA: HeroData[] = [
 	{
@@ -36,14 +38,20 @@ const HERO_DATA: HeroData[] = [
 	},
 ];
 
-import { useMiniCartUI } from './mini-cart-ui-context';
-
-// Get a subset of products for the homepage
-const FEATURED_PRODUCTS = mockProducts.slice(0, 4);
-
 export default function Home() {
 	const { dispatch } = useCart();
 	const { openMiniCart } = useMiniCartUI();
+	const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+
+	// Generate random products on client-side to avoid hydration mismatch
+	useEffect(() => {
+		const getRandomProducts = (products: Product[], count: number = 8): Product[] => {
+			const shuffled = [...products].sort(() => 0.5 - Math.random());
+			return shuffled.slice(0, Math.min(count, products.length));
+		};
+		
+		setFeaturedProducts(getRandomProducts(mockProducts, 8));
+	}, []);
 
 	const addToCart = (product: Product) => {
 		// Create placeholder image for cart item
@@ -79,22 +87,14 @@ export default function Home() {
 				className="mb-4"
 			/>
 
-			{/* Products Section */}
-			<div className="max-w-2xl mx-auto py-4">
-				<main>
-					<div
-						id="products"
-						className="grid grid-cols-1 md:grid-cols-2 gap-8"
-					>
-						{FEATURED_PRODUCTS.map((product) => (
-							<ProductCard
-								key={product.id}
-								product={product}
-								onAddToCart={addToCart}
-							/>
-						))}
-					</div>
-				</main>
+			{/* Featured Products Carousel */}
+			<div className="max-w-7xl mx-auto px-4 py-8">
+				{featuredProducts.length > 0 && (
+					<FeaturedProductsCarousel
+						products={featuredProducts}
+						onAddToCart={addToCart}
+					/>
+				)}
 			</div>
 		</div>
 	);

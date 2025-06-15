@@ -7,7 +7,7 @@ import MiniCart from './components/MiniCart';
 import { MiniCartUIProvider, useMiniCartUI } from './mini-cart-ui-context';
 import { MyAccountUIProvider, useMyAccountUI } from './my-account-ui-context';
 import { MobileMenuUIProvider, useMobileMenuUI } from './mobile-menu-ui-context';
-import { CategoriesProvider, useCategories } from './categories-context';
+import { CategoriesProvider } from './categories-context';
 import MyAccountModal from './components/MyAccountModal';
 import MobileMenuModal from './components/MobileMenuModal';
 import GlobalHeader from './components/GlobalHeader';
