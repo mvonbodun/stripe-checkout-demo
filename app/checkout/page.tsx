@@ -284,7 +284,7 @@ const CheckoutForm = React.memo(function CheckoutForm({
             <div className="mb-4">
               <svg className="animate-spin h-12 w-12 mx-auto text-blue-600" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Processing Your Order</h3>
@@ -496,6 +496,19 @@ export default function CheckoutPage() {
   // Use global cart context
   const { state: cart, dispatch, isLoaded } = useCart();
 
+  // Debug: Log cart state changes
+  useEffect(() => {
+    console.log('🛒 Cart state updated:', {
+      order_subtotal: cart.order_subtotal,
+      order_tax_total: cart.order_tax_total,
+      order_shipping_total: cart.order_shipping_total,
+      order_shipping_tax_total: cart.order_shipping_tax_total,
+      order_grand_total: cart.order_grand_total,
+      shipping_method_id: cart.shipping_method_id,
+      shipping_method_name: cart.shipping_method_name
+    });
+  }, [cart.order_subtotal, cart.order_tax_total, cart.order_shipping_total, cart.order_shipping_tax_total, cart.order_grand_total, cart.shipping_method_id]);
+
   const itemCount = cart.line_items.reduce((sum: number, item: typeof cart.line_items[number]) => sum + item.quantity, 0);
 
   // Use a ref to track the timeout for debouncing
@@ -706,7 +719,7 @@ export default function CheckoutPage() {
             <div className="mb-4">
               <svg className="animate-spin h-12 w-12 mx-auto text-blue-600" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading Checkout</h3>
@@ -722,7 +735,7 @@ export default function CheckoutPage() {
             <div className="mb-4">
               <svg className="animate-spin h-12 w-12 mx-auto text-blue-600" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Updating Payment Details</h3>
@@ -737,7 +750,7 @@ export default function CheckoutPage() {
             <div className="mb-4">
               <svg className="animate-spin h-12 w-12 mx-auto text-blue-600" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading Cart</h3>

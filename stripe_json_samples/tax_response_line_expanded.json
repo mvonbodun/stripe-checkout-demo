@@ -1,215 +1,133 @@
 {
-  "id": "taxcalc_1RUDrxRlgFrbOsNHuBGjfqJs",
+  "id": "taxcalc_1RaLblRlgFrbOsNHXIEXaNAz",
   "object": "tax.calculation",
-  "amount_total": 10607,
+  "amount_total": 204249,
   "currency": "usd",
   "customer": null,
   "customer_details": {
     "address": {
-      "city": "Spring",
+      "city": "Pensacola",
       "country": "US",
-      "line1": "63 Heritage Hill Circle",
-      "line2": "",
-      "postal_code": "77381",
-      "state": "TX"
+      "line1": "2436 Tronjo Terrace",
+      "line2": null,
+      "postal_code": "32503",
+      "state": "FL"
     },
     "address_source": "shipping",
     "ip_address": null,
     "tax_ids": [],
     "taxability_override": "none"
   },
-  "expires_at": 1756329609,
+  "expires_at": 1757789325,
   "line_items": {
     "object": "list",
     "data": [
       {
-        "id": "tax_li_SP1v6VFOWWHc69",
+        "id": "tax_li_SVMK4rrjZEiXZu",
         "object": "tax.calculation_line_item",
-        "amount": 2500,
-        "amount_tax": 206,
+        "amount": 189999,
+        "amount_tax": 14250,
         "livemode": false,
         "metadata": {},
         "product": null,
         "quantity": 1,
-        "reference": "b29d15c1-0d23-441c-9eb8-772ed955c393",
+        "reference": "587efc9a-398f-44ab-b571-7445cf9ceb94",
         "tax_behavior": "exclusive",
         "tax_breakdown": [
           {
-            "amount": 156,
+            "amount": 11400,
             "jurisdiction": {
               "country": "US",
-              "display_name": "Texas",
+              "display_name": "Florida",
               "level": "state",
-              "state": "TX"
+              "state": "FL"
             },
-            "sourcing": "origin",
+            "sourcing": "destination",
             "tax_rate_details": {
               "display_name": "Sales Tax",
-              "percentage_decimal": "6.25",
+              "percentage_decimal": "6.0",
               "tax_type": "sales_tax"
             },
             "taxability_reason": "standard_rated",
-            "taxable_amount": 2500
+            "taxable_amount": 189999
+          },
+          {
+            "amount": 2850,
+            "jurisdiction": {
+              "country": "US",
+              "display_name": "Escambia",
+              "level": "county",
+              "state": "FL"
+            },
+            "sourcing": "destination",
+            "tax_rate_details": {
+              "display_name": "Discretionary Sales Surtax",
+              "percentage_decimal": "1.5",
+              "tax_type": "sales_tax"
+            },
+            "taxability_reason": "standard_rated",
+            "taxable_amount": 189999
           },
           {
             "amount": 0,
             "jurisdiction": {
               "country": "US",
-              "display_name": "Montgomery",
-              "level": "county",
-              "state": "TX"
+              "display_name": "Pensacola",
+              "level": "city",
+              "state": "FL"
             },
-            "sourcing": "origin",
+            "sourcing": "destination",
             "tax_rate_details": null,
             "taxability_reason": "not_subject_to_tax",
             "taxable_amount": 0
-          },
-          {
-            "amount": 25,
-            "jurisdiction": {
-              "country": "US",
-              "display_name": "The Woodlands Township",
-              "level": "district",
-              "state": "TX"
-            },
-            "sourcing": "origin",
-            "tax_rate_details": {
-              "display_name": "Sales Tax",
-              "percentage_decimal": "1.0",
-              "tax_type": "sales_tax"
-            },
-            "taxability_reason": "standard_rated",
-            "taxable_amount": 2500
-          },
-          {
-            "amount": 25,
-            "jurisdiction": {
-              "country": "US",
-              "display_name": "The Woodlands Township Economical Development Zone",
-              "level": "district",
-              "state": "TX"
-            },
-            "sourcing": "origin",
-            "tax_rate_details": {
-              "display_name": "Sales Tax",
-              "percentage_decimal": "1.0",
-              "tax_type": "sales_tax"
-            },
-            "taxability_reason": "standard_rated",
-            "taxable_amount": 2500
-          }
-        ],
-        "tax_code": "txcd_99999999"
-      },
-      {
-        "id": "tax_li_SP1vuYDD4Uj4Wv",
-        "object": "tax.calculation_line_item",
-        "amount": 6000,
-        "amount_tax": 495,
-        "livemode": false,
-        "metadata": {},
-        "product": null,
-        "quantity": 1,
-        "reference": "f785991a-abf0-432c-8d63-06e5df619842",
-        "tax_behavior": "exclusive",
-        "tax_breakdown": [
-          {
-            "amount": 375,
-            "jurisdiction": {
-              "country": "US",
-              "display_name": "Texas",
-              "level": "state",
-              "state": "TX"
-            },
-            "sourcing": "origin",
-            "tax_rate_details": {
-              "display_name": "Sales Tax",
-              "percentage_decimal": "6.25",
-              "tax_type": "sales_tax"
-            },
-            "taxability_reason": "standard_rated",
-            "taxable_amount": 6000
-          },
-          {
-            "amount": 0,
-            "jurisdiction": {
-              "country": "US",
-              "display_name": "Montgomery",
-              "level": "county",
-              "state": "TX"
-            },
-            "sourcing": "origin",
-            "tax_rate_details": null,
-            "taxability_reason": "not_subject_to_tax",
-            "taxable_amount": 0
-          },
-          {
-            "amount": 60,
-            "jurisdiction": {
-              "country": "US",
-              "display_name": "The Woodlands Township",
-              "level": "district",
-              "state": "TX"
-            },
-            "sourcing": "origin",
-            "tax_rate_details": {
-              "display_name": "Sales Tax",
-              "percentage_decimal": "1.0",
-              "tax_type": "sales_tax"
-            },
-            "taxability_reason": "standard_rated",
-            "taxable_amount": 6000
-          },
-          {
-            "amount": 60,
-            "jurisdiction": {
-              "country": "US",
-              "display_name": "The Woodlands Township Economical Development Zone",
-              "level": "district",
-              "state": "TX"
-            },
-            "sourcing": "origin",
-            "tax_rate_details": {
-              "display_name": "Sales Tax",
-              "percentage_decimal": "1.0",
-              "tax_type": "sales_tax"
-            },
-            "taxability_reason": "standard_rated",
-            "taxable_amount": 6000
           }
         ],
         "tax_code": "txcd_99999999"
       }
     ],
     "has_more": false,
-    "total_count": 2,
-    "url": "/v1/tax/calculations/taxcalc_1RUDrxRlgFrbOsNHuBGjfqJs/line_items"
+    "total_count": 1,
+    "url": "/v1/tax/calculations/taxcalc_1RaLblRlgFrbOsNHXIEXaNAz/line_items"
   },
   "livemode": false,
   "ship_from_details": null,
   "shipping_cost": {
-    "amount": 1299,
-    "amount_tax": 107,
+    "amount": 0,
+    "amount_tax": 0,
     "tax_behavior": "exclusive",
     "tax_code": "txcd_92010001"
   },
-  "tax_amount_exclusive": 808,
+  "tax_amount_exclusive": 14250,
   "tax_amount_inclusive": 0,
   "tax_breakdown": [
     {
-      "amount": 808,
+      "amount": 14250,
       "inclusive": false,
       "tax_rate_details": {
         "country": "US",
         "flat_amount": null,
-        "percentage_decimal": "8.25",
+        "percentage_decimal": "7.5",
         "rate_type": "percentage",
-        "state": "TX",
+        "state": "FL",
         "tax_type": "sales_tax"
       },
       "taxability_reason": "standard_rated",
-      "taxable_amount": 9799
+      "taxable_amount": 189999
+    },
+    {
+      "amount": 0,
+      "inclusive": false,
+      "tax_rate_details": {
+        "country": "US",
+        "flat_amount": null,
+        "percentage_decimal": "0.0",
+        "rate_type": "percentage",
+        "state": "FL",
+        "tax_type": "sales_tax"
+      },
+      "taxability_reason": "product_exempt",
+      "taxable_amount": 0
     }
   ],
-  "tax_date": 1748553609
+  "tax_date": 1750013325
 }

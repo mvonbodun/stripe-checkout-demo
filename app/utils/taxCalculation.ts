@@ -97,16 +97,29 @@ export function updateCartTaxTotals(
   taxResponse: TaxCalculationResponse,
   cart: Cart,
   dispatch: (action: 
-    | { type: 'UPDATE_LINE_TAX_TOTAL'; product_id: number; tax_total: number }
-    | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: number; shipping_tax_total: number }
+    | { type: 'UPDATE_LINE_TAX_TOTAL'; product_id: string; tax_total: number }
+    | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: string; shipping_tax_total: number }
   ) => void,
   onTaxCalculationIdChange?: (id: string | null) => void
 ) {
+  console.log(' updateCartTaxTotals called with:', {
+    calculation_id: taxResponse.calculation_id,
+    line_items_count: taxResponse.calculation?.line_items?.data?.length || 0,
+    shipping_cost_tax: taxResponse.calculation?.shipping_cost?.amount_tax || 0,
+    cart_line_items_count: cart.line_items.length
+  });
+
   // Update individual line item tax totals
   if (taxResponse.calculation && taxResponse.calculation.line_items && taxResponse.calculation.line_items.data) {
+    console.log(' Debugging tax line item matching:');
+    console.log('Cart line items:', cart.line_items.map(item => ({ id: item.id, product_id: item.product_id, name: item.name })));
+    console.log('Tax line items:', taxResponse.calculation.line_items.data.map(item => ({ reference: item.reference, amount_tax: item.amount_tax })));
+    
     taxResponse.calculation.line_items.data.forEach((taxLineItem) => {
       // Find the corresponding cart item by reference (which is the item.id)
       const cartItem = cart.line_items.find(item => item.id === taxLineItem.reference);
+      console.log(` Looking for cart item with id: ${taxLineItem.reference}, found:`, cartItem ? { id: cartItem.id, product_id: cartItem.product_id } : 'NOT FOUND');
+      
       if (cartItem) {
         // Dispatch UPDATE_LINE_TAX_TOTAL for each line item
         dispatch({ 
@@ -114,6 +127,8 @@ export function updateCartTaxTotals(
           product_id: cartItem.product_id, 
           tax_total: taxLineItem.amount_tax / 100 // Convert from cents to dollars
         });
+      } else {
+        console.error(' Could not find cart item for tax line item reference:', taxLineItem.reference);
       }
     });
   }
@@ -160,8 +175,8 @@ export function updateCartTaxTotals(
 export function clearCartTaxTotals(
   cart: Cart,
   dispatch: (action: 
-    | { type: 'UPDATE_LINE_TAX_TOTAL'; product_id: number; tax_total: number }
-    | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: number; shipping_tax_total: number }
+    | { type: 'UPDATE_LINE_TAX_TOTAL'; product_id: string; tax_total: number }
+    | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: string; shipping_tax_total: number }
   ) => void,
   onTaxCalculationIdChange?: (id: string | null) => void
 ) {

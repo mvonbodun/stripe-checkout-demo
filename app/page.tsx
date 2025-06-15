@@ -53,7 +53,7 @@ export default function Home() {
 			type: 'ADD_ITEM',
 			item: {
 				id: '', // Will be generated in reducer
-				product_id: parseInt(product.id), // Convert string ID to number for cart compatibility
+				product_id: product.id, // Use string ID directly instead of parseInt
 				name: product.name,
 				attributes: product.features?.slice(0, 3) || [], // Use features as attributes
 				image: placeholderImage, // Use placeholder instead of non-existent image

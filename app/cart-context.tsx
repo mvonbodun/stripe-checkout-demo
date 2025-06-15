@@ -24,7 +24,7 @@ export type Address = {
 
 export type CartItem = {
   id: string;
-  product_id: number;
+  product_id: string;
   name: string;
   attributes?: string[];
   image?: string;
@@ -56,13 +56,13 @@ type CartState = Cart;
 
 type CartAction =
   | { type: 'ADD_ITEM'; item: CartItem }
-  | { type: 'REMOVE_ITEM'; product_id: number }
-  | { type: 'UPDATE_QUANTITY'; product_id: number; quantity: number }
+  | { type: 'REMOVE_ITEM'; product_id: string }
+  | { type: 'UPDATE_QUANTITY'; product_id: string; quantity: number }
   | { type: 'CLEAR_CART' }
   | { type: 'UPDATE_TAX_TOTAL'; tax_total: number }
-  | { type: 'UPDATE_LINE_TAX_TOTAL'; product_id: number; tax_total: number }
-  | { type: 'UPDATE_LINE_SHIPPING_TOTAL'; product_id: number; shipping_total: number }
-  | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: number; shipping_tax_total: number }
+  | { type: 'UPDATE_LINE_TAX_TOTAL'; product_id: string; tax_total: number }
+  | { type: 'UPDATE_LINE_SHIPPING_TOTAL'; product_id: string; shipping_total: number }
+  | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: string; shipping_tax_total: number }
   | { type: 'UPDATE_PAYMENT_INTENT'; payment_intent: string | null }
   | { type: 'UPDATE_SHIPPING_METHOD'; shipping_method_id: string; shipping_method_name: string; shipping_method_cost: number }
   | { type: 'UPDATE_SHIPPING_ADDRESS'; shipping_address: Address | null }
@@ -136,6 +136,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return recalcTotals(state.line_items.map(item => ({ ...item })), action.tax_total);
     }
     case 'UPDATE_LINE_TAX_TOTAL': {
+      console.log('🛒 UPDATE_LINE_TAX_TOTAL:', { product_id: action.product_id, tax_total: action.tax_total });
       // Update the line_tax_total for a specific item and recalculate totals
       const updatedItems = state.line_items.map(item =>
         item.product_id === action.product_id ? { ...item, line_tax_total: action.tax_total } : item
@@ -143,6 +144,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return recalcTotals(updatedItems);
     }
     case 'UPDATE_LINE_SHIPPING_TOTAL': {
+      console.log('🛒 UPDATE_LINE_SHIPPING_TOTAL:', { product_id: action.product_id, shipping_total: action.shipping_total });
       // Update the line_shipping_total for a specific item and recalculate totals
       const updatedItems = state.line_items.map(item =>
         item.product_id === action.product_id ? { ...item, line_shipping_total: action.shipping_total } : item
@@ -150,6 +152,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return recalcTotals(updatedItems);
     }
     case 'UPDATE_LINE_SHIPPING_TAX_TOTAL': {
+      console.log('🛒 UPDATE_LINE_SHIPPING_TAX_TOTAL:', { product_id: action.product_id, shipping_tax_total: action.shipping_tax_total });
       // Update the line_shipping_tax_total for a specific item and recalculate totals
       const updatedItems = state.line_items.map(item =>
         item.product_id === action.product_id ? { ...item, line_shipping_tax_total: action.shipping_tax_total } : item
@@ -157,6 +160,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return recalcTotals(updatedItems);
     }
     case 'UPDATE_SHIPPING_METHOD': {
+      console.log('🛒 UPDATE_SHIPPING_METHOD:', { 
+        shipping_method_id: action.shipping_method_id, 
+        shipping_method_name: action.shipping_method_name, 
+        shipping_method_cost: action.shipping_method_cost 
+      });
       // Update shipping method and distribute shipping cost among line items
       const { shipping_method_id, shipping_method_name, shipping_method_cost } = action;
       
