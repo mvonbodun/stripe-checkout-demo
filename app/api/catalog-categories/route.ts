@@ -1,78 +1,68 @@
 import { NextResponse } from 'next/server';
+import { 
+  Category, 
+  CategoryTree, 
+  mockCategories, 
+  getCategoriesByLevel, 
+  getCategoryTree,
+  findCategoryById,
+  findCategoryBySlug 
+} from '../../models/category';
 
-export interface CatalogCategory {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  active: boolean;
-  order: number;
-}
-
-// Mock catalog categories data
-const mockCategories: CatalogCategory[] = [
-  {
-    id: '1',
-    name: 'Electronics',
-    slug: 'electronics',
-    description: 'Latest gadgets and electronics',
-    active: true,
-    order: 1,
-  },
-  {
-    id: '2',
-    name: 'Clothing',
-    slug: 'clothing',
-    description: 'Fashion and apparel',
-    active: true,
-    order: 2,
-  },
-  {
-    id: '3',
-    name: 'Home & Garden',
-    slug: 'home-garden',
-    description: 'Home improvement and garden supplies',
-    active: true,
-    order: 3,
-  },
-  {
-    id: '4',
-    name: 'Sports & Outdoors',
-    slug: 'sports-outdoors',
-    description: 'Sports equipment and outdoor gear',
-    active: true,
-    order: 4,
-  },
-  {
-    id: '5',
-    name: 'Books',
-    slug: 'books',
-    description: 'Books and literature',
-    active: true,
-    order: 5,
-  },
-  {
-    id: '6',
-    name: 'Beauty',
-    slug: 'beauty',
-    description: 'Beauty and personal care',
-    active: true,
-    order: 6,
-  },
-];
-
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Filter only active categories and sort by order
-    const activeCategories = mockCategories
-      .filter(category => category.active)
-      .sort((a, b) => a.order - b.order);
+    const { searchParams } = new URL(request.url);
+    const level = searchParams.get('level');
+    const parentId = searchParams.get('parentId');
+    const slug = searchParams.get('slug');
+    const tree = searchParams.get('tree');
+    const id = searchParams.get('id');
 
-    return NextResponse.json(activeCategories);
+    // Get single category by ID
+    if (id) {
+      const category = findCategoryById(id);
+      if (!category) {
+        return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+      }
+      return NextResponse.json(category);
+    }
+
+    // Get single category by slug
+    if (slug) {
+      const category = findCategoryBySlug(slug);
+      if (!category) {
+        return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+      }
+      return NextResponse.json(category);
+    }
+
+    // Get category tree
+    if (tree === 'true') {
+      const categoryTree = getCategoryTree();
+      return NextResponse.json(categoryTree);
+    }
+
+    // Get categories by level
+    if (level) {
+      const levelNum = parseInt(level) as 1 | 2 | 3;
+      if (levelNum >= 1 && levelNum <= 3) {
+        const categories = getCategoriesByLevel(levelNum);
+        return NextResponse.json(categories);
+      }
+    }
+
+    // Get categories by parent ID
+    if (parentId) {
+      const childCategories = mockCategories.filter(cat => cat.parentId === parentId);
+      return NextResponse.json(childCategories);
+    }
+
+    // Return all categories by default
+    return NextResponse.json(mockCategories);
   } catch (error) {
-    console.error('Error fetching catalog categories:', error);
+    console.error('Error fetching categories:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch catalog categories' },
+      { error: 'Failed to fetch categories' },
       { status: 500 }
     );
   }

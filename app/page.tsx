@@ -3,41 +3,8 @@
 import { useCart } from './cart-context';
 import ProductCard from './components/ProductCard';
 import Hero, { HeroData } from './components/Hero';
-
-const PRODUCTS = [
-	{
-		product_id: 1,
-		name: 'T-Shirt',
-		price: 25.0,
-		image: 'https://placehold.co/120x120',
-		attributes: ['Large', 'Red'],
-		taxcode: 'txcd_99999999',
-	},
-	{
-		product_id: 2,
-		name: 'Sneakers',
-		price: 60.0,
-		image: 'https://placehold.co/120x120',
-		attributes: ['Size 10'],
-		taxcode: 'txcd_99999999',
-	},
-	{
-		product_id: 3,
-		name: 'Shorts',
-		price: 40.0,
-		image: 'https://placehold.co/120x120',
-		attributes: ['Size 32'],
-		taxcode: 'txcd_99999999',
-	},
-	{
-		product_id: 4,
-		name: 'Hat',
-		price: 15.0,
-		image: 'https://placehold.co/120x120',
-		attributes: ['Size Large'],
-		taxcode: 'txcd_99999999',
-	},
-];
+import { mockProducts, Product } from './models/product';
+import { getValidTaxCode } from './models/common';
 
 const HERO_DATA: HeroData[] = [
 	{
@@ -71,17 +38,25 @@ const HERO_DATA: HeroData[] = [
 
 import { useMiniCartUI } from './mini-cart-ui-context';
 
+// Get a subset of products for the homepage
+const FEATURED_PRODUCTS = mockProducts.slice(0, 4);
+
 export default function Home() {
 	const { dispatch } = useCart();
 	const { openMiniCart } = useMiniCartUI();
 
-	const addToCart = (product: typeof PRODUCTS[0]) => {
+	const addToCart = (product: Product) => {
 		dispatch({
 			type: 'ADD_ITEM',
 			item: {
-				...product,
 				id: '', // Will be generated in reducer
+				product_id: parseInt(product.id), // Convert string ID to number for cart compatibility
+				name: product.name,
+				attributes: product.features?.slice(0, 3) || [], // Use features as attributes
+				image: product.images?.[0]?.url || undefined,
+				price: product.basePrice,
 				quantity: 1,
+				taxcode: getValidTaxCode(product.taxCode), // Use utility function for tax code validation
 				line_subtotal: 0, // Will be calculated in reducer
 				line_shipping_total: 0,
 				line_tax_total: 0,
@@ -93,8 +68,7 @@ export default function Home() {
 	};
 
 	return (
-		<div className="w-full">
-			{/* Hero Section */}
+		<div className="min-h-screen bg-base-100">
 			<Hero
 				heroes={HERO_DATA}
 				autoRotate={true}
@@ -109,9 +83,9 @@ export default function Home() {
 						id="products"
 						className="grid grid-cols-1 md:grid-cols-2 gap-8"
 					>
-						{PRODUCTS.map((product) => (
+						{FEATURED_PRODUCTS.map((product) => (
 							<ProductCard
-								key={product.product_id}
+								key={product.id}
 								product={product}
 								onAddToCart={addToCart}
 							/>
