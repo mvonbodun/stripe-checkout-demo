@@ -25,6 +25,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
 }) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -56,8 +57,10 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    setHoveredCategory(categoryId);
-    setActiveDropdown(categoryId);
+    if (!isNavigating) {
+      setHoveredCategory(categoryId);
+      setActiveDropdown(categoryId);
+    }
   };
 
   const handleMouseLeave = () => {
@@ -96,6 +99,28 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
     };
   }, []);
 
+  // Function to close dropdown when navigating
+  const handleCategoryClick = (e: React.MouseEvent) => {
+    setActiveDropdown(null);
+    setHoveredCategory(null);
+    setIsNavigating(true);
+    
+    // Force blur the clicked element to remove focus state
+    const target = e.currentTarget as HTMLElement;
+    target.blur();
+    
+    // Reset navigation state after a short delay to allow page navigation
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 500);
+  };
+
+  // Handle blur to clear focus states
+  const handleBlur = () => {
+    setHoveredCategory(null);
+    setActiveDropdown(null);
+  };
+
   // Filter to only show level 1 categories
   const level1Categories = categories.filter(cat => cat.level === 1);
 
@@ -126,11 +151,13 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                   className={`
                     header-nav text-base font-medium text-gray-700 hover:text-blue-600 
                     transition-all duration-200 whitespace-nowrap py-4 px-3 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                    relative block
-                    ${hoveredCategory === category.id ? 'text-blue-600' : ''}
+                    focus:outline-none relative block
+                    ${hoveredCategory === category.id && !isNavigating ? 'text-blue-600' : ''}
+                    ${isNavigating ? 'pointer-events-none' : ''}
                   `}
                   title={category.description || category.name}
+                  onClick={handleCategoryClick}
+                  onBlur={handleBlur}
                 >
                   {category.name}
                   {/* Hover underline */}
@@ -138,7 +165,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                     className={`
                       absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 
                       transform transition-transform duration-200 origin-left
-                      ${hoveredCategory === category.id ? 'scale-x-100' : 'scale-x-0'}
+                      ${hoveredCategory === category.id && !isNavigating ? 'scale-x-100' : 'scale-x-0'}
                     `}
                   />
                 </Link>
@@ -166,6 +193,8 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                           <Link
                             href={`/c/${level2Category.slug}`}
                             className="block text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                            onClick={handleCategoryClick}
+                            onBlur={handleBlur}
                           >
                             {level2Category.name}
                           </Link>
@@ -178,6 +207,8 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                                   <Link
                                     href={`/c/${level3Category.slug}`}
                                     className="block text-sm text-gray-600 hover:text-blue-600 transition-colors py-1"
+                                    onClick={handleCategoryClick}
+                                    onBlur={handleBlur}
                                   >
                                     {level3Category.name}
                                   </Link>
