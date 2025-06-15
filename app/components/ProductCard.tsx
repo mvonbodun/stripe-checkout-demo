@@ -13,9 +13,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   const placeholderImage = `https://placehold.co/200x200/e5e7eb/6b7280?text=${encodeURIComponent(product.name.split(' ').slice(0, 2).join(' '))}`;
 
   return (
-    <div className="border rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-200">
+    <div className="border rounded-lg p-4 flex flex-col h-full hover:shadow-lg transition-shadow duration-200">
       {/* Product Image - Enlarged */}
-      <div className="relative mb-4 w-full h-48 flex items-center justify-center">
+      <div className="relative mb-4 w-full h-48 flex items-center justify-center flex-shrink-0">
         <Image 
           src={placeholderImage}
           alt={product.name} 
@@ -30,29 +30,34 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
       </div>
 
       {/* Product Name */}
-      <div className="font-bold text-lg mb-2 text-center line-clamp-2">{product.name}</div>
+      <div className="font-bold text-lg mb-2 text-center line-clamp-2 flex-shrink-0">{product.name}</div>
 
-      {/* Short Description */}
-      {product.shortDescription && (
-        <div className="text-sm text-gray-600 mb-4 text-center line-clamp-2">
-          {product.shortDescription}
+      {/* Short Description - This can grow and wrap */}
+      <div className="flex-grow flex flex-col justify-between">
+        {product.shortDescription && (
+          <div className="text-sm text-gray-600 mb-4 text-center">
+            {product.shortDescription}
+          </div>
+        )}
+        
+        {/* Bottom section with price and button - anchored to bottom */}
+        <div className="mt-auto">
+          {/* Pricing */}
+          <div className="mb-4 text-center">
+            <span className="font-bold text-lg text-primary">
+              {formatPrice(product.basePrice)}
+            </span>
+          </div>
+
+          {/* Add to Cart Button */}
+          <button
+            className="btn btn-primary w-full"
+            onClick={() => onAddToCart(product)}
+          >
+            Add to Cart
+          </button>
         </div>
-      )}
-
-      {/* Pricing */}
-      <div className="mb-4 text-center">
-        <span className="font-bold text-lg text-primary">
-          {formatPrice(product.basePrice)}
-        </span>
       </div>
-
-      {/* Add to Cart Button */}
-      <button
-        className="btn btn-primary w-full"
-        onClick={() => onAddToCart(product)}
-      >
-        Add to Cart
-      </button>
     </div>
   );
 };
