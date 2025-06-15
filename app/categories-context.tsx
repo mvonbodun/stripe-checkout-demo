@@ -1,11 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { CatalogCategory } from './api/catalog-categories/route';
+import { CategoryTree } from './models/category';
 
 // Context for sharing categories data across components
 interface CategoriesContextType {
-  categories: CatalogCategory[];
+  categories: CategoryTree[];
   isLoading: boolean;
 }
 
@@ -24,7 +24,7 @@ interface CategoriesProviderProps {
 }
 
 export function CategoriesProvider({ children }: CategoriesProviderProps) {
-  const [categories, setCategories] = useState<CatalogCategory[]>([]);
+  const [categories, setCategories] = useState<CategoryTree[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch categories on mount
@@ -32,7 +32,8 @@ export function CategoriesProvider({ children }: CategoriesProviderProps) {
     const fetchCategories = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch("/api/catalog-categories");
+        // Fetch category tree instead of flat categories
+        const response = await fetch("/api/catalog-categories?tree=true");
         if (response.ok) {
           const categoriesData = await response.json();
           setCategories(categoriesData);
