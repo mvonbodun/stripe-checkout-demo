@@ -544,19 +544,19 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
           availableShippingOptions: shippingRates.map((rate: { displayName: string; amount: number }) => `${rate.displayName}: $${rate.amount/100}`)
         });
 
-        // Resolve the address change event with updated pricing
-        event.resolve({
-          lineItems,
-          shippingRates
-        });
-
-        // Update Elements with the new amount to fix the timing issue
+        // Update Elements with the new amount BEFORE resolving to fix the timing issue
         if (elements) {
           await elements.update({
             amount: Math.round(newGrandTotal * 100) // Convert to cents
           });
           console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
         }
+
+        // Resolve the address change event with updated pricing
+        event.resolve({
+          lineItems,
+          shippingRates
+        });
 
       }
 
@@ -678,14 +678,6 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
         grandTotal: newGrandTotal
       });
 
-      // Update Elements with the new amount to fix the timing issue
-      if (elements) {
-        await elements.update({
-          amount: Math.round(newGrandTotal * 100) // Convert to cents
-        });
-        console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
-      }
-
       // Resolve the event with updated totals for Stripe
       // The Express Checkout Element expects lineItems and shippingRates
       const lineItems = [
@@ -721,6 +713,14 @@ const ExpressCheckoutInner: React.FC<ExpressCheckoutComponentProps> = ({
         selectedRate: selectedRate.displayName,
         newGrandTotal: newGrandTotal
       });
+
+      // Update Elements with the new amount BEFORE resolving to fix the timing issue
+      if (elements) {
+        await elements.update({
+          amount: Math.round(newGrandTotal * 100) // Convert to cents
+        });
+        console.log('✅ Elements updated with new amount:', Math.round(newGrandTotal * 100));
+      }
 
       // Resolve the shipping rate change event with updated pricing
       event.resolve({
