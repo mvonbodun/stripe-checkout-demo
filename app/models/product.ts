@@ -1087,3 +1087,15 @@ export const sortProducts = (products: Product[], sort: ProductSort): Product[] 
     }
   });
 };
+
+// Find product by slug
+export const findProductBySlug = (slug: string): Product | undefined => {
+  return mockProducts.find(product => product.slug === slug);
+};
+
+// Get related products from same category
+export const getRelatedProducts = (productId: string, categoryId: string, limit: number = 4): Product[] => {
+  return mockProducts
+    .filter(p => p.id !== productId && p.categoryIds.includes(categoryId))
+    .slice(0, limit);
+};
