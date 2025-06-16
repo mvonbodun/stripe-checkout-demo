@@ -4,7 +4,10 @@ import { findCategoryById, getAllCategories } from '../../models/category';
 import Breadcrumb from '../../components/Breadcrumb';
 import { buildProductBreadcrumbs } from '../../utils/breadcrumbs';
 import ProductImageGallery from '../../components/ProductImageGallery';
+import ProductImageGalleryMobile from '../../components/ProductImageGalleryMobile';
 import ProductInfo from '../../components/ProductInfo';
+import ProductInfoMobile from '../../components/ProductInfoMobile';
+import ProductInfoMobileBottom from '../../components/ProductInfoMobileBottom';
 import ProductTabs from '../../components/ProductTabs';
 import RelatedProducts from '../../components/RelatedProducts';
 
@@ -40,8 +43,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbItems} className="mb-4 sm:mb-6" />
       
-      {/* Product Main Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mt-4 sm:mt-6">
+      {/* Mobile-First Layout */}
+      <div className="block lg:hidden">
+        {/* Mobile Layout: Following specified order */}
+        {/* 1. Brand, Product Name, Star Rating & Q&A */}
+        <ProductInfoMobile product={product} />
+        
+        {/* 2. Main Product Image */}
+        <div className="mt-6">
+          <ProductImageGalleryMobile product={product} />
+        </div>
+        
+        {/* 3. Attributes, Quantity, Add to Cart, Trust Icons, SKU, Weight, Dimensions */}
+        <div className="mt-6">
+          <ProductInfoMobileBottom product={product} />
+        </div>
+      </div>
+      
+      {/* Desktop Layout */}
+      <div className="hidden lg:grid lg:grid-cols-2 gap-6 lg:gap-8 mt-4 sm:mt-6">
         {/* Left: Image Gallery */}
         <ProductImageGallery product={product} />
         
