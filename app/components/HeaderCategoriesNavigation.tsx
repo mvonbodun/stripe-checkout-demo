@@ -34,20 +34,20 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
     {
       title: "New Arrivals",
       description: "Latest products just in",
-      imageUrl: "/images/marketing/new-arrivals.jpg",
+      imageUrl: "https://placehold.co/300x200/e5e7eb/6b7280?text=New+Arrivals",
       linkUrl: "/new-arrivals",
       badge: "NEW"
     },
     {
       title: "Best Sellers",
       description: "Most popular items",
-      imageUrl: "/images/marketing/bestsellers.jpg",
+      imageUrl: "https://placehold.co/300x200/e5e7eb/6b7280?text=Best+Sellers",
       linkUrl: "/bestsellers"
     },
     {
       title: "Sale Items",
       description: "Up to 50% off",
-      imageUrl: "/images/marketing/sale.jpg",
+      imageUrl: "https://placehold.co/300x200/e5e7eb/6b7280?text=Sale+Items",
       linkUrl: "/sale",
       badge: "SALE"
     }
