@@ -16,16 +16,17 @@ export interface BreadcrumbProps {
 /**
  * Reusable Breadcrumb component for navigation
  * Supports category hierarchy and future product pages
+ * Mobile-responsive with proper text wrapping
  */
 export default function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
   return (
-    <nav className={`flex ${className}`} aria-label="Breadcrumb">
-      <ol className="flex items-center space-x-2 text-sm text-gray-500">
+    <nav className={`w-full ${className}`} aria-label="Breadcrumb">
+      <ol className="flex flex-wrap items-center gap-y-1 text-sm text-gray-500">
         {items.map((item, index) => (
           <li key={index} className="flex items-center">
             {index > 0 && (
               <svg
-                className="flex-shrink-0 h-4 w-4 mx-2 text-gray-400"
+                className="flex-shrink-0 h-4 w-4 mx-1 sm:mx-2 text-gray-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 aria-hidden="true"
@@ -38,13 +39,13 @@ export default function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
               </svg>
             )}
             {item.isActive ? (
-              <span className="text-gray-900 font-medium" aria-current="page">
+              <span className="text-gray-900 font-medium break-words min-w-0 flex-shrink" aria-current="page">
                 {item.label}
               </span>
             ) : (
               <Link
                 href={item.href}
-                className="hover:text-gray-700 transition-colors duration-200"
+                className="hover:text-gray-700 transition-colors duration-200 break-words min-w-0 flex-shrink"
                 title={`Go to ${item.label}`}
               >
                 {item.label}
