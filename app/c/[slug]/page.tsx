@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { findCategoryBySlug, getAllCategories, getAllCategoryIdsInHierarchy } from '../../models/category';
 import { getProductsByCategoryHierarchy, Product } from '../../models/product';
 import { useCart } from '../../cart-context';
+import { useMiniCartUI } from '../../mini-cart-ui-context';
 import Breadcrumb, { buildCategoryBreadcrumbs } from '../../components/Breadcrumb';
 import ProductCard from '../../components/ProductCard';
 
@@ -19,6 +20,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = use(params);
   const category = findCategoryBySlug(slug);
   const { dispatch } = useCart();
+  const { openMiniCart } = useMiniCartUI();
   const [imageError, setImageError] = useState(false);
 
   if (!category) {
@@ -34,14 +36,17 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   // Function to handle adding product to cart
   const handleAddToCart = (product: Product) => {
+    // Create placeholder image for cart item (consistent with home page)
+    const placeholderImage = `https://placehold.co/100x100/e5e7eb/6b7280?text=${encodeURIComponent(product.name.split(' ').slice(0, 2).join(' '))}`;
+    
     const cartItem = {
       id: crypto.randomUUID(),
       product_id: product.id,
       name: product.name,
       price: product.basePrice,
       quantity: 1,
-      image: product.images?.[0]?.url || undefined,
-      attributes: [],
+      image: placeholderImage, // Use placeholder like home page
+      attributes: product.features?.slice(0, 3) || [], // Use features as attributes
       line_subtotal: product.basePrice,
       line_shipping_total: 0,
       line_tax_total: 0,
@@ -50,6 +55,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     };
     
     dispatch({ type: 'ADD_ITEM', item: cartItem });
+    openMiniCart(); // Open the mini cart after adding the item
   };
 
   return (
