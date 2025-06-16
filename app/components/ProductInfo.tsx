@@ -4,6 +4,7 @@ import { Product } from '../models/product';
 import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
+import ProductRatingAndQA from './ProductRatingAndQA';
 
 interface ProductInfoProps {
   product: Product;
@@ -25,14 +26,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         <div className="text-xs sm:text-sm text-gray-600 uppercase tracking-wide font-medium">
           {product.brand}
         </div>
-      )}
-      
-      {/* Product Name */}
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-        {product.name}
-      </h1>
-      
-      {/* Price */}
+      )}        {/* Product Name */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+          {product.name}
+        </h1>
+        
+        {/* Rating & Q&A */}
+        <ProductRatingAndQA />
+        
+        {/* Price */}
       <div className="flex items-center space-x-3 sm:space-x-4">
         <span className="text-2xl sm:text-3xl font-bold text-gray-900">
           ${product.basePrice.toFixed(2)}
