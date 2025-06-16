@@ -337,6 +337,17 @@ export const getProductsByCategory = (categoryId: string): Product[] => {
   );
 };
 
+// New function to get products from multiple categories (for hierarchy support)
+export const getProductsByCategoryHierarchy = (categoryIds: string[]): Product[] => {
+  if (categoryIds.length === 0) return [];
+  
+  return mockProducts.filter(product => 
+    categoryIds.some(categoryId => 
+      product.categoryId === categoryId || product.categoryIds.includes(categoryId)
+    )
+  );
+};
+
 export const getProductBySlug = (slug: string): Product | undefined => {
   return mockProducts.find(product => product.slug === slug);
 };

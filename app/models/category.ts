@@ -409,3 +409,35 @@ export const findCategoryById = (id: string): Category | undefined => {
 export const getAllCategories = (): Category[] => {
   return mockCategories;
 };
+
+// New hierarchy utility functions for product grid implementation
+export const getDescendantCategoryIds = (categoryId: string): string[] => {
+  const category = findCategoryById(categoryId);
+  if (!category) return [];
+
+  const descendants: string[] = [];
+  const children = getCategoryChildren(categoryId);
+  
+  for (const child of children) {
+    descendants.push(child.id);
+    // Recursively get grandchildren
+    const grandchildren = getDescendantCategoryIds(child.id);
+    descendants.push(...grandchildren);
+  }
+  
+  return descendants;
+};
+
+export const getAllCategoryIdsInHierarchy = (categoryId: string): string[] => {
+  const category = findCategoryById(categoryId);
+  if (!category) return [];
+
+  // For level 3 categories, only return the current category ID
+  if (category.level === 3) {
+    return [categoryId];
+  }
+
+  // For level 1 and 2 categories, include current category + all descendants
+  const descendantIds = getDescendantCategoryIds(categoryId);
+  return [categoryId, ...descendantIds];
+};

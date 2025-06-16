@@ -2,8 +2,12 @@
 
 import { use } from 'react';
 import { notFound } from 'next/navigation';
-import { findCategoryBySlug, getAllCategories } from '../../models/category';
+import Image from 'next/image';
+import { findCategoryBySlug, getAllCategories, getAllCategoryIdsInHierarchy } from '../../models/category';
+import { getProductsByCategoryHierarchy, Product } from '../../models/product';
+import { useCart } from '../../cart-context';
 import Breadcrumb, { buildCategoryBreadcrumbs } from '../../components/Breadcrumb';
+import ProductCard from '../../components/ProductCard';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -14,6 +18,7 @@ interface CategoryPageProps {
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = use(params);
   const category = findCategoryBySlug(slug);
+  const { dispatch } = useCart();
 
   if (!category) {
     notFound();
@@ -21,6 +26,30 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   const allCategories = getAllCategories();
   const breadcrumbs = buildCategoryBreadcrumbs(category, allCategories);
+
+  // Get products based on category hierarchy
+  const categoryIds = getAllCategoryIdsInHierarchy(category.id);
+  const products = getProductsByCategoryHierarchy(categoryIds);
+
+  // Function to handle adding product to cart
+  const handleAddToCart = (product: Product) => {
+    const cartItem = {
+      id: crypto.randomUUID(),
+      product_id: product.id,
+      name: product.name,
+      price: product.basePrice,
+      quantity: 1,
+      image: product.images?.[0]?.url || undefined,
+      attributes: [],
+      line_subtotal: product.basePrice,
+      line_shipping_total: 0,
+      line_tax_total: 0,
+      line_shipping_tax_total: 0,
+      line_grand_total: product.basePrice,
+    };
+    
+    dispatch({ type: 'ADD_ITEM', item: cartItem });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,11 +88,12 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             {/* Category Image */}
             {category.imageUrl && (
               <div className="ml-8 flex-shrink-0">
-                <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-200">
-                  <img
+                <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-200 relative">
+                  <Image
                     src={category.imageUrl}
                     alt={category.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
@@ -80,89 +110,41 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
       {/* Content Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Products Section */}
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Category Details</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900">Products in {category.name}</h2>
+            <span className="text-sm text-gray-500">
+              {products.length} {products.length === 1 ? 'product' : 'products'} found
+            </span>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Basic Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Basic Information</h3>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Name</dt>
-                  <dd className="text-sm text-gray-900">{category.name}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Level</dt>
-                  <dd className="text-sm text-gray-900">Level {category.level}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Status</dt>
-                  <dd className="text-sm text-gray-900">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      category.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {category.active ? 'Active' : 'Inactive'}
-                    </span>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Order</dt>
-                  <dd className="text-sm text-gray-900">{category.order}</dd>
-                </div>
-              </dl>
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                />
+              ))}
             </div>
-
-            {/* Hierarchy Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Hierarchy</h3>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Full Path</dt>
-                  <dd className="text-sm text-gray-900">{category.path}</dd>
-                </div>
-                {category.parentId && (
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Parent ID</dt>
-                    <dd className="text-sm text-gray-900">{category.parentId}</dd>
-                  </div>
-                )}
-              </dl>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Products Found</h3>
+              <p className="text-gray-500">
+                {category.level === 3 
+                  ? "No products are currently assigned to this category."
+                  : "No products found in any subcategories of this category."
+                }
+              </p>
             </div>
-
-            {/* SEO Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">SEO</h3>
-              <dl className="space-y-2">
-                {category.seoTitle && (
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">SEO Title</dt>
-                    <dd className="text-sm text-gray-900">{category.seoTitle}</dd>
-                  </div>
-                )}
-                {category.seoDescription && (
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">SEO Description</dt>
-                    <dd className="text-sm text-gray-900">{category.seoDescription}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-          </div>
-        </div>
-
-        {/* Placeholder for future content */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Products</h2>
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Products Coming Soon</h3>
-            <p className="text-gray-500">Product listings for this category will be displayed here.</p>
-          </div>
+          )}
         </div>
       </div>
     </div>
