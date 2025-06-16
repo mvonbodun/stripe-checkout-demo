@@ -7,7 +7,8 @@ import { findCategoryBySlug, getAllCategories, getAllCategoryIdsInHierarchy } fr
 import { getProductsByCategoryHierarchy, Product } from '../../models/product';
 import { useCart } from '../../cart-context';
 import { useMiniCartUI } from '../../mini-cart-ui-context';
-import Breadcrumb, { buildCategoryBreadcrumbs } from '../../components/Breadcrumb';
+import Breadcrumb from '../../components/Breadcrumb';
+import { buildCategoryBreadcrumbs } from '../../utils/breadcrumbs';
 import ProductCard from '../../components/ProductCard';
 
 interface CategoryPageProps {

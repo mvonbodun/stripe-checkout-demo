@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import { findProductBySlug, getRelatedProducts } from '../../models/product';
 import { findCategoryById, getAllCategories } from '../../models/category';
-import Breadcrumb, { buildProductBreadcrumbs } from '../../components/Breadcrumb';
+import Breadcrumb from '../../components/Breadcrumb';
+import { buildProductBreadcrumbs } from '../../utils/breadcrumbs';
 import ProductImageGallery from '../../components/ProductImageGallery';
 import ProductInfo from '../../components/ProductInfo';
 import ProductTabs from '../../components/ProductTabs';
