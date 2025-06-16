@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Product } from '../models/product';
 import { formatPrice } from '../models/common';
 
@@ -15,22 +16,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   return (
     <div className="border rounded-lg p-4 flex flex-col h-full hover:shadow-lg transition-shadow duration-200">
       {/* Product Image - Enlarged */}
-      <div className="relative mb-4 w-full h-48 flex items-center justify-center flex-shrink-0">
-        <Image 
-          src={placeholderImage}
-          alt={product.name} 
-          className="rounded object-cover" 
-          width={200} 
-          height={200}
-          priority={false}
-          loading="lazy"
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-        />
-      </div>
+      <Link href={`/p/${product.slug}`} className="block">
+        <div className="relative mb-4 w-full h-48 flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity duration-200">
+          <Image 
+            src={placeholderImage}
+            alt={product.name} 
+            className="rounded object-cover" 
+            width={200} 
+            height={200}
+            priority={false}
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+          />
+        </div>
+      </Link>
 
       {/* Product Name */}
-      <div className="font-bold text-lg mb-2 text-center line-clamp-2 flex-shrink-0">{product.name}</div>
+      <Link href={`/p/${product.slug}`} className="block">
+        <div className="font-bold text-lg mb-2 text-center line-clamp-2 flex-shrink-0 hover:text-blue-600 transition-colors duration-200">{product.name}</div>
+      </Link>
 
       {/* Short Description - This can grow and wrap */}
       <div className="flex-grow flex flex-col justify-between">
