@@ -26,7 +26,7 @@ export default function ProductNotFound() {
         </h1>
         
         <p className="text-gray-600 mb-8">
-          Sorry, we couldn't find the product you're looking for. It may have been removed or is no longer available.
+          Sorry, we couldn&apos;t find the product you&apos;re looking for. It may have been removed or is no longer available.
         </p>
         
         <div className="space-y-4">
