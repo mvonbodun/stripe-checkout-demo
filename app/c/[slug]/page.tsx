@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { findCategoryBySlug, getAllCategories, getAllCategoryIdsInHierarchy } from '../../models/category';
@@ -19,6 +19,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = use(params);
   const category = findCategoryBySlug(slug);
   const { dispatch } = useCart();
+  const [imageError, setImageError] = useState(false);
 
   if (!category) {
     notFound();
@@ -88,19 +89,25 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             {/* Category Image */}
             {category.imageUrl && (
               <div className="ml-8 flex-shrink-0">
-                <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-200 relative">
-                  <Image
-                    src={category.imageUrl}
-                    alt={category.name}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.parentElement!.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                      target.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-white font-medium">${category.name}</div>`;
-                    }}
-                  />
+                <div className="w-32 h-32 rounded-lg overflow-hidden relative">
+                  {!imageError ? (
+                    <Image
+                      src={category.imageUrl}
+                      alt={category.name}
+                      fill
+                      className="object-cover"
+                      onError={() => setImageError(true)}
+                    />
+                  ) : (
+                    <div 
+                      className="w-full h-full flex items-center justify-center text-white font-medium text-sm text-center px-2"
+                      style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                      }}
+                    >
+                      {category.name}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
