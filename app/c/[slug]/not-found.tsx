@@ -22,7 +22,7 @@ export default function CategoryNotFound() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Category Not Found</h1>
           <p className="text-gray-600">
-            The category you're looking for doesn't exist or may have been moved.
+            The category you&apos;re looking for doesn&apos;t exist or may have been moved.
           </p>
         </div>
 

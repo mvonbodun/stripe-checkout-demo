@@ -7,7 +7,7 @@ import MyAccountIcon from './MyAccountIcon';
 import HelpIcon from './HelpIcon';
 import TrackOrderIcon from './TrackOrderIcon';
 import { useMyAccountUI } from '../my-account-ui-context';
-import { CategoryTree, getCategoryTree, Category } from '../models/category';
+import { CategoryTree, getCategoryTree } from '../models/category';
 
 interface MobileMenuModalProps {
   open: boolean;

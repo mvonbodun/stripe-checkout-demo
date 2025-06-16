@@ -382,8 +382,8 @@ export const filterProducts = (filter: ProductFilter): Product[] => {
 
 export const sortProducts = (products: Product[], sort: ProductSort): Product[] => {
   return [...products].sort((a, b) => {
-    let aValue: any;
-    let bValue: any;
+    let aValue: string | number;
+    let bValue: string | number;
     
     if (sort.field === 'price') {
       aValue = a.basePrice;

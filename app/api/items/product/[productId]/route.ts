@@ -31,7 +31,11 @@ export async function GET(
       });
     }
 
-    const response: any = {
+    const response: {
+      product: typeof product;
+      items: typeof items;
+      priceRange?: { min: number; max: number } | null;
+    } = {
       product,
       items
     };

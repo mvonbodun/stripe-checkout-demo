@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { 
-  Category, 
-  CategoryTree, 
   mockCategories, 
   getCategoriesByLevel, 
   getCategoryTree,

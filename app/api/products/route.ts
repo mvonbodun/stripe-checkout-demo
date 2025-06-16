@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 import { 
-  Product, 
-  mockProducts, 
   filterProducts, 
   sortProducts, 
-  searchProducts,
   ProductFilter,
   ProductSort 
 } from '../../models/product';
