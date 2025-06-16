@@ -125,7 +125,7 @@ export const mockProducts: Product[] = [
       { name: 'HDMI Ports', value: '4', group: 'Connectivity' }
     ],
     basePrice: 1899.99,
-    compareAtPrice: 2199.99,
+    compareAtPrice: 1999.99,
     taxCode: 'txcd_99999999',
     weight: { value: 55.1, unit: 'lb' },
     dimensions: { length: 57.1, width: 32.7, height: 2.4, unit: 'in' },
@@ -178,7 +178,7 @@ export const mockProducts: Product[] = [
       { name: 'Weight', value: '3.5 pounds', group: 'Physical' }
     ],
     basePrice: 1999.00,
-    compareAtPrice: 2199.00,
+    compareAtPrice: 1999.00,
     taxCode: 'txcd_99999999',
     weight: { value: 3.5, unit: 'lb' },
     dimensions: { length: 12.31, width: 8.71, height: 0.61, unit: 'in' },
@@ -231,7 +231,7 @@ export const mockProducts: Product[] = [
       { name: 'Material', value: 'Titanium', group: 'Build' }
     ],
     basePrice: 999.00,
-    priceRange: { min: 999.00, max: 1499.00 },
+    priceRange: { min: 999, max: 1499 },
     taxCode: 'txcd_99999999',
     weight: { value: 6.60, unit: 'oz' },
     dimensions: { length: 5.77, width: 2.78, height: 0.32, unit: 'in' },
@@ -319,8 +319,8 @@ export const mockProducts: Product[] = [
       { name: 'Leg Opening', value: '16.5 inches', group: 'Measurements' },
       { name: 'Care', value: 'Machine wash cold', group: 'Care' }
     ],
-    basePrice: 89.50,
-    compareAtPrice: 98.00,
+    basePrice: 59.50,
+    compareAtPrice: 68.00,
     taxCode: 'txcd_99999999',
     weight: { value: 1.5, unit: 'lb' },
     createdAt: new Date('2024-02-15'),
@@ -349,8 +349,8 @@ export const mockProducts: Product[] = [
       { name: 'Resolution', value: '4K Ultra HD', group: 'Display' },
       { name: 'HDR', value: 'HDR10, Dolby Vision', group: 'Display' }
     ],
-    basePrice: 2199.99,
-    compareAtPrice: 2499.99,
+    basePrice: 1899.99,
+    compareAtPrice: 1999.99,
     taxCode: 'txcd_99999999',
     weight: { value: 55, unit: 'lb' },
     dimensions: { length: 57.25, width: 33, height: 14.375, unit: 'in' },
@@ -407,8 +407,8 @@ export const mockProducts: Product[] = [
       { name: 'Resolution', value: '4K Ultra HD', group: 'Display' },
       { name: 'HDR', value: 'HDR10+, Dolby Vision IQ', group: 'Display' }
     ],
-    basePrice: 3299.99,
-    compareAtPrice: 3599.99,
+    basePrice: 1999.99,
+    compareAtPrice: 1999.99,
     taxCode: 'txcd_99999999',
     weight: { value: 75, unit: 'lb' },
     dimensions: { length: 68.1, width: 39.1, height: 15.7, unit: 'in' },
@@ -555,7 +555,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'HDR10+, Quantum HDR', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz', group: 'Performance' }
     ],
-    basePrice: 179999, // $1799.99
+    basePrice: 1799.99,
     taxCode: 'txcd_99999999',
     weight: { value: 58.4, unit: 'lb' },
     dimensions: { length: 57.1, width: 32.7, height: 13.0, unit: 'in' },
@@ -584,7 +584,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'HDR10+, Quantum HDR', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz', group: 'Performance' }
     ],
-    basePrice: 129999, // $1299.99
+    basePrice: 1299.99,
     taxCode: 'txcd_99999999',
     weight: { value: 48.5, unit: 'lb' },
     dimensions: { length: 48.4, width: 27.8, height: 11.2, unit: 'in' },
@@ -613,7 +613,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'Dolby Vision, HDR10+', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz VRR', group: 'Performance' }
     ],
-    basePrice: 99999, // $999.99
+    basePrice: 999.99,
     taxCode: 'txcd_99999999',
     weight: { value: 52.9, unit: 'lb' },
     dimensions: { length: 57.0, width: 32.9, height: 13.2, unit: 'in' },
@@ -642,7 +642,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'Dolby Vision, HDR10+', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz', group: 'Performance' }
     ],
-    basePrice: 74999, // $749.99
+    basePrice: 749.99,
     taxCode: 'txcd_99999999',
     weight: { value: 46.7, unit: 'lb' },
     dimensions: { length: 48.4, width: 28.0, height: 11.8, unit: 'in' },
@@ -671,7 +671,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'Dolby Vision, HDR10', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz', group: 'Performance' }
     ],
-    basePrice: 229999, // $2299.99
+    basePrice: 1999.99,
     taxCode: 'txcd_99999999',
     weight: { value: 83.6, unit: 'lb' },
     dimensions: { length: 65.9, width: 37.9, height: 15.4, unit: 'in' },
@@ -700,7 +700,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'HDR10+, Quantum HDR', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz', group: 'Performance' }
     ],
-    basePrice: 199999, // $1999.99
+    basePrice: 1999.99,
     taxCode: 'txcd_99999999',
     weight: { value: 72.1, unit: 'lb' },
     dimensions: { length: 61.9, width: 35.4, height: 14.1, unit: 'in' },
@@ -729,7 +729,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'Dolby Vision IQ, HDR10 Pro', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz', group: 'Performance' }
     ],
-    basePrice: 149999, // $1499.99
+    basePrice: 1499.99,
     taxCode: 'txcd_99999999',
     weight: { value: 55.8, unit: 'lb' },
     dimensions: { length: 57.2, width: 32.9, height: 12.9, unit: 'in' },
@@ -758,7 +758,7 @@ export const mockProducts: Product[] = [
       { name: 'HDR', value: 'Dolby Vision, HDR10+', group: 'Display' },
       { name: 'Refresh Rate', value: '120Hz VRR', group: 'Performance' }
     ],
-    basePrice: 279999, // $2799.99
+    basePrice: 1899.99,
     taxCode: 'txcd_99999999',
     weight: { value: 108.5, unit: 'lb' },
     dimensions: { length: 74.8, width: 42.9, height: 16.8, unit: 'in' },
@@ -789,7 +789,7 @@ export const mockProducts: Product[] = [
       { name: 'Subwoofer', value: 'Wireless 8" Subwoofer', group: 'Audio' },
       { name: 'Connectivity', value: 'HDMI eARC, Bluetooth, Wi-Fi', group: 'Connectivity' }
     ],
-    basePrice: 149999, // $1499.99
+    basePrice: 1499.99,
     taxCode: 'txcd_99999999',
     weight: { value: 32.4, unit: 'lb' },
     dimensions: { length: 48.5, width: 5.4, height: 2.3, unit: 'in' },
@@ -818,7 +818,7 @@ export const mockProducts: Product[] = [
       { name: 'Voice Control', value: 'Amazon Alexa, Google Assistant', group: 'Smart Features' },
       { name: 'Connectivity', value: 'HDMI eARC, Wi-Fi, Ethernet', group: 'Connectivity' }
     ],
-    basePrice: 89999, // $899.99
+    basePrice: 899.99,
     taxCode: 'txcd_99999999',
     weight: { value: 13.78, unit: 'lb' },
     dimensions: { length: 45.0, width: 4.5, height: 3.4, unit: 'in' },
@@ -847,7 +847,7 @@ export const mockProducts: Product[] = [
       { name: 'Voice Control', value: 'Amazon Alexa, Google Assistant', group: 'Smart Features' },
       { name: 'Connectivity', value: 'HDMI eARC, Wi-Fi, Bluetooth', group: 'Connectivity' }
     ],
-    basePrice: 94999, // $949.99
+    basePrice: 949.99,
     taxCode: 'txcd_99999999',
     weight: { value: 12.5, unit: 'lb' },
     dimensions: { length: 41.1, width: 4.21, height: 2.29, unit: 'in' },
@@ -876,7 +876,7 @@ export const mockProducts: Product[] = [
       { name: 'Subwoofer', value: '10" Wireless Subwoofer', group: 'Audio' },
       { name: 'Connectivity', value: 'HDMI eARC, Bluetooth, Wi-Fi', group: 'Connectivity' }
     ],
-    basePrice: 119999, // $1199.99
+    basePrice: 1199.99,
     taxCode: 'txcd_99999999',
     weight: { value: 28.7, unit: 'lb' },
     dimensions: { length: 48.0, width: 5.1, height: 2.4, unit: 'in' },
@@ -905,7 +905,7 @@ export const mockProducts: Product[] = [
       { name: 'Subwoofers', value: 'Built-in Dual Subwoofers', group: 'Audio' },
       { name: 'Connectivity', value: 'HDMI eARC, Bluetooth, Wi-Fi', group: 'Connectivity' }
     ],
-    basePrice: 129999, // $1299.99
+    basePrice: 1299.99,
     taxCode: 'txcd_99999999',
     weight: { value: 18.7, unit: 'lb' },
     dimensions: { length: 51.1, width: 5.6, height: 2.7, unit: 'in' },
@@ -934,7 +934,7 @@ export const mockProducts: Product[] = [
       { name: 'Subwoofer', value: 'Wireless 8" Subwoofer', group: 'Audio' },
       { name: 'Connectivity', value: 'HDMI eARC, Bluetooth, Wi-Fi', group: 'Connectivity' }
     ],
-    basePrice: 159999, // $1599.99
+    basePrice: 1599.99,
     taxCode: 'txcd_99999999',
     weight: { value: 25.4, unit: 'lb' },
     dimensions: { length: 55.5, width: 5.4, height: 2.5, unit: 'in' },
@@ -963,7 +963,7 @@ export const mockProducts: Product[] = [
       { name: 'Subwoofer', value: 'Wireless 12" Subwoofer', group: 'Audio' },
       { name: 'Connectivity', value: 'HDMI eARC, Bluetooth, Optical', group: 'Connectivity' }
     ],
-    basePrice: 179999, // $1799.99
+    basePrice: 1799.99,
     taxCode: 'txcd_99999999',
     weight: { value: 38.8, unit: 'lb' },
     dimensions: { length: 45.0, width: 6.5, height: 4.0, unit: 'in' },
@@ -992,7 +992,7 @@ export const mockProducts: Product[] = [
       { name: 'Subwoofer', value: 'Wireless 8" Subwoofer', group: 'Audio' },
       { name: 'Connectivity', value: 'HDMI eARC, Bluetooth, Wi-Fi', group: 'Connectivity' }
     ],
-    basePrice: 79999, // $799.99
+    basePrice: 799.99,
     taxCode: 'txcd_99999999',
     weight: { value: 19.4, unit: 'lb' },
     dimensions: { length: 48.0, width: 5.7, height: 3.0, unit: 'in' },
