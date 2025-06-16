@@ -145,7 +145,7 @@ export default function OrderConfirmation() {
           <div className="space-y-4 mb-6">
             <h3 className="font-semibold text-gray-900">Items Ordered</h3>
             {order.items.map((item) => (
-              <div key={`${item.product_id}-${item.attributes?.join('-') ?? ''}`} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                 <div className="flex items-center">
                   <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-100 mr-4">
                     {item.image ? (

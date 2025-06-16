@@ -790,7 +790,7 @@ export default function CheckoutPage() {
           <div className="text-lg font-bold mb-4">Order Summary</div>
           <div className="space-y-4 mb-6">
             {cart.line_items.map((item: typeof cart.line_items[number]) => (
-              <div key={`${item.product_id}-${item.attributes?.join('-') ?? ''}`} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm relative">
+              <div key={item.id} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm relative">
                 <div className="relative mr-3">
                   <div className="w-14 h-14 rounded-md overflow-hidden relative bg-gray-100">
                     {/* Regular img tag with error handling and fallback */}

@@ -76,7 +76,7 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
           ) : (
             <div className="flex flex-col gap-6">
               {line_items.map(item => (
-                <div className="border-b-2 border-gray-200 pb-4" key={item.product_id}>
+                <div className="border-b-2 border-gray-200 pb-4" key={item.id}>
                   <div className="grid grid-cols-[100px_1fr] gap-4 min-h-[100px] relative">
                     {/* Column 1: Thumbnail */}
                     <div className="flex-shrink-0">
