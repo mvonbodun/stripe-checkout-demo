@@ -4,10 +4,10 @@ import { getProductById } from '../../../../models/product';
 
 export async function GET(
   request: Request,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const { productId } = params;
+    const { productId } = await params;
     const { searchParams } = new URL(request.url);
     const includePriceRange = searchParams.get('includePriceRange') === 'true';
 
