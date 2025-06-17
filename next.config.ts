@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
     unoptimized: true, // This will disable the Image Optimization API when running through tunnels like ngrok
     domains: ['placehold.co'], // For legacy compatibility
   },
+  // Production optimizations
+  compress: true,
+  poweredByHeader: false,
 };
 
 export default nextConfig;
