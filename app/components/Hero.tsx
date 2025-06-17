@@ -55,8 +55,8 @@ export default function Hero({
   return (
     <div className={`hero min-h-[400px] bg-base-100 ${className}`}>
       <div className="hero-content flex-col lg:flex-row-reverse w-full max-w-6xl">
-        {/* Right Column - Image (60% width) */}
-        <div className="flex-[0_0_60%] w-full">
+        {/* Right Column - Image */}
+        <div className="w-full lg:w-3/5">
           <Image
             src={currentHero.image}
             alt={currentHero.title}
@@ -67,8 +67,8 @@ export default function Hero({
           />
         </div>
         
-        {/* Left Column - Content (40% width) */}
-        <div className="flex-[0_0_40%] w-full pr-0 lg:pr-8">
+        {/* Left Column - Content */}
+        <div className="w-full lg:w-2/5 lg:pr-8">
           <h1 className="text-4xl lg:text-5xl font-bold text-base-content leading-tight">
             {currentHero.title}
           </h1>

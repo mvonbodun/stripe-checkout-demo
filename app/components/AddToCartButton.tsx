@@ -54,7 +54,7 @@ export default function AddToCartButton({
     <button
       onClick={handleAddToCart}
       disabled={disabled}
-      className={`w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium ${className}`}
+      className={`btn btn-primary w-full ${className}`}
     >
       Add to Cart
     </button>
