@@ -4,10 +4,10 @@ import { findCategoryById } from '../../../../models/category';
 
 export async function GET(
   request: Request,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
-    const { categoryId } = params;
+    const { categoryId } = await params;
     const { searchParams } = new URL(request.url);
 
     // Verify category exists
