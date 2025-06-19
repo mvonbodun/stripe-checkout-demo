@@ -19,7 +19,7 @@
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "stripe": "^18.1.0",
+    "stripe": "^18.2.1",
     "tailwindcss": "^4.1.7"
   },
   "devDependencies": {
