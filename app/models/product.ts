@@ -331,7 +331,7 @@ export const mockProducts: Product[] = [
 
   // Additional OLED TVs (7 more to make 8 total in category '111')
   {
-    id: 'prod-oled-tv-2',
+    id: 'prod_6',
     name: 'Sony A90J 65" OLED 4K HDR TV',
     slug: 'sony-a90j-65-oled-4k-hdr-tv',
     description: 'Premium Sony OLED TV with XR OLED Contrast Pro and Acoustic Surface Audio+',
@@ -360,7 +360,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Experience premium picture quality with Sony A90J OLED TV featuring XR processor and Acoustic Surface Audio+.'
   },
   {
-    id: 'prod-oled-tv-3',
+    id: 'prod_7',
     name: 'Samsung S95B 55" QD-OLED 4K TV',
     slug: 'samsung-s95b-55-qd-oled-4k-tv',
     description: 'Samsung Quantum Dot OLED TV with Neural Quantum Processor 4K and ultra-slim design',
@@ -389,7 +389,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Samsung S95B QD-OLED TV with Neural Quantum Processor 4K and stunning Quantum HDR OLED technology.'
   },
   {
-    id: 'prod-oled-tv-4',
+    id: 'prod_8',
     name: 'Panasonic JZ2000 77" OLED 4K TV',
     slug: 'panasonic-jz2000-77-oled-4k-tv',
     description: 'Professional-grade Panasonic OLED TV with HCX Pro AI Processor and Dolby Vision IQ',
@@ -418,7 +418,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Professional-grade Panasonic JZ2000 OLED TV with HCX Pro AI Processor and Dolby Vision IQ.'
   },
   {
-    id: 'prod-oled-tv-5',
+    id: 'prod_9',
     name: 'Philips OLED806 48" 4K Ambilight TV',
     slug: 'philips-oled806-48-4k-ambilight-tv',
     description: 'Philips OLED TV with unique 3-sided Ambilight technology and P5 AI Perfect Picture Engine',
@@ -447,7 +447,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Experience unique 3-sided Ambilight technology with Philips OLED806 featuring P5 AI Perfect Picture Engine.'
   },
   {
-    id: 'prod-oled-tv-6',
+    id: 'prod_10',
     name: 'Hisense A7G 50" OLED 4K TV',
     slug: 'hisense-a7g-50-oled-4k-tv',
     description: 'Affordable Hisense OLED TV with Quantum Dot Color and Dolby Vision support',
@@ -476,7 +476,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Affordable OLED excellence with Hisense A7G featuring Quantum Dot Color and Dolby Vision support.'
   },
   {
-    id: 'prod-oled-tv-7',
+    id: 'prod_11',
     name: 'Vizio OLED H1 65" 4K HDR TV',
     slug: 'vizio-oled-h1-65-4k-hdr-tv',
     description: 'Vizio OLED TV with ProGaming Engine and Variable Refresh Rate for gaming enthusiasts',
@@ -505,7 +505,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Gaming excellence with Vizio OLED H1 featuring ProGaming Engine and Variable Refresh Rate technology.'
   },
   {
-    id: 'prod-oled-tv-8',
+    id: 'prod_12',
     name: 'Xiaomi TV Master 55" OLED',
     slug: 'xiaomi-tv-master-55-oled',
     description: 'Xiaomi TV Master OLED with MediaTek MT9650 processor and premium metal design',
@@ -536,7 +536,7 @@ export const mockProducts: Product[] = [
 
   // QLED TVs (Category ID: '112') - 8 products
   {
-    id: 'qled-001',
+    id: 'prod_13',
     name: 'Samsung QN90A 65" Neo QLED 4K Smart TV',
     slug: 'samsung-qn90a-65-neo-qled-4k',
     description: 'Experience the next generation of QLED with Samsung Neo QLED technology featuring Quantum Mini LEDs for incredible contrast and brightness.',
@@ -565,7 +565,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Premium Neo QLED TV with Quantum Mini LEDs and 4K AI upscaling technology.'
   },
   {
-    id: 'qled-002',
+    id: 'prod_14',
     name: 'Samsung Q80A 55" QLED 4K Smart TV',
     slug: 'samsung-q80a-55-qled-4k',
     description: 'Direct Full Array backlighting with Quantum HDR delivers exceptional contrast and color accuracy in this premium QLED display.',
@@ -594,7 +594,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'QLED TV with Direct Full Array backlighting and Quantum HDR technology.'
   },
   {
-    id: 'qled-003',
+    id: 'prod_15',
     name: 'TCL 6-Series 65" QLED 4K HDR Smart TV',
     slug: 'tcl-6-series-65-qled-4k-hdr',
     description: 'Mini-LED backlighting with QLED quantum dots delivers stunning contrast and vibrant colors with Dolby Vision HDR support.',
@@ -623,7 +623,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Mini-LED QLED TV with quantum dots and Dolby Vision HDR technology.'
   },
   {
-    id: 'qled-004',
+    id: 'prod_16',
     name: 'Hisense U8G 55" QLED 4K Android TV',
     slug: 'hisense-u8g-55-qled-4k-android',
     description: 'Quantum Dot Wide Color Gamut technology with Full Array Local Dimming delivers exceptional picture quality and gaming performance.',
@@ -652,7 +652,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'QLED Android TV with Quantum Dot technology and Full Array Local Dimming.'
   },
   {
-    id: 'qled-005',
+    id: 'prod_17',
     name: 'Sony X95J 75" QLED 4K Google TV',
     slug: 'sony-x95j-75-qled-4k-google',
     description: 'Full Array LED with XR Triluminos Pro delivers wide color gamut and precise contrast control for cinematic viewing experience.',
@@ -681,7 +681,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Premium QLED TV with XR Triluminos Pro and Cognitive Processor XR technology.'
   },
   {
-    id: 'qled-006',
+    id: 'prod_18',
     name: 'Samsung QN85A 70" Neo QLED 4K Smart TV',
     slug: 'samsung-qn85a-70-neo-qled-4k',
     description: 'Neo Quantum Processor 4K with Anti-Glare technology provides exceptional viewing in any lighting condition.',
@@ -710,7 +710,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Neo QLED TV with Anti-Glare technology and Neo Quantum Processor 4K.'
   },
   {
-    id: 'qled-007',
+    id: 'prod_19',
     name: 'LG QNED90UP 65" QLED NanoCell 4K TV',
     slug: 'lg-qned90up-65-qled-nanocell-4k',
     description: 'Quantum Dot NanoCell technology with Mini LED backlighting delivers pure colors and exceptional brightness.',
@@ -739,7 +739,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'QLED NanoCell TV with Quantum Dot technology and Mini LED backlighting.'
   },
   {
-    id: 'qled-008',
+    id: 'prod_20',
     name: 'Vizio P-Series Quantum X 85" 4K HDR Smart TV',
     slug: 'vizio-p-series-quantum-x-85-4k-hdr',
     description: 'Ultra Bright 3000 nits with Quantum Color delivers the ultimate HDR experience with Full Array backlighting.',
@@ -770,7 +770,7 @@ export const mockProducts: Product[] = [
 
   // Soundbars (Category ID: '113') - 8 products
   {
-    id: 'soundbar-001',
+    id: 'prod_21',
     name: 'Samsung HW-Q950A 11.1.4ch Soundbar with Dolby Atmos',
     slug: 'samsung-hw-q950a-11-1-4ch-soundbar-dolby-atmos',
     description: 'Premium 11.1.4 channel soundbar with wireless rear speakers delivers immersive Dolby Atmos and DTS:X surround sound experience.',
@@ -799,7 +799,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Premium soundbar system with 11.1.4 channels, Dolby Atmos, and wireless rear speakers.'
   },
   {
-    id: 'soundbar-002',
+    id: 'prod_22',
     name: 'Sonos Arc Premium Smart Soundbar',
     slug: 'sonos-arc-premium-smart-soundbar',
     description: 'Dolby Atmos soundbar with eleven high-performance drivers creates wide, tall soundstage that fills the room.',
@@ -828,7 +828,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Premium Dolby Atmos soundbar with 11 drivers and smart home integration.'
   },
   {
-    id: 'soundbar-003',
+    id: 'prod_23',
     name: 'Bose Soundbar 900 with Dolby Atmos',
     slug: 'bose-soundbar-900-dolby-atmos',
     description: 'Immersive soundbar with proprietary PhaseGuide technology creates spacious sound that goes beyond traditional soundbars.',
@@ -857,7 +857,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Premium soundbar with PhaseGuide technology and immersive Dolby Atmos audio.'
   },
   {
-    id: 'soundbar-004',
+    id: 'prod_24',
     name: 'JBL Bar 9.1 True Wireless Surround Soundbar',
     slug: 'jbl-bar-9-1-true-wireless-surround-soundbar',
     description: 'Revolutionary soundbar with detachable wireless surround speakers and 10" wireless subwoofer for true 9.1 surround sound.',
@@ -886,7 +886,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Revolutionary soundbar with detachable wireless surround speakers and true 9.1 audio.'
   },
   {
-    id: 'soundbar-005',
+    id: 'prod_25',
     name: 'Sony HT-A7000 7.1.2ch Dolby Atmos Soundbar',
     slug: 'sony-ht-a7000-7-1-2ch-dolby-atmos-soundbar',
     description: 'Premium soundbar with 360 Spatial Sound Mapping and built-in dual subwoofers for powerful, immersive audio experience.',
@@ -915,7 +915,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Premium soundbar with 360 Spatial Sound Mapping and built-in dual subwoofers.'
   },
   {
-    id: 'soundbar-006',
+    id: 'prod_26',
     name: 'LG SP11RA 7.1.4 AI Sound Pro Soundbar',
     slug: 'lg-sp11ra-7-1-4-ai-sound-pro-soundbar',
     description: 'AI Sound Pro technology automatically optimizes audio based on content while Meridian Audio delivers audiophile-quality sound.',
@@ -944,7 +944,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'AI-powered soundbar with Meridian Audio technology and 7.1.4 channel audio.'
   },
   {
-    id: 'soundbar-007',
+    id: 'prod_27',
     name: 'Klipsch Cinema 1200 5.1.4 Dolby Atmos Soundbar',
     slug: 'klipsch-cinema-1200-5-1-4-dolby-atmos-soundbar',
     description: 'Horn-loaded technology delivers dynamic, detailed sound with wireless 12" subwoofer for powerful bass response.',
@@ -973,7 +973,7 @@ export const mockProducts: Product[] = [
     seoDescription: 'Premium soundbar with horn-loaded technology and wireless 12" subwoofer.'
   },
   {
-    id: 'soundbar-008',
+    id: 'prod_28',
     name: 'Vizio Elevate 5.1.4 Rotating Dolby Atmos Soundbar',
     slug: 'vizio-elevate-5-1-4-rotating-dolby-atmos-soundbar',
     description: 'Unique rotating speakers automatically adjust for optimal Dolby Atmos and DTS:X performance with adaptive height virtualization.',
