@@ -153,27 +153,48 @@ This document outlines the comprehensive plan to refactor the product model from
 - Components maintain backward compatibility where appropriate
 - Phase 4 (Page Updates) ready to begin
 
-## Phase 4: Page and Layout Updates
+## Phase 4: Page and Layout Updates ✅ COMPLETED
 
-### 4.1 Update `app/p/[slug]/page.tsx`
+### 4.1 Update `app/p/[slug]/page.tsx` ✅
 **Priority: High**
-- [ ] Load items data alongside product data using `getItemsByProductId`
-- [ ] Pass items data to components that need it
-- [ ] Handle default item selection logic
-- [ ] Update component props throughout the page
-- [ ] Add error handling for products without items
+- [x] Load items data alongside product data using `getItemsByProduct`
+- [x] Pass items data to components that need it
+- [x] Handle default item selection logic
+- [x] Update component props throughout the page
+- [x] Add error handling for products without items
+- [x] Update ProductInfo and ProductInfoMobileBottom component calls
 
-### 4.2 Update category pages (`app/c/[slug]/page.tsx`)
+### 4.2 Update category pages (`app/c/[slug]/page.tsx`) ✅
 **Priority: Medium**
-- [ ] Ensure product cards work with new structure
-- [ ] Update any weight/dimension displays in product listings
-- [ ] Update filtering if it uses specifications
+- [x] Ensure product cards work with new structure (ProductCard component unchanged - no issues)
+- [x] Update cart item creation to include item_id and sku fields
+- [x] Update any weight/dimension displays in product listings (none found)
+- [x] Update filtering if it uses specifications (uses existing product-level data - no changes needed)
 
-### 4.3 Update other product-related pages
+### 4.3 Update other product-related pages ✅
 **Priority: Low**
-- [ ] Search results pages
-- [ ] Featured products displays
-- [ ] Any other pages that display product information
+- [x] `app/page.tsx` (Homepage) - Updated cart item creation to include item_id and sku
+- [x] Search results pages - No specific search result pages found that need updates
+- [x] Featured products displays - Handled via homepage updates
+- [x] Any other pages that display product information - Reviewed checkout and other pages, no issues found
+
+### 4.4 Update cart system infrastructure ✅
+**Priority: High**
+- [x] Update `app/cart-context.tsx` CartItem interface to include:
+  - [x] `item_id?: string` - Reference to specific item/variant
+  - [x] `sku?: string` - SKU from the item
+- [x] Maintain backward compatibility with existing cart items
+- [x] All cart-related components now support the enhanced cart item structure
+
+**Phase 4 Status**: ✅ COMPLETED
+- All pages now properly load and pass items data to components
+- Product detail page fully integrated with new architecture
+- Category page cart functionality updated
+- Homepage cart functionality updated
+- Cart system enhanced to support item references
+- All TypeScript errors resolved
+- Backward compatibility maintained
+- System ready for Phase 5 (Cart and Checkout Updates)
 
 ## Phase 5: Cart and Checkout Updates
 

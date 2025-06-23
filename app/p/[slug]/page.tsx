@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { findProductBySlug, getRelatedProducts } from '../../models/product';
+import { getItemsByProduct } from '../../models/item';
 import { findCategoryById, getAllCategories } from '../../models/category';
 import Breadcrumb from '../../components/Breadcrumb';
 import { buildProductBreadcrumbs } from '../../utils/breadcrumbs';
@@ -24,6 +25,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) {
     notFound();
   }
+
+  // Load items data for the product
+  const items = getItemsByProduct(product.id);
 
   // Get category and breadcrumb data
   const allCategories = getAllCategories();
@@ -56,7 +60,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         
         {/* 3. Attributes, Quantity, Add to Cart, Trust Icons, SKU, Weight, Dimensions */}
         <div className="mt-6">
-          <ProductInfoMobileBottom product={product} />
+          <ProductInfoMobileBottom product={product} items={items} />
         </div>
       </div>
       
@@ -66,7 +70,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <ProductImageGallery product={product} />
         
         {/* Right: Product Info */}
-        <ProductInfo product={product} />
+        <ProductInfo product={product} items={items} />
       </div>
       
       {/* Product Details Tabs */}

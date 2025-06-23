@@ -42,9 +42,11 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     
     const cartItem = {
       id: crypto.randomUUID(),
+      item_id: undefined, // No specific item selected from category page
       product_id: product.id,
       name: product.name,
       price: product.basePrice,
+      sku: product.id,
       quantity: 1,
       image: placeholderImage, // Use placeholder like home page
       attributes: product.features?.slice(0, 3) || [], // Use features as attributes

@@ -61,8 +61,10 @@ export default function Home() {
 			type: 'ADD_ITEM',
 			item: {
 				id: '', // Will be generated in reducer
+				item_id: undefined, // No specific item selected from homepage
 				product_id: product.id, // Use string ID directly instead of parseInt
 				name: product.name,
+				sku: product.id,
 				attributes: product.features?.slice(0, 3) || [], // Use features as attributes
 				image: placeholderImage, // Use placeholder instead of non-existent image
 				price: product.basePrice,

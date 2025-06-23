@@ -24,8 +24,10 @@ export type Address = {
 
 export type CartItem = {
   id: string;
+  item_id?: string; // Reference to specific item/variant
   product_id: string;
   name: string;
+  sku?: string; // SKU from the item
   attributes?: string[];
   image?: string;
   price: number;
