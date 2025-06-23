@@ -47,12 +47,14 @@ function getPaymentIntentPayload({
   if (payment_intent_id) payload.payment_intent_id = payment_intent_id;
   if (includeCart) {
     payload.cart = cart.line_items.map((item) => ({
-      id: String(item.product_id),
+      id: String(item.item_id), // Use item_id instead of product_id for better tracking
       name: item.name,
       quantity: item.quantity,
       price: item.price,
       taxcode: item.taxcode ?? '',
-      attributes: item.attributes ?? []
+      attributes: item.attributes ?? [],
+      sku: item.sku, // Include SKU for better identification
+      selectedSpecifications: item.selectedSpecifications || [] // Include specification details
     }));
   }
   return payload;
@@ -507,7 +509,7 @@ export default function CheckoutPage() {
       shipping_method_id: cart.shipping_method_id,
       shipping_method_name: cart.shipping_method_name
     });
-  }, [cart.order_subtotal, cart.order_tax_total, cart.order_shipping_total, cart.order_shipping_tax_total, cart.order_grand_total, cart.shipping_method_id]);
+  }, [cart.order_subtotal, cart.order_tax_total, cart.order_shipping_total, cart.order_shipping_tax_total, cart.order_grand_total, cart.shipping_method_id, cart.shipping_method_name]);
 
   const itemCount = cart.line_items.reduce((sum: number, item: typeof cart.line_items[number]) => sum + item.quantity, 0);
 

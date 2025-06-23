@@ -47,14 +47,15 @@ export default function AddToCartButton({
     // Create cart item with item reference
     const cartItem = {
       id: crypto.randomUUID(), // Generate unique ID for cart item
-      item_id: selectedItem?.id, // Reference to the actual item/variant
+      item_id: selectedItem?.id || `${product.id}_default`, // Required: Reference to the actual item/variant
       product_id: product.id,
       name: itemToAdd.name,
       price: itemToAdd.price,
-      sku: itemToAdd.sku || product.id,
+      sku: itemToAdd.sku || product.id, // Required: SKU from the item
       quantity: quantity,
       image: itemImage,
-      attributes: attributes,
+      attributes: attributes, // Keep for backward compatibility
+      selectedSpecifications: selectedItem?.itemDefiningSpecificationValues || [], // New structured specifications
       line_subtotal: itemToAdd.price * quantity,
       line_shipping_total: 0,
       line_tax_total: 0,

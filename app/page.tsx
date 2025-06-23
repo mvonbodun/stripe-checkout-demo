@@ -61,11 +61,12 @@ export default function Home() {
 			type: 'ADD_ITEM',
 			item: {
 				id: '', // Will be generated in reducer
-				item_id: undefined, // No specific item selected from homepage
+				item_id: `${product.id}_default`, // Required: Use default item ID for generic products
 				product_id: product.id, // Use string ID directly instead of parseInt
 				name: product.name,
-				sku: product.id,
-				attributes: product.features?.slice(0, 3) || [], // Use features as attributes
+				sku: product.id, // Required: Use product ID as SKU for generic products
+				attributes: product.features?.slice(0, 3) || [], // Use features as attributes (backward compatibility)
+				selectedSpecifications: [], // Empty for generic product adds
 				image: placeholderImage, // Use placeholder instead of non-existent image
 				price: product.basePrice,
 				quantity: 1,

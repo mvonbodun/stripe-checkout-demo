@@ -42,14 +42,15 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     
     const cartItem = {
       id: crypto.randomUUID(),
-      item_id: undefined, // No specific item selected from category page
+      item_id: `${product.id}_default`, // Required: Use default item ID for generic products
       product_id: product.id,
       name: product.name,
       price: product.basePrice,
-      sku: product.id,
+      sku: product.id, // Required: Use product ID as SKU for generic products
       quantity: 1,
       image: placeholderImage, // Use placeholder like home page
-      attributes: product.features?.slice(0, 3) || [], // Use features as attributes
+      attributes: product.features?.slice(0, 3) || [], // Use features as attributes (backward compatibility)
+      selectedSpecifications: [], // Empty for generic product adds
       line_subtotal: product.basePrice,
       line_shipping_total: 0,
       line_tax_total: 0,

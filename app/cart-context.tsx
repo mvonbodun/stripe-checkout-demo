@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useContext, useReducer, ReactNode, useEffect, useState } from 'react';
+import { getItemById } from './models/item';
 
 // Address type enum for billing or shipping
 export enum AddressType {
@@ -24,11 +25,12 @@ export type Address = {
 
 export type CartItem = {
   id: string;
-  item_id?: string; // Reference to specific item/variant
+  item_id: string; // Required reference to specific item/variant
   product_id: string;
   name: string;
-  sku?: string; // SKU from the item
-  attributes?: string[];
+  sku: string; // Required SKU from the item
+  attributes?: string[]; // Kept for backward compatibility, but selectedSpecifications is preferred
+  selectedSpecifications: { name: string; value: string; displayName?: string }[]; // Item defining specification values
   image?: string;
   price: number;
   quantity: number;
@@ -58,13 +60,13 @@ type CartState = Cart;
 
 type CartAction =
   | { type: 'ADD_ITEM'; item: CartItem }
-  | { type: 'REMOVE_ITEM'; product_id: string }
-  | { type: 'UPDATE_QUANTITY'; product_id: string; quantity: number }
+  | { type: 'REMOVE_ITEM'; item_id: string }
+  | { type: 'UPDATE_QUANTITY'; item_id: string; quantity: number }
   | { type: 'CLEAR_CART' }
   | { type: 'UPDATE_TAX_TOTAL'; tax_total: number }
-  | { type: 'UPDATE_LINE_TAX_TOTAL'; product_id: string; tax_total: number }
-  | { type: 'UPDATE_LINE_SHIPPING_TOTAL'; product_id: string; shipping_total: number }
-  | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; product_id: string; shipping_tax_total: number }
+  | { type: 'UPDATE_LINE_TAX_TOTAL'; item_id: string; tax_total: number }
+  | { type: 'UPDATE_LINE_SHIPPING_TOTAL'; item_id: string; shipping_total: number }
+  | { type: 'UPDATE_LINE_SHIPPING_TAX_TOTAL'; item_id: string; shipping_tax_total: number }
   | { type: 'UPDATE_PAYMENT_INTENT'; payment_intent: string | null }
   | { type: 'UPDATE_SHIPPING_METHOD'; shipping_method_id: string; shipping_method_name: string; shipping_method_cost: number }
   | { type: 'UPDATE_SHIPPING_ADDRESS'; shipping_address: Address | null }
@@ -138,26 +140,26 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return recalcTotals(state.line_items.map(item => ({ ...item })), action.tax_total);
     }
     case 'UPDATE_LINE_TAX_TOTAL': {
-      console.log('🛒 UPDATE_LINE_TAX_TOTAL:', { product_id: action.product_id, tax_total: action.tax_total });
+      console.log('🛒 UPDATE_LINE_TAX_TOTAL:', { item_id: action.item_id, tax_total: action.tax_total });
       // Update the line_tax_total for a specific item and recalculate totals
       const updatedItems = state.line_items.map(item =>
-        item.product_id === action.product_id ? { ...item, line_tax_total: action.tax_total } : item
+        item.item_id === action.item_id ? { ...item, line_tax_total: action.tax_total } : item
       );
       return recalcTotals(updatedItems);
     }
     case 'UPDATE_LINE_SHIPPING_TOTAL': {
-      console.log('🛒 UPDATE_LINE_SHIPPING_TOTAL:', { product_id: action.product_id, shipping_total: action.shipping_total });
+      console.log('🛒 UPDATE_LINE_SHIPPING_TOTAL:', { item_id: action.item_id, shipping_total: action.shipping_total });
       // Update the line_shipping_total for a specific item and recalculate totals
       const updatedItems = state.line_items.map(item =>
-        item.product_id === action.product_id ? { ...item, line_shipping_total: action.shipping_total } : item
+        item.item_id === action.item_id ? { ...item, line_shipping_total: action.shipping_total } : item
       );
       return recalcTotals(updatedItems);
     }
     case 'UPDATE_LINE_SHIPPING_TAX_TOTAL': {
-      console.log('🛒 UPDATE_LINE_SHIPPING_TAX_TOTAL:', { product_id: action.product_id, shipping_tax_total: action.shipping_tax_total });
+      console.log('🛒 UPDATE_LINE_SHIPPING_TAX_TOTAL:', { item_id: action.item_id, shipping_tax_total: action.shipping_tax_total });
       // Update the line_shipping_tax_total for a specific item and recalculate totals
       const updatedItems = state.line_items.map(item =>
-        item.product_id === action.product_id ? { ...item, line_shipping_tax_total: action.shipping_tax_total } : item
+        item.item_id === action.item_id ? { ...item, line_shipping_tax_total: action.shipping_tax_total } : item
       );
       return recalcTotals(updatedItems);
     }
@@ -206,6 +208,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       };
     }
     case 'ADD_ITEM': {
+      // Validate item availability before adding
+      const validation = validateItemAvailability(action.item.item_id, action.item.quantity);
+      if (!validation.isValid) {
+        console.warn('Cart add item validation failed:', validation.error);
+        // For now, continue with the add but log the warning
+        // In a real app, you might want to return the current state or throw an error
+      }
+      
       // Ensure the new item has all required line-level fields initialized
       const newItem = {
         ...action.item,
@@ -217,18 +227,27 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         line_grand_total: 0, // Will be calculated in recalcTotals
       };
       
-      // Find if an item with the same product_id and attributes exists
+      // Find if an item with the same item_id exists (exact item match)
       const existingIndex = state.line_items.findIndex(item =>
-        item.product_id === newItem.product_id &&
-        JSON.stringify(item.attributes ?? []) === JSON.stringify(newItem.attributes ?? [])
+        item.item_id === newItem.item_id
       );
       let updatedItems;
       if (existingIndex !== -1) {
+        // Validate combined quantity for existing item
+        const existingItem = state.line_items[existingIndex];
+        const combinedQuantity = existingItem.quantity + newItem.quantity;
+        const combinedValidation = validateItemAvailability(newItem.item_id, combinedQuantity);
+        
+        if (!combinedValidation.isValid) {
+          console.warn('Cart update quantity validation failed:', combinedValidation.error);
+          // For now, continue with the add but log the warning
+        }
+        
         // Update quantity of the existing item
         updatedItems = [...state.line_items];
         updatedItems[existingIndex] = {
           ...updatedItems[existingIndex],
-          quantity: updatedItems[existingIndex].quantity + newItem.quantity
+          quantity: combinedQuantity
         };
       } else {
         updatedItems = [...state.line_items, newItem];
@@ -236,12 +255,21 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return recalcTotals(updatedItems);
     }
     case 'REMOVE_ITEM':
-      const updatedItems = state.line_items.filter(item => item.product_id !== action.product_id);
+      const updatedItems = state.line_items.filter(item => item.item_id !== action.item_id);
       return recalcTotals(updatedItems);
     case 'UPDATE_QUANTITY': {
-      const updatedItems = state.line_items.map(item =>
-        item.product_id === action.product_id ? { ...item, quantity: action.quantity } : item
-      );
+      const updatedItems = state.line_items.map(item => {
+        if (item.item_id === action.item_id) {
+          // Validate new quantity
+          const validation = validateItemAvailability(item.item_id, action.quantity);
+          if (!validation.isValid) {
+            console.warn('Cart update quantity validation failed:', validation.error);
+            // For now, continue with the update but log the warning
+          }
+          return { ...item, quantity: action.quantity };
+        }
+        return item;
+      });
       return recalcTotals(updatedItems);
     }
     case 'CLEAR_CART':
@@ -326,4 +354,27 @@ export function useCart() {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
+}
+
+// Item availability validation utility
+export function validateItemAvailability(item_id: string, requestedQuantity: number): { isValid: boolean; error?: string; availableQuantity?: number } {
+  const item = getItemById(item_id);
+  
+  if (!item) {
+    return { isValid: false, error: 'Item not found' };
+  }
+  
+  if (!item.isInStock) {
+    return { isValid: false, error: 'Item is out of stock' };
+  }
+  
+  if (item.inventoryTracking && item.inventoryQuantity < requestedQuantity) {
+    return { 
+      isValid: false, 
+      error: `Only ${item.inventoryQuantity} items available`,
+      availableQuantity: item.inventoryQuantity
+    };
+  }
+  
+  return { isValid: true };
 }

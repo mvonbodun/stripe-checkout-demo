@@ -104,12 +104,24 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
                         <button
                           className="bg-transparent border-none text-gray-500 text-lg cursor-pointer hover:text-gray-700 transition-colors flex-shrink-0"
                           aria-label={`Remove ${item.name}`}
-                          onClick={() => dispatch({ type: 'REMOVE_ITEM', product_id: item.product_id })}
+                          onClick={() => dispatch({ type: 'REMOVE_ITEM', item_id: item.item_id })}
                         >
                           X
                         </button>
                       </div>
-                      {item.attributes && item.attributes.length > 0 && (
+                      {/* Show selected specifications instead of generic attributes */}
+                      {item.selectedSpecifications && item.selectedSpecifications.length > 0 && (
+                        <div className="text-sm text-gray-600 mt-0.5 mb-3">
+                          {item.selectedSpecifications.map((spec, idx) => (
+                            <div key={idx} className="mb-0.5">
+                              {spec.displayName || spec.value}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {/* Fallback to attributes for backward compatibility */}
+                      {(!item.selectedSpecifications || item.selectedSpecifications.length === 0) && 
+                       item.attributes && item.attributes.length > 0 && (
                         <div className="text-sm text-gray-600 mt-0.5 mb-3">
                           {item.attributes.map((attr, idx) => (
                             <div key={idx} className="mb-0.5">{attr}</div>
@@ -122,7 +134,7 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
                         <button
                           className="bg-gray-100 border-none rounded w-7 h-7 text-lg cursor-pointer text-gray-800 transition-colors hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                           aria-label="Decrease quantity"
-                          onClick={() => dispatch({ type: 'UPDATE_QUANTITY', product_id: item.product_id, quantity: Math.max(1, item.quantity - 1) })}
+                          onClick={() => dispatch({ type: 'UPDATE_QUANTITY', item_id: item.item_id, quantity: Math.max(1, item.quantity - 1) })}
                           disabled={item.quantity <= 1}
                         >
                           –
@@ -131,7 +143,7 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
                         <button
                           className="bg-gray-100 border-none rounded w-7 h-7 text-lg cursor-pointer text-gray-800 transition-colors hover:bg-gray-200 flex items-center justify-center"
                           aria-label="Increase quantity"
-                          onClick={() => dispatch({ type: 'UPDATE_QUANTITY', product_id: item.product_id, quantity: item.quantity + 1 })}
+                          onClick={() => dispatch({ type: 'UPDATE_QUANTITY', item_id: item.item_id, quantity: item.quantity + 1 })}
                         >
                           +
                         </button>
