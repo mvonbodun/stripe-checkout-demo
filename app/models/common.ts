@@ -93,3 +93,27 @@ export const TAX_CODES = {
   CLOTHING: 'txcd_99999999', // Using general for clothing
   ELECTRONICS: 'txcd_99999999', // Using general for electronics
 } as const;
+
+// New interfaces for product-item architecture
+
+/**
+ * Defines a specification that differentiates items/variants within a product
+ * e.g., "Screen Size", "Color", "Storage Capacity"
+ */
+export interface ItemDefiningSpecification {
+  name: string;        // e.g., "Screen Size", "Color", "Storage"
+  group: string;       // e.g., "Display Size", "Appearance", "Capacity"
+  required?: boolean;  // Whether selection is required (default: true)
+  order?: number;      // Display order for UI
+}
+
+/**
+ * Represents the actual value for an item-defining specification
+ * Links to the specification by name and provides the specific value
+ */
+export interface ItemDefiningSpecificationValue {
+  name: string;        // Must match ItemDefiningSpecification.name
+  value: string;       // e.g., "65\"", "Space Gray", "256GB"
+  displayName?: string; // e.g., "65 inches", "Space Gray", "256 GB"
+  order?: number;      // Display order within the specification
+}
