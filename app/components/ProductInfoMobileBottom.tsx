@@ -1,17 +1,36 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Product } from '../models/product';
+import { Item, getDefaultItem, findItemBySpecificationValues } from '../models/item';
 import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
 
 interface ProductInfoMobileBottomProps {
   product: Product;
+  items: Item[];
 }
 
-export default function ProductInfoMobileBottom({ product }: ProductInfoMobileBottomProps) {
+export default function ProductInfoMobileBottom({ product, items }: ProductInfoMobileBottomProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+
+  // Get selected item based on options, or default to first item
+  useEffect(() => {
+    if (items.length === 0) {
+      setSelectedItem(null);
+      return;
+    }
+
+    if (Object.keys(selectedOptions).length > 0) {
+      const foundItem = findItemBySpecificationValues(product.id, selectedOptions);
+      setSelectedItem(foundItem || null);
+    } else {
+      const defaultItem = getDefaultItem(product.id);
+      setSelectedItem(defaultItem || items[0]);
+    }
+  }, [selectedOptions, product.id, items]);
 
   return (
     <div className="space-y-4">
@@ -41,6 +60,7 @@ export default function ProductInfoMobileBottom({ product }: ProductInfoMobileBo
         <div className="flex-1">
           <AddToCartButton
             product={product}
+            selectedItem={selectedItem}
             quantity={quantity}
             selectedOptions={selectedOptions}
             className="w-full"
@@ -74,18 +94,18 @@ export default function ProductInfoMobileBottom({ product }: ProductInfoMobileBo
       <div className="border-t pt-4 space-y-2 text-sm text-gray-600">
         <div className="flex justify-between">
           <span>SKU:</span>
-          <span className="font-mono text-xs">{product.id}</span>
+          <span className="font-mono text-xs">{selectedItem?.sku || product.id}</span>
         </div>
-        {product.weight && (
+        {selectedItem?.weight && (
           <div className="flex justify-between">
             <span>Weight:</span>
-            <span>{product.weight.value} {product.weight.unit}</span>
+            <span>{selectedItem.weight.value} {selectedItem.weight.unit}</span>
           </div>
         )}
-        {product.dimensions && (
+        {selectedItem?.dimensions && (
           <div className="flex justify-between">
             <span>Dimensions:</span>
-            <span>{product.dimensions.length} × {product.dimensions.width} × {product.dimensions.height} {product.dimensions.unit}</span>
+            <span>{selectedItem.dimensions.length} × {selectedItem.dimensions.width} × {selectedItem.dimensions.height} {selectedItem.dimensions.unit}</span>
           </div>
         )}
       </div>

@@ -18,9 +18,11 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
     
     const cartItem = {
       id: crypto.randomUUID(),
+      item_id: undefined, // No specific item selected from related products
       product_id: product.id,
       name: product.name,
       price: product.basePrice,
+      sku: product.id,
       quantity: 1,
       image: placeholderImage,
       attributes: product.features?.slice(0, 3) || [],

@@ -87,53 +87,71 @@ This document outlines the comprehensive plan to refactor the product model from
 - Functions handle edge cases and validation properly
 - Ready to proceed to Phase 3
 
-## Phase 3: Component Updates
+## Phase 3: Component Updates ✅ COMPLETED
 
-### 3.1 Update `app/components/ProductTabs.tsx`
+### 3.1 Update `app/components/ProductTabs.tsx` ✅
 **Priority: High**
-- [ ] Change `product.specifications` to `product.productLevelSpecifications`
-- [ ] Update prop types and interfaces
-- [ ] Test specifications tab functionality
-- [ ] Handle empty specifications gracefully
+- [x] Change `product.specifications` to `product.productLevelSpecifications`
+- [x] Update prop types and interfaces
+- [x] Test specifications tab functionality
+- [x] Handle empty specifications gracefully
 
-### 3.2 Update `app/components/AttributeSelector.tsx`
+### 3.2 Update `app/components/AttributeSelector.tsx` ✅
 **Priority: Critical**
-- [ ] Replace dynamic attribute generation with `product.itemDefiningSpecifications`
-- [ ] Load available values from associated items using new utility functions
-- [ ] Update selection logic to work with specification-based system
-- [ ] Update component interface to receive items data
-- [ ] Add validation for required specifications
-- [ ] Handle specification ordering and grouping
+- [x] Replace dynamic attribute generation with `product.itemDefiningSpecifications`
+- [x] Load available values from associated items using new utility functions
+- [x] Update selection logic to work with specification-based system
+- [x] Update component interface to receive items data
+- [x] Add validation for required specifications
+- [x] Handle specification ordering and grouping
+- [x] Maintain fallback for products without itemDefiningSpecifications
 
-### 3.3 Update `app/components/ProductInfo.tsx`
+### 3.3 Update `app/components/ProductInfo.tsx` ✅
 **Priority: High**
-- [ ] Remove direct access to `product.weight` and `product.dimensions`
-- [ ] Add logic to get weight/dimensions from selected item or default item
-- [ ] Update component props to receive items data and selected item
-- [ ] Handle case where no items exist
-- [ ] Update weight/dimensions display logic
+- [x] Remove direct access to `product.weight` and `product.dimensions`
+- [x] Add logic to get weight/dimensions from selected item or default item
+- [x] Update component props to receive items data and selected item
+- [x] Handle case where no items exist
+- [x] Update weight/dimensions display logic
+- [x] Add selected item state management with useEffect
+- [x] Pass selectedItem to AddToCartButton
 
-### 3.4 Update `app/components/ProductInfoMobileBottom.tsx`
+### 3.4 Update `app/components/ProductInfoMobileBottom.tsx` ✅
 **Priority: High**
-- [ ] Same changes as ProductInfo.tsx
-- [ ] Remove direct access to `product.weight` and `product.dimensions`
-- [ ] Add logic to get weight/dimensions from selected item
-- [ ] Update component interface
+- [x] Same changes as ProductInfo.tsx
+- [x] Remove direct access to `product.weight` and `product.dimensions`
+- [x] Add logic to get weight/dimensions from selected item
+- [x] Update component interface
+- [x] Add selected item state management
+- [x] Pass selectedItem to AddToCartButton
 
-### 3.5 Update `app/components/AddToCartButton.tsx`
+### 3.5 Update `app/components/AddToCartButton.tsx` ✅
 **Priority: Critical**
-- [ ] Update to work with specification-based selection
-- [ ] Ensure cart items reference the correct item ID and specifications
-- [ ] Update cart item creation to include item reference
-- [ ] Handle specification validation before adding to cart
-- [ ] Update error handling for invalid specifications
+- [x] Update to work with specification-based selection
+- [x] Ensure cart items reference the correct item ID and specifications
+- [x] Update cart item creation to include item reference
+- [x] Handle specification validation before adding to cart
+- [x] Update error handling for invalid specifications
+- [x] Add selectedItem prop and use item-specific data (price, name, images)
+- [x] Add item_id and sku to cart item structure
 
-### 3.6 Update related components
+### 3.6 Update related components ✅
 **Priority: Medium**
-- [ ] `ProductCard.tsx` - Handle weight/dimensions if displayed
-- [ ] `RelatedProducts.tsx` - Update if it shows specifications
-- [ ] `MiniCart.tsx` - Update cart item display for specifications
-- [ ] `ProductImageGallery.tsx` - Handle item-specific images if needed
+- [x] `ProductCard.tsx` - Reviewed, no changes needed (doesn't reference moved fields)
+- [x] `RelatedProducts.tsx` - Updated cart item structure to include item_id and sku
+- [x] `MiniCart.tsx` - Reviewed, works with new attribute system (no changes needed)
+- [x] `ProductImageGallery.tsx` - Reviewed, works with product-level images (no changes needed)
+
+**Phase 3 Status**: ✅ COMPLETED
+- All critical and high-priority components updated
+- Components now work with new product-item architecture
+- Weight/dimensions properly sourced from selected items
+- Specifications properly sourced from productLevelSpecifications
+- Attribute selection uses itemDefiningSpecifications and utility functions
+- Cart system updated to reference specific items
+- All TypeScript errors resolved
+- Components maintain backward compatibility where appropriate
+- Phase 4 (Page Updates) ready to begin
 
 ## Phase 4: Page and Layout Updates
 

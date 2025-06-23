@@ -63,15 +63,15 @@ export default function ProductTabs({ product }: ProductTabsProps) {
 
         {activeTab === 'specifications' && (
           <div>
-            {product.specifications && product.specifications.length > 0 ? (
+            {product.productLevelSpecifications && product.productLevelSpecifications.length > 0 ? (
               <div className="space-y-6 sm:space-y-8">
                 {Object.entries(
-                  product.specifications.reduce((groups, spec) => {
+                  product.productLevelSpecifications.reduce((groups, spec) => {
                     const group = spec.group || 'General';
                     if (!groups[group]) groups[group] = [];
                     groups[group].push(spec);
                     return groups;
-                  }, {} as Record<string, typeof product.specifications>)
+                  }, {} as Record<string, typeof product.productLevelSpecifications>)
                 ).map(([group, specs]) => (
                   <div key={group}>
                     <h4 className="font-semibold text-gray-900 mb-3 text-base sm:text-lg">{group}</h4>

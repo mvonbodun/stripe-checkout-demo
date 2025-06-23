@@ -1,5 +1,6 @@
 'use client';
 import { Product } from '../models/product';
+import { getAvailableSpecificationValues } from '../models/item';
 
 interface AttributeSelectorProps {
   product: Product;
@@ -12,10 +13,22 @@ export default function AttributeSelector({
   selectedOptions, 
   onOptionsChange 
 }: AttributeSelectorProps) {
-  // Generate attribute options based on product type and categories
+  // Use itemDefiningSpecifications from the product to determine available attributes
   const getAttributesForProduct = (product: Product) => {
     const attributes: Record<string, string[]> = {};
     
+    // If product has itemDefiningSpecifications, use those
+    if (product.itemDefiningSpecifications && product.itemDefiningSpecifications.length > 0) {
+      product.itemDefiningSpecifications.forEach(spec => {
+        const availableValues = getAvailableSpecificationValues(product.id, spec.name);
+        if (availableValues.length > 0) {
+          attributes[spec.name] = availableValues;
+        }
+      });
+      return attributes;
+    }
+    
+    // Fallback: generate attributes based on product type and categories (for products without itemDefiningSpecifications)
     // Add size options for clothing
     if (product.categoryIds.includes('2')) { // Clothing category
       attributes.Size = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
