@@ -204,7 +204,6 @@ export const mockItems: Item[] = [
     barcode: '194253164531',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
-      { name: 'Processor', value: 'M3 Pro', displayName: 'M3 Pro' },
       { name: 'Storage', value: '512GB', displayName: '512 GB SSD' },
       { name: 'Color', value: 'Space Gray', displayName: 'Space Gray' }
     ],
@@ -238,7 +237,6 @@ export const mockItems: Item[] = [
     barcode: '194253164548',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
-      { name: 'Processor', value: 'M3 Pro', displayName: 'M3 Pro' },
       { name: 'Storage', value: '1TB', displayName: '1 TB SSD' },
       { name: 'Color', value: 'Space Gray', displayName: 'Space Gray' }
     ],
@@ -272,7 +270,6 @@ export const mockItems: Item[] = [
     barcode: '194253164555',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
-      { name: 'Processor', value: 'M3 Pro', displayName: 'M3 Pro' },
       { name: 'Storage', value: '512GB', displayName: '512 GB SSD' },
       { name: 'Color', value: 'Silver', displayName: 'Silver' }
     ],

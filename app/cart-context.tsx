@@ -199,8 +199,8 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           line_shipping_total: 0
         }));
       }
-      
       const newState = recalcTotals(updatedItems);
+      console.log("VVV Full Cart -> Updated line items after shipping method: ", newState) ;
       return {
         ...newState,
         shipping_method_id,
@@ -252,6 +252,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       } else {
         updatedItems = [...state.line_items, newItem];
       }
+      console.log("State after ADD_ITEM action:", state);
       return recalcTotals(updatedItems);
     }
     case 'REMOVE_ITEM':
