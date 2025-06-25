@@ -38,6 +38,7 @@ export default function ProductInfoMobileBottom({ product, items }: ProductInfoM
       <div className="pt-4">
         <AttributeSelector 
           product={product}
+          items={items}
           selectedOptions={selectedOptions}
           onOptionsChange={setSelectedOptions}
         />

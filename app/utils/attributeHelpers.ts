@@ -17,7 +17,11 @@ export function getAttributesForProduct(product: Product, items: Item[]): Record
         attributes[spec.name] = availableValues;
       }
     });
-    return attributes;
+    
+    // Only return if we found some attributes, otherwise fall back to analyzing items
+    if (Object.keys(attributes).length > 0) {
+      return attributes;
+    }
   }
   
   // Fallback: analyze items directly if no itemDefiningSpecifications

@@ -122,6 +122,7 @@ export default function ProductInfo({ product, items }: ProductInfoProps) {
       <div className="border-t pt-4 sm:pt-6">
         <AttributeSelector 
           product={product}
+          items={items}
           selectedOptions={selectedOptions}
           onOptionsChange={setSelectedOptions}
         />

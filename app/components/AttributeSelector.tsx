@@ -1,92 +1,214 @@
 'use client';
+import { useState, useEffect, useMemo } from 'react';
 import { Product } from '../models/product';
-import { getAvailableSpecificationValues } from '../models/item';
+import { Item } from '../models/item';
+import {
+  buildAttributeCombinationMatrix,
+  calculateAttributeAvailability,
+  validateAndCleanSelections,
+  AttributeAvailability
+} from '../utils/attributeCombinations';
+import { getAttributesForProduct, getAttributeDisplayName, findClosestOption } from '../utils/attributeHelpers';
 
 interface AttributeSelectorProps {
   product: Product;
+  items: Item[]; // Add items to props
   selectedOptions: Record<string, string>;
   onOptionsChange: (options: Record<string, string>) => void;
 }
 
 export default function AttributeSelector({ 
   product, 
+  items,
   selectedOptions, 
   onOptionsChange 
 }: AttributeSelectorProps) {
-  // Use itemDefiningSpecifications from the product to determine available attributes
-  const getAttributesForProduct = (product: Product) => {
-    const attributes: Record<string, string[]> = {};
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [recentlyChanged, setRecentlyChanged] = useState<string | null>(null);
+
+  // Build combination matrix and attributes when items change (memoized)
+  const { allAttributes, combinationMatrix } = useMemo(() => {
+    if (items.length === 0) {
+      return { allAttributes: {}, combinationMatrix: {} };
+    }
+
+    try {
+      const allAttributes = getAttributesForProduct(product, items);
+      const combinationMatrix = buildAttributeCombinationMatrix(product.id, items);
+      return { allAttributes, combinationMatrix };
+    } catch (error) {
+      console.error('Error building attribute state:', error);
+      return { allAttributes: {}, combinationMatrix: {} };
+    }
+  }, [items, product]);
+
+  // Calculate current availability based on selected options (memoized)
+  const currentAvailability = useMemo(() => {
+    if (Object.keys(combinationMatrix).length === 0) {
+      return {};
+    }
+
+    return calculateAttributeAvailability(
+      combinationMatrix,
+      selectedOptions,
+      allAttributes
+    );
+  }, [combinationMatrix, selectedOptions, allAttributes]);
+
+  // Set calculating state when items change
+  useEffect(() => {
+    if (items.length === 0) return;
     
-    // If product has itemDefiningSpecifications, use those
-    if (product.itemDefiningSpecifications && product.itemDefiningSpecifications.length > 0) {
-      product.itemDefiningSpecifications.forEach(spec => {
-        const availableValues = getAvailableSpecificationValues(product.id, spec.name);
-        if (availableValues.length > 0) {
-          attributes[spec.name] = availableValues;
+    setIsCalculating(true);
+    const timer = setTimeout(() => setIsCalculating(false), 100);
+    return () => clearTimeout(timer);
+  }, [items]);
+
+  // Clear recently changed indicator
+  useEffect(() => {
+    if (recentlyChanged) {
+      const timer = setTimeout(() => setRecentlyChanged(null), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [recentlyChanged]);
+
+  // Enhanced option change handler with validation
+  const handleOptionChange = (attributeName: string, value: string) => {
+    if (Object.keys(combinationMatrix).length === 0) return;
+    
+    const availability = currentAvailability[attributeName]?.[value];
+    if (!availability?.isAvailable) return; // Don't allow selection of unavailable options
+    
+    setRecentlyChanged(attributeName);
+    
+    const newOptions = { ...selectedOptions, [attributeName]: value };
+    
+    // Check if this selection makes other current selections invalid
+    const cleanedOptions = validateAndCleanSelections(
+      newOptions,
+      combinationMatrix
+    );
+    
+    // If some selections were removed, try to find smart alternatives
+    if (Object.keys(cleanedOptions).length < Object.keys(newOptions).length) {
+      const removedAttrs = Object.keys(newOptions).filter(key => !cleanedOptions[key]);
+      
+      // Try to find closest alternatives for removed selections
+      removedAttrs.forEach(removedAttr => {
+        if (removedAttr !== attributeName) { // Don't replace the one we just selected
+          const originalValue = newOptions[removedAttr];
+          const validOptions = Object.keys(combinationMatrix[removedAttr] || {});
+          const closestOption = findClosestOption(originalValue, validOptions);
+          
+          if (closestOption) {
+            const testOptions = { ...cleanedOptions, [removedAttr]: closestOption };
+            const testValidity = validateAndCleanSelections(testOptions, combinationMatrix);
+            
+            if (Object.keys(testValidity).length === Object.keys(testOptions).length) {
+              cleanedOptions[removedAttr] = closestOption;
+            }
+          }
         }
       });
-      return attributes;
     }
     
-    // Fallback: generate attributes based on product type and categories (for products without itemDefiningSpecifications)
-    // Add size options for clothing
-    if (product.categoryIds.includes('2')) { // Clothing category
-      attributes.Size = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-    }
-    
-    // Add color options for applicable products
-    if (product.categoryIds.includes('2') || product.categoryIds.includes('13')) { // Clothing or Mobile
-      attributes.Color = ['Black', 'White', 'Gray', 'Blue', 'Red'];
-    }
-    
-    // Add capacity for electronics
-    if (product.categoryIds.includes('121') || product.categoryIds.includes('131')) { // Laptops or Smartphones
-      attributes.Storage = ['128GB', '256GB', '512GB', '1TB'];
-    }
-    
-    // Add screen size for TVs
-    if (product.categoryIds.includes('111') || product.categoryIds.includes('112')) { // OLED TVs or QLED TVs
-      attributes['Screen Size'] = ['55"', '65"', '75"', '85"'];
-    }
-    
-    return attributes;
+    onOptionsChange(cleanedOptions);
   };
 
-  const attributes = getAttributesForProduct(product);
+  // Get CSS classes for option buttons
+  const getOptionClassName = (
+    attributeName: string, 
+    option: string, 
+    availability: AttributeAvailability
+  ) => {
+    const state = availability[attributeName]?.[option];
+    
+    if (!state) return '';
+    
+    const baseClasses = 'px-4 py-2 border rounded-md text-sm font-medium transition-all duration-200';
+    const isRecentlyChanged = recentlyChanged === attributeName;
+    
+    if (state.isSelected) {
+      const selectedClasses = 'bg-blue-600 text-white border-blue-600';
+      return `${baseClasses} ${selectedClasses} ${isRecentlyChanged ? 'ring-2 ring-blue-300' : ''}`;
+    }
+    
+    if (!state.isAvailable) {
+      return `${baseClasses} bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50`;
+    }
+    
+    return `${baseClasses} bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 cursor-pointer`;
+  };
 
-  if (Object.keys(attributes).length === 0) {
+  // Show loading state
+  if (isCalculating) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+          <span>Loading available options...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // No attribute state available
+  if (Object.keys(allAttributes).length === 0) {
     return null;
   }
 
-  const handleOptionChange = (attributeName: string, value: string) => {
-    const newOptions = { ...selectedOptions, [attributeName]: value };
-    onOptionsChange(newOptions);
-  };
-
   return (
     <div className="space-y-4">
-      {Object.entries(attributes).map(([attributeName, options]) => (
+      {Object.entries(allAttributes).map(([attributeName, options]) => (
         <div key={attributeName}>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {attributeName}
           </label>
           <div className="flex flex-wrap gap-2">
-            {options.map((option) => (
-              <button
-                key={option}
-                onClick={() => handleOptionChange(attributeName, option)}
-                className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors ${
-                  selectedOptions[attributeName] === option
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                }`}
-              >
-                {option}
-              </button>
-            ))}
+            {(options as string[]).map((option) => {
+              const state = currentAvailability[attributeName]?.[option];
+              const displayName = getAttributeDisplayName(items, attributeName, option);
+              
+              return (
+                <button
+                  key={option}
+                  onClick={() => handleOptionChange(attributeName, option)}
+                  disabled={!state?.isAvailable}
+                  aria-pressed={state?.isSelected}
+                  aria-describedby={!state?.isAvailable ? `${attributeName}-${option}-unavailable` : undefined}
+                  className={getOptionClassName(attributeName, option, currentAvailability)}
+                  title={!state?.isAvailable ? 'Not available with current selection' : displayName || option}
+                >
+                  {displayName || option}
+                  {/* Hidden description for screen readers */}
+                  {!state?.isAvailable && (
+                    <span 
+                      id={`${attributeName}-${option}-unavailable`} 
+                      className="sr-only"
+                    >
+                      {option} is not available with your current selection
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       ))}
+      
+      {/* Debug info in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-4 p-2 bg-gray-100 rounded text-xs text-gray-600">
+          <details>
+            <summary className="cursor-pointer">Debug Info</summary>
+            <div className="mt-2 space-y-1">
+              <div>Selected: {JSON.stringify(selectedOptions)}</div>
+              <div>Available combinations: {Object.keys(combinationMatrix).length}</div>
+              <div>Recently changed: {recentlyChanged || 'none'}</div>
+            </div>
+          </details>
+        </div>
+      )}
     </div>
   );
 }
