@@ -6,30 +6,45 @@ import {
   buildAttributeCombinationMatrix,
   calculateAttributeAvailability,
   validateAndCleanSelections,
-  AttributeAvailability
+  AttributeAvailability,
+  AttributeCombinationMatrix
 } from '../utils/attributeCombinations';
 import { getAttributesForProduct, getAttributeDisplayName, findClosestOption } from '../utils/attributeHelpers';
 
 interface AttributeSelectorProps {
   product: Product;
-  items: Item[]; // Add items to props
+  items: Item[];
   selectedOptions: Record<string, string>;
   onOptionsChange: (options: Record<string, string>) => void;
+  // Enhanced props for Phase 3
+  combinationMatrix?: AttributeCombinationMatrix;
+  allAttributes?: Record<string, string[]>;
+  onError?: (error: string) => void;
+  onStateChange?: (state: { isLoading: boolean; hasError: boolean }) => void;
 }
 
 export default function AttributeSelector({ 
-  product, 
+  product,
   items,
   selectedOptions, 
-  onOptionsChange 
+  onOptionsChange,
+  combinationMatrix: providedMatrix,
+  allAttributes: providedAttributes,
+  onError,
+  onStateChange
 }: AttributeSelectorProps) {
-  const [isCalculating, setIsCalculating] = useState(false);
   const [recentlyChanged, setRecentlyChanged] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
-  // Build combination matrix and attributes when items change (memoized)
-  const { allAttributes, combinationMatrix } = useMemo(() => {
+  // Fallback: Calculate matrix and attributes if not provided (backward compatibility)
+  const { combinationMatrix, allAttributes } = useMemo(() => {
+    if (providedMatrix && providedAttributes) {
+      return { combinationMatrix: providedMatrix, allAttributes: providedAttributes };
+    }
+
+    // Fallback to original calculation
     if (items.length === 0) {
-      return { allAttributes: {}, combinationMatrix: {} };
+      return { combinationMatrix: {}, allAttributes: {} };
     }
 
     try {
@@ -38,9 +53,12 @@ export default function AttributeSelector({
       return { allAttributes, combinationMatrix };
     } catch (error) {
       console.error('Error building attribute state:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error building attributes';
+      setHasError(true);
+      onError?.(errorMessage);
       return { allAttributes: {}, combinationMatrix: {} };
     }
-  }, [items, product]);
+  }, [providedMatrix, providedAttributes, items, product, onError]);
 
   // Calculate current availability based on selected options (memoized)
   const currentAvailability = useMemo(() => {
@@ -48,21 +66,25 @@ export default function AttributeSelector({
       return {};
     }
 
-    return calculateAttributeAvailability(
-      combinationMatrix,
-      selectedOptions,
-      allAttributes
-    );
-  }, [combinationMatrix, selectedOptions, allAttributes]);
+    try {
+      return calculateAttributeAvailability(
+        combinationMatrix,
+        selectedOptions,
+        allAttributes
+      );
+    } catch (error) {
+      console.error('Error calculating availability:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error calculating availability';
+      setHasError(true);
+      onError?.(errorMessage);
+      return {};
+    }
+  }, [combinationMatrix, selectedOptions, allAttributes, onError]);
 
-  // Set calculating state when items change
+  // Notify parent of state changes
   useEffect(() => {
-    if (items.length === 0) return;
-    
-    setIsCalculating(true);
-    const timer = setTimeout(() => setIsCalculating(false), 100);
-    return () => clearTimeout(timer);
-  }, [items]);
+    onStateChange?.({ isLoading: false, hasError });
+  }, [hasError, onStateChange]);
 
   // Clear recently changed indicator
   useEffect(() => {
@@ -140,13 +162,15 @@ export default function AttributeSelector({
     return `${baseClasses} bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 cursor-pointer`;
   };
 
-  // Show loading state
-  if (isCalculating) {
+  // Show error state
+  if (hasError) {
     return (
       <div className="space-y-4">
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-          <span>Loading available options...</span>
+        <div className="flex items-center space-x-2 text-sm text-red-600 bg-red-50 p-3 rounded-md">
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <span>Error loading product options. Please refresh the page.</span>
         </div>
       </div>
     );

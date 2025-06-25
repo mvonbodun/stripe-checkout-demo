@@ -1,7 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Product } from '../models/product';
 import { Item, getDefaultItem, findItemBySpecificationValues } from '../models/item';
+import { buildAttributeCombinationMatrix, AttributeCombinationMatrix } from '../utils/attributeCombinations';
+import { getAttributesForProduct } from '../utils/attributeHelpers';
 import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
@@ -9,38 +11,122 @@ import AttributeSelector from './AttributeSelector';
 interface ProductInfoMobileBottomProps {
   product: Product;
   items: Item[];
+  // Phase 3: Enhanced props for pre-calculated data
+  combinationMatrix?: AttributeCombinationMatrix;
+  allAttributes?: Record<string, string[]>;
 }
 
-export default function ProductInfoMobileBottom({ product, items }: ProductInfoMobileBottomProps) {
+export default function ProductInfoMobileBottom({ 
+  product, 
+  items, 
+  combinationMatrix: providedMatrix,
+  allAttributes: providedAttributes 
+}: ProductInfoMobileBottomProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [attributeError, setAttributeError] = useState<string | null>(null);
+  const [attributeState, setAttributeState] = useState<{ isLoading: boolean; hasError: boolean }>({ 
+    isLoading: false, 
+    hasError: false 
+  });
 
-  // Get selected item based on options, or default to first item
+  // Pre-calculate combination matrix and attributes (Phase 3 enhancement)
+  const { combinationMatrix, allAttributes, hasValidData } = useMemo(() => {
+    // Use provided data if available (Phase 3)
+    if (providedMatrix && providedAttributes) {
+      return { 
+        combinationMatrix: providedMatrix, 
+        allAttributes: providedAttributes, 
+        hasValidData: Object.keys(providedAttributes).length > 0 
+      };
+    }
+
+    // Fallback to original calculation for backward compatibility
+    if (items.length === 0) {
+      return { combinationMatrix: {}, allAttributes: {}, hasValidData: false };
+    }
+
+    try {
+      const allAttributes = getAttributesForProduct(product, items);
+      const combinationMatrix = buildAttributeCombinationMatrix(product.id, items);
+      return { 
+        allAttributes, 
+        combinationMatrix, 
+        hasValidData: Object.keys(allAttributes).length > 0 
+      };
+    } catch (error) {
+      console.error('Error pre-calculating attribute data:', error);
+      return { combinationMatrix: {}, allAttributes: {}, hasValidData: false };
+    }
+  }, [providedMatrix, providedAttributes, product, items]);
+
+  // Enhanced options change handler
+  const handleOptionsChange = useCallback((newOptions: Record<string, string>) => {
+    setSelectedOptions(newOptions);
+    
+    // Find matching item
+    if (Object.keys(newOptions).length > 0) {
+      const foundItem = findItemBySpecificationValues(product.id, newOptions);
+      setSelectedItem(foundItem || null);
+    } else {
+      const defaultItem = getDefaultItem(product.id);
+      setSelectedItem(defaultItem || (items.length > 0 ? items[0] : null));
+    }
+  }, [product.id, items]);
+
+  // Handle attribute selector errors
+  const handleAttributeError = useCallback((error: string) => {
+    setAttributeError(error);
+  }, []);
+
+  // Handle attribute selector state changes
+  const handleAttributeStateChange = useCallback((state: { isLoading: boolean; hasError: boolean }) => {
+    setAttributeState(state);
+  }, []);
+
+  // Legacy fallback: Get selected item based on options (for backward compatibility)
   useEffect(() => {
     if (items.length === 0) {
       setSelectedItem(null);
       return;
     }
 
-    if (Object.keys(selectedOptions).length > 0) {
-      const foundItem = findItemBySpecificationValues(product.id, selectedOptions);
-      setSelectedItem(foundItem || null);
-    } else {
+    // Only run if not handled by enhanced callback
+    if (!hasValidData && Object.keys(selectedOptions).length === 0) {
       const defaultItem = getDefaultItem(product.id);
       setSelectedItem(defaultItem || items[0]);
     }
-  }, [selectedOptions, product.id, items]);
+  }, [selectedOptions, product.id, items, hasValidData]);
 
   return (
     <div className="space-y-4">
       {/* Attribute Selectors (Size, Color, etc.) */}
       <div className="pt-4">
+        {/* Error State */}
+        {attributeError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{attributeError}</p>
+          </div>
+        )}
+        
+        {/* Loading State */}
+        {attributeState.isLoading && (
+          <div className="mb-4 flex items-center space-x-2 text-sm text-gray-500">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+            <span>Loading product options...</span>
+          </div>
+        )}
+        
         <AttributeSelector 
           product={product}
           items={items}
           selectedOptions={selectedOptions}
-          onOptionsChange={setSelectedOptions}
+          onOptionsChange={handleOptionsChange}
+          combinationMatrix={combinationMatrix}
+          allAttributes={allAttributes}
+          onError={handleAttributeError}
+          onStateChange={handleAttributeStateChange}
         />
       </div>
       

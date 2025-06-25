@@ -2,13 +2,14 @@ import { notFound } from 'next/navigation';
 import { findProductBySlug, getRelatedProducts } from '../../models/product';
 import { getItemsByProduct } from '../../models/item';
 import { findCategoryById, getAllCategories } from '../../models/category';
+import { buildProductAttributeData } from '../../utils/productAttributeData';
 import Breadcrumb from '../../components/Breadcrumb';
 import { buildProductBreadcrumbs } from '../../utils/breadcrumbs';
 import ProductImageGallery from '../../components/ProductImageGallery';
 import ProductImageGalleryMobile from '../../components/ProductImageGalleryMobile';
-import ProductInfo from '../../components/ProductInfo';
 import ProductInfoMobile from '../../components/ProductInfoMobile';
-import ProductInfoMobileBottom from '../../components/ProductInfoMobileBottom';
+import EnhancedProductInfo from '../../components/EnhancedProductInfo';
+import EnhancedProductInfoMobileBottom from '../../components/EnhancedProductInfoMobileBottom';
 import ProductTabs from '../../components/ProductTabs';
 import RelatedProducts from '../../components/RelatedProducts';
 
@@ -28,6 +29,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   // Load items data for the product
   const items = getItemsByProduct(product.id);
+
+  // Phase 3: Pre-calculate attribute data at page level
+  const attributeData = buildProductAttributeData(product, items);
 
   // Get category and breadcrumb data
   const allCategories = getAllCategories();
@@ -60,7 +64,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
         
         {/* 3. Attributes, Quantity, Add to Cart, Trust Icons, SKU, Weight, Dimensions */}
         <div className="mt-6">
-          <ProductInfoMobileBottom product={product} items={items} />
+          <EnhancedProductInfoMobileBottom 
+            product={product} 
+            items={items} 
+            attributeData={attributeData}
+          />
         </div>
       </div>
       
@@ -70,7 +78,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <ProductImageGallery product={product} />
         
         {/* Right: Product Info */}
-        <ProductInfo product={product} items={items} />
+        <EnhancedProductInfo 
+          product={product} 
+          items={items} 
+          attributeData={attributeData}
+        />
       </div>
       
       {/* Product Details Tabs */}
