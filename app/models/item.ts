@@ -903,6 +903,45 @@ export const mockItems: Item[] = [
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-15')
   },
+  {
+    id: 'item_24',
+    productId: 'prod_17',
+    sku: 'SONOS-SOUND-2024',
+    name: 'Sonos Arc Ultra Soundbar - 2024 Model',
+    price: 249.99,
+    compareAtPrice: 299.99,
+    inventoryQuantity: 6,
+    inventoryTracking: true,
+    weight: { value: 55.1, unit: 'lb' },
+    dimensions: { length: 57.1, width: 32.7, height: 2.4, unit: 'in' },
+    barcode: '438243408100',
+    status: Status.ACTIVE,
+    itemDefiningSpecificationValues: [
+    ],
+    images: [
+      {
+        id: 'img_sonos_arc',
+        url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=Sonos%20Arc%20Ultra%20Soundbar%202024',
+        altText: 'Sonos Arc Ultra Soundbar 2024',
+        order: 1,
+        type: 'image'
+      },
+      {
+        id: 'img_2',
+        url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=Sonos%20Arc%20Ultra%20Soundbar%20Side',
+        altText: 'Sonos Arc Ultra Soundbar side view',
+        order: 2,
+        type: 'image'
+      }
+
+    ],
+    position: 1,
+    isInStock: true,
+    isLowStock: false,
+    lowStockThreshold: 2,
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15')
+  },
 
 ];
 

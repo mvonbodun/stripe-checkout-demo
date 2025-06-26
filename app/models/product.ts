@@ -660,6 +660,31 @@ export const mockProducts: Product[] = [
     seoTitle: 'Hisense U8G 55" QLED 4K Android TV',
     seoDescription: 'QLED Android TV with Quantum Dot technology and Full Array Local Dimming.'
   },
+  {
+    id: 'prod_17',
+    name: 'Sonos Arc Ultra Soundbar',
+    slug: 'sonos-arc-ultra-soundbar',
+    description: 'Premium smart soundbar with Dolby Atmos support and voice control.',
+    shortDescription: 'Smart soundbar with Dolby Atmos',
+    categoryId: '113', // Soundbars
+    categoryIds: ['113', '11', '1'],
+    brand: 'Sonos',
+    status: 'active' as Status,
+    images: [
+      { id: 'img-sonos-001', url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=Sonos%20Arc%20Ultra%20Soundbar', altText: 'Sonos Arc Ultra Soundbar', type: 'image' as const, order: 1 }
+    ],
+    features: ['Dolby Atmos', 'Voice Control', 'Smart Home Integration'],
+    productLevelSpecifications: [
+      { name: 'Audio Channels', value: '5.1.2', group: 'Audio' },
+      { name: 'Connectivity', value: 'HDMI eARC, Optical, Wi-Fi, Bluetooth', group: 'Audio' },
+    ],
+    basePrice: 249.99,
+    taxCode: 'txcd_99999999',
+    createdAt: new Date('2024-01-22'),
+    updatedAt: new Date('2024-01-22'),
+    seoTitle: 'Sonos Arc Ultra Soundbar',
+    seoDescription: 'Premium smart soundbar with Dolby Atmos support and voice control.'
+  },
 
 ];
 
