@@ -232,27 +232,64 @@ export default function ProductInfo({
       
       {/* Quantity & Add to Cart */}
       <div className="space-y-4 border-t pt-4 sm:pt-6">
-        <div>
+        {/* Mobile Layout */}
+        <div className="lg:hidden">
+          {/* Quantity Label - Spans full width of both columns */}
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Quantity
           </label>
-          <QuantitySelector
-            initialQuantity={quantity}
-            onChange={setQuantity}
-            className="w-32"
-            max={product.totalInventory || 99}
-          />
+          
+          {/* Quantity Selector and Add to Cart on same row */}
+          <div className="flex gap-3">
+            <div className="w-36">
+              <QuantitySelector
+                initialQuantity={quantity}
+                onChange={setQuantity}
+                className="w-full"
+                max={product.totalInventory || 99}
+              />
+            </div>
+            <div className="flex-1">
+              <AddToCartButton
+                product={product}
+                selectedItem={selectedItem}
+                quantity={quantity}
+                selectedOptions={selectedOptions}
+                className="w-full h-12"
+                disabled={!addToCartValidation.isEnabled}
+              />
+            </div>
+          </div>
         </div>
-        
-        <div className="sticky bottom-4 bg-white border-t pt-4 -mx-4 px-4 sm:static sm:bg-transparent sm:border-0 sm:p-0">
-          <AddToCartButton
-            product={product}
-            selectedItem={selectedItem}
-            quantity={quantity}
-            selectedOptions={selectedOptions}
-            className="w-full"
-            disabled={!addToCartValidation.isEnabled}
-          />
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:block">
+          {/* Quantity Label - Spans full width of both columns */}
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Quantity
+          </label>
+          
+          {/* Quantity Selector and Add to Cart on same row */}
+          <div className="flex gap-3">
+            <div className="flex-shrink-0">
+              <QuantitySelector
+                initialQuantity={quantity}
+                onChange={setQuantity}
+                className=""
+                max={product.totalInventory || 99}
+              />
+            </div>
+            <div className="flex-1">
+              <AddToCartButton
+                product={product}
+                selectedItem={selectedItem}
+                quantity={quantity}
+                selectedOptions={selectedOptions}
+                className="w-full h-12"
+                disabled={!addToCartValidation.isEnabled}
+              />
+            </div>
+          </div>
         </div>
         
         {/* Trust Badges */}

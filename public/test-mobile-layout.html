@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Layout Test - Grid-Based Solution</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: white;
+        }
+        .iframe-container {
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+        }
+        .description {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mobile Layout Test - Grid-Based Add to Cart & Quantity Selector</h1>
+    
+    <div class="test-section">
+        <h2>Mobile View (375px width - iPhone size)</h2>
+        <div class="description">
+            <strong>Grid Layout:</strong> Using CSS Grid with <code>grid-cols-[auto_1fr]</code> to ensure:
+            <ul>
+                <li>Quantity selector takes only the space it needs (auto)</li>
+                <li>Add to Cart button fills remaining space (1fr)</li>
+                <li>No overlap with proper gap spacing</li>
+                <li>Perfect vertical alignment with <code>items-center</code></li>
+            </ul>
+        </div>
+        <div class="iframe-container">
+            <iframe 
+                src="http://localhost:3001/p/apple-macbook-pro-14-inch" 
+                width="375" 
+                height="800"
+                style="border: none; display: block;">
+            </iframe>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Small Mobile View (320px width - iPhone SE)</h2>
+        <div class="description">
+            <strong>Extreme Mobile Test:</strong> Testing on very narrow screens to ensure no overflow.
+        </div>
+        <div class="iframe-container">
+            <iframe 
+                src="http://localhost:3001/p/apple-macbook-pro-14-inch" 
+                width="320" 
+                height="700"
+                style="border: none; display: block;">
+            </iframe>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Desktop View (1200px width)</h2>
+        <div class="description">
+            <strong>Desktop Comparison:</strong> Should use flexbox layout (lg:flex) with same components.
+        </div>
+        <div class="iframe-container">
+            <iframe 
+                src="http://localhost:3001/p/apple-macbook-pro-14-inch" 
+                width="1200" 
+                height="800"
+                style="border: none; display: block;">
+            </iframe>
+        </div>
+    </div>
+</body>
+</html>

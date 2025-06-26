@@ -71,7 +71,7 @@ export default function AddToCartButton({
     <button
       onClick={handleAddToCart}
       disabled={disabled}
-      className={`btn w-full transition-all duration-200 ${
+      className={`btn w-full transition-all duration-200 !h-12 min-h-12 flex items-center justify-center ${
         disabled 
           ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300 hover:bg-gray-300 hover:border-gray-300' 
           : 'btn-primary'

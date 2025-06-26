@@ -35,11 +35,6 @@ export const Price = ({
     currencyDisplay: showCode ? 'code' : 'symbol',
   }).format(amount);
 
-  // Debug output for development
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`Price component: amount=${amount}, formatted=${formatted}`);
-  }
-
   return <span className={className}>{formatted}</span>;
 };
 

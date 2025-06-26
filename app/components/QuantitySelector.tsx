@@ -25,11 +25,11 @@ export default function QuantitySelector({
   };
 
   return (
-    <div className={`flex items-center border border-gray-300 rounded-md ${className}`}>
+    <div className={`flex items-center border border-gray-300 rounded-md h-12 bg-white ${className}`}>
       <button
         onClick={() => updateQuantity(quantity - 1)}
         disabled={quantity <= min}
-        className="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center justify-center w-10 h-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         aria-label="Decrease quantity"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,14 +43,14 @@ export default function QuantitySelector({
         onChange={(e) => updateQuantity(parseInt(e.target.value) || min)}
         min={min}
         max={max}
-        className="w-16 text-center border-0 focus:ring-0 focus:outline-none"
+        className="w-16 h-full text-center border-0 focus:outline-none bg-transparent"
         aria-label="Quantity"
       />
       
       <button
         onClick={() => updateQuantity(quantity + 1)}
         disabled={quantity >= max}
-        className="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center justify-center w-10 h-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         aria-label="Increase quantity"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

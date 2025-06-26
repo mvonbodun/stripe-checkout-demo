@@ -144,28 +144,32 @@ export default function ProductInfoMobileBottom({
       </div>
       
       {/* Quantity & Add to Cart */}
-      <div className="flex items-center space-x-4 pt-4">
-        <div className="flex-shrink-0">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quantity
-          </label>
-          <QuantitySelector
-            initialQuantity={quantity}
-            onChange={setQuantity}
-            className="w-20"
-            max={product.totalInventory || 99}
-          />
-        </div>
+      <div className="space-y-4 pt-4">
+        {/* Quantity Label - Spans full width above both components */}
+        <label className="block text-sm font-medium text-gray-700">
+          Quantity
+        </label>
         
-        <div className="flex-1">
-          <AddToCartButton
-            product={product}
-            selectedItem={selectedItem}
-            quantity={quantity}
-            selectedOptions={selectedOptions}
-            className="w-full"
-            disabled={!addToCartValidation.isEnabled}
-          />
+        {/* Quantity Selector and Add to Cart on same row */}
+        <div className="flex gap-3">
+          <div className="w-36">
+            <QuantitySelector
+              initialQuantity={quantity}
+              onChange={setQuantity}
+              className="w-full"
+              max={product.totalInventory || 99}
+            />
+          </div>
+          <div className="flex-1">
+            <AddToCartButton
+              product={product}
+              selectedItem={selectedItem}
+              quantity={quantity}
+              selectedOptions={selectedOptions}
+              className="w-full h-12"
+              disabled={!addToCartValidation.isEnabled}
+            />
+          </div>
         </div>
       </div>
       
