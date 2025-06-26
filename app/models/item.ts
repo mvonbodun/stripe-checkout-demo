@@ -75,12 +75,19 @@ export const mockItems: Item[] = [
     ],
     images: [
       {
-        id: 'img_iphone_nt_128',
-        url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=iPhone%2015%20Pro%20128GB%20Natural%20Titanium',
-        altText: 'iPhone 15 Pro 128GB Natural Titanium',
+        id: 'img_iphone_nt_128_front',
+        url: 'https://placehold.co/600x600/797982/white?text=iPhone%2015%20Pro%20128GB%20Natural%20Titanium%E2%80%93front',
+        altText: 'iPhone 15 Pro 128GB Natural Titanium - front',
         order: 1,
         type: 'image'
-      }
+      },
+      {
+        id: 'img_iphone_nt_128_side',
+        url: 'https://placehold.co/600x600/797982/white?text=iPhone%2015%20Pro%20128GB%20Natural%20Titanium%E2%80%93side',
+        altText: 'iPhone 15 Pro 128GB Natural Titanium - side',
+        order: 1,
+        type: 'image'
+      },
     ],
     position: 1,
     isInStock: true,
@@ -108,9 +115,16 @@ export const mockItems: Item[] = [
     ],
     images: [
       {
-        id: 'img_iphone_nt_256',
-        url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=iPhone%2015%20Pro%20256GB%20Natural%20Titanium',
-        altText: 'iPhone 15 Pro 256GB Natural Titanium',
+        id: 'img_iphone_nt_256_front',
+        url: 'https://placehold.co/600x600/797982/white?text=iPhone%2015%20Pro%20256GB%20Natural%20Titanium%E2%80%93front',
+        altText: 'iPhone 15 Pro 256GB Natural Titanium - front',
+        order: 1,
+        type: 'image'
+      },
+      {
+        id: 'img_iphone_nt_256_side',
+        url: 'https://placehold.co/600x600/797982/white?text=iPhone%2015%20Pro%20256GB%20Natural%20Titanium%E2%80%93side',
+        altText: 'iPhone 15 Pro 256GB Natural Titanium - side',
         order: 1,
         type: 'image'
       }
@@ -141,9 +155,16 @@ export const mockItems: Item[] = [
     ],
     images: [
       {
-        id: 'img_iphone_bt_128',
-        url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=iPhone%2015%20Pro%20128GB%20Blue%20Titanium',
-        altText: 'iPhone 15 Pro 128GB Blue Titanium',
+        id: 'img_iphone_bt_128_blue_front',
+        url: 'https://placehold.co/600x600/blue/6b7280?text=iPhone%2015%20Pro%20128GB%20Blue%20Titanium%E2%80%93front',
+        altText: 'iPhone 15 Pro 128GB Blue Titanium - front',
+        order: 1,
+        type: 'image'
+      },
+      {
+        id: 'img_iphone_bt_128_blue_side',
+        url: 'https://placehold.co/600x600/blue/6b7280?text=iPhone%2015%20Pro%20128GB%20Blue%20Titanium%E2%80%93side',
+        altText: 'iPhone 15 Pro 128GB Blue Titanium - side',
         order: 1,
         type: 'image'
       }
@@ -174,9 +195,16 @@ export const mockItems: Item[] = [
     ],
     images: [
       {
-        id: 'img_iphone_nt_512',
-        url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=iPhone%2015%20Pro%20512GB%20Natural%20Titanium',
-        altText: 'iPhone 15 Pro 512GB Natural Titanium',
+        id: 'img_iphone_nt_512_front',
+        url: 'https://placehold.co/600x600/797982/white?text=iPhone%2015%20Pro%20512GB%20Natural%20Titanium%E2%80%93front',
+        altText: 'iPhone 15 Pro 512GB Natural Titanium - front',
+        order: 1,
+        type: 'image'
+      },
+      {
+        id: 'img_iphone_nt_512_side',
+        url: 'https://placehold.co/600x600/e5e7eb/6b7280?text=iPhone%2015%20Pro%20512GB%20Natural%20Titanium%E2%80%93side',
+        altText: 'iPhone 15 Pro 512GB Natural Titanium - side',
         order: 1,
         type: 'image'
       }
