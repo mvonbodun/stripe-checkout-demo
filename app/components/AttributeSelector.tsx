@@ -9,7 +9,7 @@ import {
   AttributeAvailability,
   AttributeCombinationMatrix
 } from '../utils/attributeCombinations';
-import { getAttributesForProduct, getAttributeDisplayName, findClosestOption } from '../utils/attributeHelpers';
+import { getAttributesForProduct, getAttributeDisplayName, findClosestOption, calculateInitialAttributeSelections } from '../utils/attributeHelpers';
 
 interface AttributeSelectorProps {
   product: Product;
@@ -93,6 +93,24 @@ export default function AttributeSelector({
       return () => clearTimeout(timer);
     }
   }, [recentlyChanged]);
+
+  // Auto-select first attribute on mount
+  useEffect(() => {
+    // Only run if no options are currently selected and we have valid data
+    if (Object.keys(selectedOptions).length === 0 && 
+        Object.keys(allAttributes).length > 0 && 
+        Object.keys(combinationMatrix).length > 0) {
+      
+      const initialSelections = calculateInitialAttributeSelections(
+        allAttributes, 
+        combinationMatrix
+      );
+      
+      if (Object.keys(initialSelections).length > 0) {
+        onOptionsChange(initialSelections);
+      }
+    }
+  }, [allAttributes, combinationMatrix, selectedOptions, onOptionsChange]);
 
   // Enhanced option change handler with validation
   const handleOptionChange = (attributeName: string, value: string) => {

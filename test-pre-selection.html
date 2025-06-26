@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Selection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .test-case {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AttributeSelector Pre-Selection Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Cases</h2>
+        <div class="test-case">
+            <strong>iPhone 15 Pro (Multi-attribute):</strong>
+            <br>Expected: Color="Natural Titanium" pre-selected, Storage NOT pre-selected
+        </div>
+        <div class="test-case">
+            <strong>MacBook Pro 14" (Multi-attribute):</strong>
+            <br>Expected: Color="Space Gray" pre-selected, Storage NOT pre-selected
+        </div>
+        <div class="test-case">
+            <strong>Samsung OLED TV (Single attribute):</strong>
+            <br>Expected: Screen Size="65"" pre-selected (only attribute)
+        </div>
+        <div class="test-case">
+            <strong>Sony Headphones (No variants):</strong>
+            <br>Expected: No AttributeSelector shown
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>iPhone 15 Pro - Multi-Attribute Test</h2>
+        <p>Should pre-select Color only (first attribute), not Storage</p>
+        <iframe src="http://localhost:3001/p/iphone-15-pro"></iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>MacBook Pro 14" - Multi-Attribute Test</h2>
+        <p>Should pre-select Color only (first attribute), not Storage</p>
+        <iframe src="http://localhost:3001/p/apple-macbook-pro-14-inch"></iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Samsung OLED TV - Single Attribute Test</h2>
+        <p>Should pre-select Screen Size (only attribute)</p>
+        <iframe src="http://localhost:3001/p/samsung-oled-4k-smart-tv"></iframe>
+    </div>
+
+    <div class="test-section">
+        <h2>Sony Headphones - No Variants Test</h2>
+        <p>Should show no AttributeSelector (product has no variants)</p>
+        <iframe src="http://localhost:3001/p/sony-wh-1000xm5-headphones"></iframe>
+    </div>
+
+    <script>
+        // Check if development server is running
+        fetch('http://localhost:3001/')
+            .then(response => {
+                if (!response.ok) {
+                    document.body.innerHTML = '<h1>Error: Development server not running</h1><p>Please start the development server with: npm run dev</p>';
+                }
+            })
+            .catch(error => {
+                document.body.innerHTML = '<h1>Error: Development server not running</h1><p>Please start the development server with: npm run dev</p>';
+            });
+    </script>
+</body>
+</html>

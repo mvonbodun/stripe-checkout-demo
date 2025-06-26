@@ -200,3 +200,46 @@ export function debugCombinationMatrix(matrix: AttributeCombinationMatrix): void
     });
   });
 }
+
+/**
+ * Calculate initial attribute selections for pre-selection
+ * Only pre-selects the first attribute and its first available value
+ * @param allAttributes - Available attributes and their values
+ * @param combinationMatrix - Attribute combination matrix for validation
+ * @returns Record of pre-selected attribute -> value pairs
+ */
+export function calculateInitialAttributeSelections(
+  allAttributes: Record<string, string[]>,
+  combinationMatrix: AttributeCombinationMatrix
+): Record<string, string> {
+  // Return empty if no attributes available
+  if (Object.keys(allAttributes).length === 0) {
+    return {};
+  }
+
+  // Get the first attribute (respects ordering from allAttributes)
+  const firstAttributeName = Object.keys(allAttributes)[0];
+  const firstAttributeValues = allAttributes[firstAttributeName];
+
+  // Return empty if no values available for first attribute
+  if (!firstAttributeValues || firstAttributeValues.length === 0) {
+    return {};
+  }
+
+  // Get the first available value for the first attribute
+  const firstValue = firstAttributeValues[0];
+
+  // Validate that this selection is available using combination matrix
+  // Check if the combination matrix has this attribute and value
+  if (combinationMatrix[firstAttributeName] && 
+      combinationMatrix[firstAttributeName][firstValue]) {
+    
+    // Return the pre-selection for only the first attribute
+    return {
+      [firstAttributeName]: firstValue
+    };
+  }
+
+  // No valid pre-selection available
+  return {};
+}
