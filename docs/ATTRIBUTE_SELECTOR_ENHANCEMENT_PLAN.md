@@ -734,8 +734,6 @@ Phase 2 delivers a professional-grade attribute selector that:
 
 **Total Phase 2 Code**: 200+ lines of enhanced component logic with comprehensive state management and visual feedback.
 
-The enhanced AttributeSelector is now ready for real-world usage and matches the interactive experience of professional e-commerce sites like Dick's Sporting Goods.
-
 ---
 
 ## Phase 3: Component & Page-Level Integration - COMPLETE ✅
@@ -813,3 +811,120 @@ Phase 3 delivers enterprise-grade page-level integration:
 - Seamless integration across desktop and mobile layouts
 
 **Total Implementation**: 3 phases complete with 500+ lines of production-ready code implementing smart attribute selection across the entire product experience.
+
+---
+
+## 🐛 Critical Bug Fix: Bidirectional Availability Calculation
+
+**Status**: FIXED ✅  
+**Fix Date**: June 25, 2025  
+**Issue**: Attribute options not properly graying out when both attributes are selected
+
+### Bug Description
+
+**Reported Issues:**
+1. **MacBook Pro 14"**: Select Space Gray + 1TB → Silver should be grayed out but wasn't
+2. **iPhone 15 Pro**: Select 512GB + Natural Titanium → Blue Titanium should be grayed out but wasn't
+
+**Root Cause:**
+The `calculateAttributeAvailability` function had flawed logic that only checked availability for **unselected** attributes:
+
+```typescript
+// BROKEN LOGIC
+Object.entries(allAttributes).forEach(([attrName, values]) => {
+  if (!selectedOptions[attrName]) { // ❌ Only checks unselected attributes
+    // Check availability...
+  }
+});
+```
+
+**Problem:** When both Color and Storage were selected, the condition `!selectedOptions[attrName]` was false for both attributes, so **no availability checking occurred at all**.
+
+### Fix Implementation
+
+**Updated Logic:**
+```typescript
+// FIXED LOGIC  
+Object.entries(allAttributes).forEach(([attrName, values]) => {
+  values.forEach(value => {
+    // Check ALL attribute values, regardless of selection state
+    const otherSelections = Object.entries(selectedOptions).filter(([attr]) => attr !== attrName);
+    
+    // Check compatibility with selections from OTHER attributes
+    const isCompatible = otherSelections.every(([selectedAttr, selectedValue]) => {
+      const matrixEntry = matrix[selectedAttr]?.[selectedValue];
+      if (!matrixEntry) return false;
+      
+      const validValues = matrixEntry.validCombinations[attrName] || [];
+      return validValues.includes(value);
+    });
+    
+    availability[attrName][value].isAvailable = isCompatible;
+  });
+});
+```
+
+### Key Changes
+
+1. **Removed Condition**: Eliminated `if (!selectedOptions[attrName])` restriction
+2. **Check ALL Values**: Now checks availability for every attribute value, not just unselected attributes  
+3. **Other Selections Filter**: Uses `otherSelections` to exclude current attribute from compatibility checking
+4. **Proper Bidirectional Logic**: Each value is checked against selections from other attributes only
+
+### Test Coverage
+
+Added comprehensive test cases for the reported scenarios:
+
+```typescript
+describe('Bug Fix: Bidirectional Availability Calculation', () => {
+  it('should gray out Silver when Space Gray + 1TB are selected (MacBook scenario)', () => {
+    const selections = { Color: 'Space Gray', Storage: '1TB' };
+    const availability = calculateAttributeAvailability(matrix, selections, allAttributes);
+    
+    expect(availability.Color.Silver.isAvailable).toBe(false); // ✅ Now correctly disabled
+  });
+
+  it('should gray out 1TB when Silver + 512GB are selected (MacBook scenario)', () => {
+    const selections = { Color: 'Silver', Storage: '512GB' };
+    const availability = calculateAttributeAvailability(matrix, selections, allAttributes);
+    
+    expect(availability.Storage['1TB'].isAvailable).toBe(false); // ✅ Now correctly disabled
+  });
+
+  it('should handle iPhone scenario with Natural Titanium + 512GB selection', () => {
+    const selections = { Color: 'Natural Titanium', Storage: '512GB' };
+    const availability = calculateAttributeAvailability(matrix, selections, allAttributes);
+    
+    expect(availability.Color['Blue Titanium'].isAvailable).toBe(false); // ✅ Now correctly disabled
+  });
+});
+```
+
+### Verification Results
+
+✅ **All 26 tests passing** including new bug fix tests  
+✅ **MacBook Pro**: Silver correctly grayed out when Space Gray + 1TB selected  
+✅ **MacBook Pro**: 1TB correctly grayed out when Silver + 512GB selected  
+✅ **iPhone 15 Pro**: Blue Titanium correctly grayed out when Natural Titanium + 512GB selected  
+✅ **No regressions**: All existing functionality continues to work  
+✅ **TypeScript compilation**: No errors or type issues  
+
+### Impact
+
+**Before Fix:**
+- Users could see invalid options as available
+- Confusing UX where options appeared selectable but would trigger auto-deselection
+- Only worked in one direction (partial constraint enforcement)
+
+**After Fix:**
+- Complete bidirectional constraint enforcement
+- Professional UX matching industry standards
+- Clear visual feedback prevents user confusion
+- All invalid combinations immediately grayed out
+
+**Files Modified:**
+- ✅ `app/utils/attributeCombinations.ts` - Fixed `calculateAttributeAvailability` function
+- ✅ `__tests__/attributeCombinations.test.ts` - Added comprehensive test coverage for bug scenarios
+- ✅ `verify-bug-fix.mjs` - Created verification script for manual testing
+
+This fix ensures the attribute selector now works perfectly for all reported scenarios and maintains the professional e-commerce experience expected by users.

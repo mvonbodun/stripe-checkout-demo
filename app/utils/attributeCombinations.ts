@@ -98,24 +98,29 @@ export function calculateAttributeAvailability(
     return availability;
   }
   
-  // For each unselected attribute, determine availability based on selections
+  // For ALL attributes and values, determine availability based on selections
   Object.entries(allAttributes).forEach(([attrName, values]) => {
-    if (!selectedOptions[attrName]) {
-      values.forEach(value => {
-        // Check if this value is compatible with all current selections
-        const isCompatible = Object.entries(selectedOptions).every(([selectedAttr, selectedValue]) => {
-          if (selectedAttr === attrName) return true;
-          
-          const matrixEntry = matrix[selectedAttr]?.[selectedValue];
-          if (!matrixEntry) return false;
-          
-          const validValues = matrixEntry.validCombinations[attrName] || [];
-          return validValues.includes(value);
-        });
+    values.forEach(value => {
+      // Check if this value is compatible with selections from OTHER attributes
+      const otherSelections = Object.entries(selectedOptions).filter(([attr]) => attr !== attrName);
+      
+      // If no other selections exist, this value is available
+      if (otherSelections.length === 0) {
+        availability[attrName][value].isAvailable = true;
+        return;
+      }
+      
+      // Check if this value is compatible with all selections from other attributes
+      const isCompatible = otherSelections.every(([selectedAttr, selectedValue]) => {
+        const matrixEntry = matrix[selectedAttr]?.[selectedValue];
+        if (!matrixEntry) return false;
         
-        availability[attrName][value].isAvailable = isCompatible;
+        const validValues = matrixEntry.validCombinations[attrName] || [];
+        return validValues.includes(value);
       });
-    }
+      
+      availability[attrName][value].isAvailable = isCompatible;
+    });
   });
   
   return availability;

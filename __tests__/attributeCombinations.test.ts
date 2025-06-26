@@ -323,3 +323,172 @@ describe('Phase 1: Attribute Combination Logic', () => {
     });
   });
 });
+
+describe('Bug Fix: Bidirectional Availability Calculation', () => {
+    it('should gray out Silver when Space Gray + 1TB are selected (MacBook scenario)', () => {
+      const matrix = buildAttributeCombinationMatrix('prod_macbook', mockMacBookItems);
+      const allAttributes = getAttributesForProduct(mockMacBookProduct, mockMacBookItems);
+      
+      // Select Space Gray + 1TB (valid combination)
+      const selections = { Color: 'Space Gray', Storage: '1TB' };
+      const availability = calculateAttributeAvailability(matrix, selections, allAttributes);
+      
+      // Silver should be unavailable because Silver + 1TB is not a valid combination
+      expect(availability.Color.Silver.isAvailable).toBe(false);
+      expect(availability.Color.Silver.isSelected).toBe(false);
+      
+      // Space Gray should remain available and selected
+      expect(availability.Color['Space Gray'].isAvailable).toBe(true);
+      expect(availability.Color['Space Gray'].isSelected).toBe(true);
+      
+      // 1TB should remain available and selected
+      expect(availability.Storage['1TB'].isAvailable).toBe(true);
+      expect(availability.Storage['1TB'].isSelected).toBe(true);
+      
+      // 512GB should remain available (works with both colors)
+      expect(availability.Storage['512GB'].isAvailable).toBe(true);
+      expect(availability.Storage['512GB'].isSelected).toBe(false);
+    });
+
+    it('should gray out 1TB when Silver + 512GB are selected (MacBook scenario)', () => {
+      const matrix = buildAttributeCombinationMatrix('prod_macbook', mockMacBookItems);
+      const allAttributes = getAttributesForProduct(mockMacBookProduct, mockMacBookItems);
+      
+      // Select Silver + 512GB (valid combination)
+      const selections = { Color: 'Silver', Storage: '512GB' };
+      const availability = calculateAttributeAvailability(matrix, selections, allAttributes);
+      
+      // 1TB should be unavailable because Silver + 1TB is not a valid combination
+      expect(availability.Storage['1TB'].isAvailable).toBe(false);
+      expect(availability.Storage['1TB'].isSelected).toBe(false);
+      
+      // Space Gray should remain available (works with both storage options)
+      expect(availability.Color['Space Gray'].isAvailable).toBe(true);
+      expect(availability.Color['Space Gray'].isSelected).toBe(false);
+      
+      // Silver should remain available and selected
+      expect(availability.Color.Silver.isAvailable).toBe(true);
+      expect(availability.Color.Silver.isSelected).toBe(true);
+      
+      // 512GB should remain available and selected
+      expect(availability.Storage['512GB'].isAvailable).toBe(true);
+      expect(availability.Storage['512GB'].isSelected).toBe(true);
+    });
+
+    it('should handle iPhone scenario with Natural Titanium + 512GB selection', () => {
+      // Create mock iPhone data
+      const mockiPhoneItems: Item[] = [
+        {
+          id: 'item_iphone_natural_128',
+          productId: 'prod_iphone',
+          sku: 'IP-NT-128',
+          name: 'iPhone 15 Pro Natural Titanium 128GB',
+          price: 99900,
+          inventoryQuantity: 10,
+          inventoryTracking: true,
+          status: Status.ACTIVE,
+          itemDefiningSpecificationValues: [
+            { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' },
+            { name: 'Storage', value: '128GB', displayName: '128 GB' }
+          ],
+          images: [],
+          position: 1,
+          isInStock: true,
+          isLowStock: false,
+          lowStockThreshold: 3,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 'item_iphone_natural_512',
+          productId: 'prod_iphone',
+          sku: 'IP-NT-512',
+          name: 'iPhone 15 Pro Natural Titanium 512GB',
+          price: 129900,
+          inventoryQuantity: 5,
+          inventoryTracking: true,
+          status: Status.ACTIVE,
+          itemDefiningSpecificationValues: [
+            { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' },
+            { name: 'Storage', value: '512GB', displayName: '512 GB' }
+          ],
+          images: [],
+          position: 2,
+          isInStock: true,
+          isLowStock: false,
+          lowStockThreshold: 3,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 'item_iphone_blue_128',
+          productId: 'prod_iphone',
+          sku: 'IP-BT-128',
+          name: 'iPhone 15 Pro Blue Titanium 128GB',
+          price: 99900,
+          inventoryQuantity: 8,
+          inventoryTracking: true,
+          status: Status.ACTIVE,
+          itemDefiningSpecificationValues: [
+            { name: 'Color', value: 'Blue Titanium', displayName: 'Blue Titanium' },
+            { name: 'Storage', value: '128GB', displayName: '128 GB' }
+          ],
+          images: [],
+          position: 3,
+          isInStock: true,
+          isLowStock: false,
+          lowStockThreshold: 3,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+
+      const mockiPhoneProduct: Product = {
+        id: 'prod_iphone',
+        name: 'iPhone 15 Pro',
+        slug: 'iphone-15-pro',
+        description: 'Latest iPhone',
+        brand: 'Apple',
+        categoryId: 'cat_phones',
+        categoryIds: ['cat_phones'],
+        basePrice: 99900,
+        taxCode: 'P0000000',
+        status: Status.ACTIVE,
+        features: ['A17 Pro chip', 'Titanium design'],
+        productLevelSpecifications: [],
+        totalInventory: 23,
+        itemDefiningSpecifications: [
+          { name: 'Color', group: 'Appearance' },
+          { name: 'Storage', group: 'Capacity' }
+        ],
+        images: [],
+        seoTitle: 'iPhone 15 Pro',
+        seoDescription: 'Latest iPhone',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      const matrix = buildAttributeCombinationMatrix('prod_iphone', mockiPhoneItems);
+      const allAttributes = getAttributesForProduct(mockiPhoneProduct, mockiPhoneItems);
+      
+      // Select Natural Titanium + 512GB (valid combination)
+      const selections = { Color: 'Natural Titanium', Storage: '512GB' };
+      const availability = calculateAttributeAvailability(matrix, selections, allAttributes);
+      
+      // Blue Titanium should be unavailable because Blue Titanium + 512GB is not a valid combination
+      expect(availability.Color['Blue Titanium'].isAvailable).toBe(false);
+      expect(availability.Color['Blue Titanium'].isSelected).toBe(false);
+      
+      // Natural Titanium should remain available and selected
+      expect(availability.Color['Natural Titanium'].isAvailable).toBe(true);
+      expect(availability.Color['Natural Titanium'].isSelected).toBe(true);
+      
+      // 512GB should remain available and selected
+      expect(availability.Storage['512GB'].isAvailable).toBe(true);
+      expect(availability.Storage['512GB'].isSelected).toBe(true);
+      
+      // 128GB should remain available (works with both colors)
+      expect(availability.Storage['128GB'].isAvailable).toBe(true);
+      expect(availability.Storage['128GB'].isSelected).toBe(false);
+    });
+  });
