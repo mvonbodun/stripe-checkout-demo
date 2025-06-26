@@ -71,9 +71,14 @@ export default function AddToCartButton({
     <button
       onClick={handleAddToCart}
       disabled={disabled}
-      className={`btn btn-primary w-full ${className}`}
+      className={`btn w-full transition-all duration-200 ${
+        disabled 
+          ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300 hover:bg-gray-300 hover:border-gray-300' 
+          : 'btn-primary'
+      } ${className}`}
+      title={disabled ? 'Please select product options to add to cart' : 'Add item to cart'}
     >
-      Add to Cart
+      {disabled ? 'Select Options' : 'Add to Cart'}
     </button>
   );
 }

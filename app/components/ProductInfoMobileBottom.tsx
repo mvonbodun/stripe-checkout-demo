@@ -4,6 +4,7 @@ import { Product } from '../models/product';
 import { Item, getDefaultItem, findItemBySpecificationValues } from '../models/item';
 import { buildAttributeCombinationMatrix, AttributeCombinationMatrix } from '../utils/attributeCombinations';
 import { getAttributesForProduct } from '../utils/attributeHelpers';
+import { validateAddToCartState } from '../utils/addToCartValidation';
 import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
@@ -99,6 +100,18 @@ export default function ProductInfoMobileBottom({
     }
   }, [selectedOptions, product.id, items, hasValidData]);
 
+  // Validate Add to Cart button state
+  const addToCartValidation = useMemo(() => {
+    return validateAddToCartState(product, items, selectedOptions);
+  }, [product, items, selectedOptions]);
+
+  // Synchronize selectedItem with validation result
+  useEffect(() => {
+    if (addToCartValidation.selectedItem !== selectedItem) {
+      setSelectedItem(addToCartValidation.selectedItem);
+    }
+  }, [addToCartValidation.selectedItem, selectedItem]);
+
   return (
     <div className="space-y-4">
       {/* Attribute Selectors (Size, Color, etc.) */}
@@ -151,6 +164,7 @@ export default function ProductInfoMobileBottom({
             quantity={quantity}
             selectedOptions={selectedOptions}
             className="w-full"
+            disabled={!addToCartValidation.isEnabled}
           />
         </div>
       </div>

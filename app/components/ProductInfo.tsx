@@ -4,6 +4,7 @@ import { Product } from '../models/product';
 import { Item, getDefaultItem, findItemBySpecificationValues } from '../models/item';
 import { buildAttributeCombinationMatrix, AttributeCombinationMatrix } from '../utils/attributeCombinations';
 import { getAttributesForProduct } from '../utils/attributeHelpers';
+import { validateAddToCartState } from '../utils/addToCartValidation';
 import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
@@ -104,6 +105,18 @@ export default function ProductInfo({
   const discountPercentage = product.compareAtPrice && product.compareAtPrice > product.basePrice
     ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
     : null;
+
+  // Validate Add to Cart button state
+  const addToCartValidation = useMemo(() => {
+    return validateAddToCartState(product, items, selectedOptions);
+  }, [product, items, selectedOptions]);
+
+  // Synchronize selectedItem with validation result
+  useEffect(() => {
+    if (addToCartValidation.selectedItem !== selectedItem) {
+      setSelectedItem(addToCartValidation.selectedItem);
+    }
+  }, [addToCartValidation.selectedItem, selectedItem]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -235,6 +248,7 @@ export default function ProductInfo({
             quantity={quantity}
             selectedOptions={selectedOptions}
             className="w-full"
+            disabled={!addToCartValidation.isEnabled}
           />
         </div>
         
