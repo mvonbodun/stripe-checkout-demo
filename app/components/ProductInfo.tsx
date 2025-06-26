@@ -9,6 +9,7 @@ import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
 import ProductRatingAndQA from './ProductRatingAndQA';
+import Price from './Price';
 
 interface ProductInfoProps {
   product: Product;
@@ -135,14 +136,16 @@ export default function ProductInfo({
         
         {/* Price */}
       <div className="flex items-center space-x-3 sm:space-x-4">
-        <span className="text-2xl sm:text-3xl font-bold text-gray-900">
-          ${product.basePrice.toFixed(2)}
-        </span>
+        <Price 
+          amount={product.basePrice} 
+          className="text-2xl sm:text-3xl font-bold text-gray-900" 
+        />
         {product.compareAtPrice && product.compareAtPrice > product.basePrice && (
           <>
-            <span className="text-lg sm:text-xl text-gray-500 line-through">
-              ${product.compareAtPrice.toFixed(2)}
-            </span>
+            <Price 
+              amount={product.compareAtPrice} 
+              className="text-lg sm:text-xl text-gray-500 line-through" 
+            />
             {discountPercentage && (
               <span className="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded-full">
                 {discountPercentage}% OFF

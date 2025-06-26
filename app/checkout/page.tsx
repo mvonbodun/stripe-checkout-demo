@@ -11,6 +11,7 @@ import type { PaymentRequest } from '@stripe/stripe-js';
 import { useRouter } from 'next/navigation';
 import ShippingMethods from '../components/ShippingMethods';
 import { buildTaxCalculationPayload, calculateTax, updateCartTaxTotals, clearCartTaxTotals } from '../utils/taxCalculation';
+import Price from '../components/Price';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -823,7 +824,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <div className="ml-2 font-semibold text-gray-700 whitespace-nowrap">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  <Price amount={item.price * item.quantity} />
                 </div>
               </div>
             ))}
@@ -851,12 +852,12 @@ export default function CheckoutPage() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-800">Subtotal - {itemCount} items</span>
-              <span className="text-gray-800">${cart.order_subtotal.toFixed(2)}</span>
+              <span className="text-gray-800"><Price amount={cart.order_subtotal} /></span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-800">Shipping</span>
               <span className={cart.order_shipping_total === 0 ? "text-green-600 font-semibold" : "text-gray-800"}>
-                {cart.order_shipping_total === 0 ? "FREE" : `$${cart.order_shipping_total.toFixed(2)}`}
+                {cart.order_shipping_total === 0 ? "FREE" : <Price amount={cart.order_shipping_total} />}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -865,17 +866,17 @@ export default function CheckoutPage() {
                   <svg className="ml-1 w-4 h-4 text-gray-400 hover:text-gray-600" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" stroke="white" strokeWidth="2"/><text x="10" y="15" textAnchor="middle" fontSize="12" fill="white">?</text></svg>
                 </Tooltip>
               </span>
-              <span className="text-gray-800">${cart.order_tax_total.toFixed(2)}</span>
+              <span className="text-gray-800"><Price amount={cart.order_tax_total} /></span>
             </div>
             {cart.order_shipping_tax_total > 0 && (
               <div className="flex justify-between items-center">
                 <span className="text-gray-800">Shipping tax</span>
-                <span className="text-gray-800">${cart.order_shipping_tax_total.toFixed(2)}</span>
+                <span className="text-gray-800"><Price amount={cart.order_shipping_tax_total} /></span>
               </div>
             )}
             <div className="flex justify-between items-center mt-3">
               <span className="text-base font-bold text-gray-800">Total</span>
-              <span className="text-base font-bold text-gray-800">${cart.order_grand_total.toFixed(2)}</span>
+              <span className="text-base font-bold text-gray-800"><Price amount={cart.order_grand_total} /></span>
             </div>
           </div>
           </div>

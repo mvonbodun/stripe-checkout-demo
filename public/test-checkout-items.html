@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Checkout Items</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005a87;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Test Checkout Items</h1>
+    <p>Use this page to add test items to your cart for testing the checkout page.</p>
+    
+    <button onclick="addMacBook()">Add MacBook Pro 14"</button>
+    <button onclick="addiPhone()">Add iPhone 15 Pro</button>
+    <button onclick="addHeadphones()">Add Sony Headphones</button>
+    <button onclick="clearCart()">Clear Cart</button>
+    <button onclick="goToCheckout()">Go to Checkout</button>
+    
+    <div id="status"></div>
+
+    <script>
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="${isError ? 'error' : 'success'}">${message}</div>`;
+        }
+
+        function addMacBook() {
+            const item = {
+                item_id: "13_512gb_space_gray",
+                product_id: 13,
+                name: "Apple MacBook Pro 14-inch",
+                attributes: ["Space Gray", "512GB"],
+                selectedSpecifications: [
+                    { name: "Color", value: "Space Gray", displayName: "Space Gray" },
+                    { name: "Storage", value: "512GB", displayName: "512 GB SSD" }
+                ],
+                image: "https://via.placeholder.com/100x100?text=MacBook",
+                price: 1999.00,
+                quantity: 1,
+                sku: "MBA14-SG-512",
+                taxcode: "txcd_99999999"
+            };
+            
+            // Dispatch to cart context (this won't work directly in static HTML)
+            // Instead, we'll store in localStorage and reload the page
+            const existingCart = JSON.parse(localStorage.getItem('cart-context') || '{"line_items":[]}');
+            existingCart.line_items = existingCart.line_items || [];
+            existingCart.line_items.push(item);
+            
+            // Update totals
+            existingCart.order_subtotal = existingCart.line_items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            existingCart.order_grand_total = existingCart.order_subtotal;
+            
+            localStorage.setItem('cart-context', JSON.stringify(existingCart));
+            showStatus('MacBook Pro added to cart! Refresh the checkout page to see changes.');
+        }
+
+        function addiPhone() {
+            const item = {
+                item_id: "14_128gb_natural",
+                product_id: 14,
+                name: "iPhone 15 Pro",
+                attributes: ["Natural Titanium", "128GB"],
+                selectedSpecifications: [
+                    { name: "Color", value: "Natural Titanium", displayName: "Natural Titanium" },
+                    { name: "Storage", value: "128GB", displayName: "128GB" }
+                ],
+                image: "https://via.placeholder.com/100x100?text=iPhone",
+                price: 999.00,
+                quantity: 1,
+                sku: "IP15P-NT-128",
+                taxcode: "txcd_99999999"
+            };
+            
+            const existingCart = JSON.parse(localStorage.getItem('cart-context') || '{"line_items":[]}');
+            existingCart.line_items = existingCart.line_items || [];
+            existingCart.line_items.push(item);
+            
+            existingCart.order_subtotal = existingCart.line_items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            existingCart.order_grand_total = existingCart.order_subtotal;
+            
+            localStorage.setItem('cart-context', JSON.stringify(existingCart));
+            showStatus('iPhone 15 Pro added to cart! Refresh the checkout page to see changes.');
+        }
+
+        function addHeadphones() {
+            const item = {
+                item_id: "15_black",
+                product_id: 15,
+                name: "Sony WH-1000XM5 Headphones",
+                attributes: ["Black"],
+                selectedSpecifications: [
+                    { name: "Color", value: "Black", displayName: "Black" }
+                ],
+                image: "https://via.placeholder.com/100x100?text=Headphones",
+                price: 399.99,
+                quantity: 1,
+                sku: "SONY-WH1000XM5-BK",
+                taxcode: "txcd_99999999"
+            };
+            
+            const existingCart = JSON.parse(localStorage.getItem('cart-context') || '{"line_items":[]}');
+            existingCart.line_items = existingCart.line_items || [];
+            existingCart.line_items.push(item);
+            
+            existingCart.order_subtotal = existingCart.line_items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            existingCart.order_grand_total = existingCart.order_subtotal;
+            
+            localStorage.setItem('cart-context', JSON.stringify(existingCart));
+            showStatus('Sony Headphones added to cart! Refresh the checkout page to see changes.');
+        }
+
+        function clearCart() {
+            localStorage.removeItem('cart-context');
+            showStatus('Cart cleared! Refresh the checkout page to see changes.');
+        }
+
+        function goToCheckout() {
+            window.open('/checkout', '_blank');
+        }
+
+        // Show current cart status
+        window.onload = function() {
+            const cart = JSON.parse(localStorage.getItem('cart-context') || '{"line_items":[]}');
+            if (cart.line_items && cart.line_items.length > 0) {
+                showStatus(`Current cart has ${cart.line_items.length} item(s). Total: $${cart.order_subtotal?.toFixed(2) || '0.00'}`);
+            } else {
+                showStatus('Cart is currently empty.');
+            }
+        };
+    </script>
+</body>
+</html>

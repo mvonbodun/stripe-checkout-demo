@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Price from '../components/Price';
 
 type CompletedOrder = {
   id: string;
@@ -171,8 +172,8 @@ export default function OrderConfirmation() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-gray-900">${item.line_grand_total.toFixed(2)}</p>
-                  <p className="text-sm text-gray-600">${item.price.toFixed(2)} each</p>
+                  <p className="font-medium text-gray-900"><Price amount={item.line_grand_total} /></p>
+                  <p className="text-sm text-gray-600"><Price amount={item.price} /> each</p>
                 </div>
               </div>
             ))}
@@ -184,11 +185,11 @@ export default function OrderConfirmation() {
             <div className="space-y-2">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span>${order.subtotal.toFixed(2)}</span>
+                <span><Price amount={order.subtotal} /></span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Shipping</span>
-                <span>{order.shipping > 0 ? `$${order.shipping.toFixed(2)}` : 'FREE'}</span>
+                <span>{order.shipping > 0 ? <Price amount={order.shipping} /> : 'FREE'}</span>
               </div>
               {order.shipping_method_name && (
                 <div className="flex justify-between text-sm text-gray-500">
@@ -198,17 +199,17 @@ export default function OrderConfirmation() {
               )}
               <div className="flex justify-between text-gray-600">
                 <span>Tax</span>
-                <span>${order.tax.toFixed(2)}</span>
+                <span><Price amount={order.tax} /></span>
               </div>
               {order.shipping_tax > 0 && (
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping Tax</span>
-                  <span>${order.shipping_tax.toFixed(2)}</span>
+                  <span><Price amount={order.shipping_tax} /></span>
                 </div>
               )}
               <div className="border-t pt-2 flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span>${order.total.toFixed(2)}</span>
+                <span><Price amount={order.total} /></span>
               </div>
             </div>
           </div>
@@ -220,7 +221,7 @@ export default function OrderConfirmation() {
               <div className="text-gray-600">
                 <p className="font-medium">{order.shipping_method_name}</p>
                 <p className="text-sm">
-                  Cost: {order.shipping > 0 ? `$${order.shipping.toFixed(2)}` : 'FREE'}
+                  Cost: {order.shipping > 0 ? <Price amount={order.shipping} /> : 'FREE'}
                 </p>
               </div>
             </div>

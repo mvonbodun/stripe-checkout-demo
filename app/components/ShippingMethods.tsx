@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useCart, type Cart } from '../cart-context';
 import { buildTaxCalculationPayload, calculateTax, updateCartTaxTotals, clearCartTaxTotals } from '../utils/taxCalculation';
+import Price from './Price';
 
 export type ShippingMethod = {
   shipping_method_id: string;
@@ -305,7 +306,7 @@ export default function ShippingMethods({
               <div className="font-semibold text-gray-900 ml-4">
                 {method.shipping_method_cost === 0 
                   ? 'FREE' 
-                  : `$${method.shipping_method_cost.toFixed(2)}`
+                  : <Price amount={method.shipping_method_cost} />
                 }
               </div>
             </div>

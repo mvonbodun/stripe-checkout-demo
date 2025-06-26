@@ -4,6 +4,7 @@ import { useCart } from '../cart-context';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ExpressCheckoutComponent from './ExpressCheckoutComponent';
+import Price from './Price';
 
 interface MiniCartProps {
   open: boolean;
@@ -152,7 +153,7 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
                       {/* Price positioned in bottom right corner */}
                       <div className="absolute bottom-0 right-0">
                         <div className="font-medium text-gray-900 text-base text-right">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          <Price amount={item.price * item.quantity} />
                         </div>
                       </div>
                     </div>
@@ -167,11 +168,11 @@ const MiniCart: React.FC<MiniCartProps> = ({ open, onClose }) => {
             <>
               <div className="flex justify-between mb-2 text-base">
                 <span>Subtotal</span>
-                <span>${order_subtotal.toFixed(2)}</span>
+                <span><Price amount={order_subtotal} /></span>
               </div>
               <div className="flex justify-between mb-2 text-base">
                 <span>Shipping</span>
-                <span>{order_shipping_total === 0 ? 'FREE' : `$${order_shipping_total.toFixed(2)}`}</span>
+                <span>{order_shipping_total === 0 ? 'FREE' : <Price amount={order_shipping_total} />}</span>
               </div>
               <button
                 className="w-full py-3.5 bg-gray-900 text-white border-none rounded font-semibold text-lg mt-2 cursor-pointer transition-colors hover:bg-gray-800"
