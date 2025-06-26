@@ -236,8 +236,8 @@ export const mockProducts: Product[] = [
       { name: 'Material', value: 'Titanium', group: 'Build' }
     ],
     itemDefiningSpecifications: [
+      { name: 'Color', group: 'Appearance' },
       { name: 'Storage', group: 'Capacity' },
-      { name: 'Color', group: 'Appearance' }
     ],
     basePrice: 999.00,
     priceRange: { min: 999, max: 1499 },
@@ -329,8 +329,9 @@ export const mockProducts: Product[] = [
       { name: 'Care', value: 'Machine wash cold', group: 'Care' }
     ],
     itemDefiningSpecifications: [
-      { name: 'Size', group: 'Sizing' },
-      { name: 'Color', group: 'Appearance' }
+      { name: 'Color', group: 'Appearance' },
+      { name: 'Waist', group: 'Sizing' },
+      { name: 'Length', group: 'Sizing' },
     ],
     basePrice: 59.50,
     compareAtPrice: 68.00,

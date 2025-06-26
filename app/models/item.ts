@@ -70,8 +70,8 @@ export const mockItems: Item[] = [
     barcode: '194253433125',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' },
       { name: 'Storage', value: '128GB', displayName: '128 GB' },
-      { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' }
     ],
     images: [
       {
@@ -103,8 +103,8 @@ export const mockItems: Item[] = [
     barcode: '194253433132',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' },
       { name: 'Storage', value: '256GB', displayName: '256 GB' },
-      { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' }
     ],
     images: [
       {
@@ -136,8 +136,8 @@ export const mockItems: Item[] = [
     barcode: '194253433149',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Blue Titanium', displayName: 'Blue Titanium' },
       { name: 'Storage', value: '128GB', displayName: '128 GB' },
-      { name: 'Color', value: 'Blue Titanium', displayName: 'Blue Titanium' }
     ],
     images: [
       {
@@ -169,8 +169,8 @@ export const mockItems: Item[] = [
     barcode: '194253433156',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' },
       { name: 'Storage', value: '512GB', displayName: '512 GB' },
-      { name: 'Color', value: 'Natural Titanium', displayName: 'Natural Titanium' }
     ],
     images: [
       {
@@ -204,8 +204,8 @@ export const mockItems: Item[] = [
     barcode: '194253164531',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Space Gray', displayName: 'Space Gray' },
       { name: 'Storage', value: '512GB', displayName: '512 GB SSD' },
-      { name: 'Color', value: 'Space Gray', displayName: 'Space Gray' }
     ],
     images: [
       {
@@ -237,8 +237,8 @@ export const mockItems: Item[] = [
     barcode: '194253164548',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Space Gray', displayName: 'Space Gray' },
       { name: 'Storage', value: '1TB', displayName: '1 TB SSD' },
-      { name: 'Color', value: 'Space Gray', displayName: 'Space Gray' }
     ],
     images: [
       {
@@ -270,8 +270,8 @@ export const mockItems: Item[] = [
     barcode: '194253164555',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Silver', displayName: 'Silver' },
       { name: 'Storage', value: '512GB', displayName: '512 GB SSD' },
-      { name: 'Color', value: 'Silver', displayName: 'Silver' }
     ],
     images: [
       {
@@ -304,9 +304,9 @@ export const mockItems: Item[] = [
     barcode: '501320032001',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Dark', displayName: 'Dark Wash' },
       { name: 'Waist', value: '32', displayName: '32"' },
       { name: 'Length', value: '32', displayName: '32"' },
-      { name: 'Wash', value: 'Dark', displayName: 'Dark Wash' }
     ],
     images: [
       {
@@ -337,9 +337,9 @@ export const mockItems: Item[] = [
     barcode: '501340032001',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Dark', displayName: 'Dark Wash' },
       { name: 'Waist', value: '34', displayName: '34"' },
       { name: 'Length', value: '32', displayName: '32"' },
-      { name: 'Wash', value: 'Dark', displayName: 'Dark Wash' }
     ],
     images: [
       {
@@ -370,9 +370,9 @@ export const mockItems: Item[] = [
     barcode: '501320034001',
     status: Status.ACTIVE,
     itemDefiningSpecificationValues: [
+      { name: 'Color', value: 'Dark', displayName: 'Dark Wash' },
       { name: 'Waist', value: '32', displayName: '32"' },
       { name: 'Length', value: '34', displayName: '34"' },
-      { name: 'Wash', value: 'Dark', displayName: 'Dark Wash' }
     ],
     images: [
       {
