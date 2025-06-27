@@ -5,6 +5,7 @@ import { Item, getDefaultItem, findItemBySpecificationValues } from '../models/i
 import { buildAttributeCombinationMatrix, AttributeCombinationMatrix } from '../utils/attributeCombinations';
 import { getAttributesForProduct } from '../utils/attributeHelpers';
 import { validateAddToCartState } from '../utils/addToCartValidation';
+import { useProductPageContext } from './ProductPageContext';
 import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
@@ -31,6 +32,7 @@ export default function ProductInfoMobileBottom({
     isLoading: false, 
     hasError: false 
   });
+  const { updateSelectedAttributes } = useProductPageContext();
 
   // Pre-calculate combination matrix and attributes (Phase 3 enhancement)
   const { combinationMatrix, allAttributes, hasValidData } = useMemo(() => {
@@ -66,6 +68,9 @@ export default function ProductInfoMobileBottom({
   const handleOptionsChange = useCallback((newOptions: Record<string, string>) => {
     setSelectedOptions(newOptions);
     
+    // Update the shared context for image gallery coordination
+    updateSelectedAttributes(newOptions);
+    
     // Find matching item
     if (Object.keys(newOptions).length > 0) {
       const foundItem = findItemBySpecificationValues(product.id, newOptions);
@@ -74,7 +79,7 @@ export default function ProductInfoMobileBottom({
       const defaultItem = getDefaultItem(product.id);
       setSelectedItem(defaultItem || (items.length > 0 ? items[0] : null));
     }
-  }, [product.id, items]);
+  }, [product.id, items, updateSelectedAttributes]);
 
   // Handle attribute selector errors
   const handleAttributeError = useCallback((error: string) => {

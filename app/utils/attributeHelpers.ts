@@ -243,3 +243,85 @@ export function calculateInitialAttributeSelections(
   // No valid pre-selection available
   return {};
 }
+
+/**
+ * Determine which item's images should be displayed based on the specified logic:
+ * 1. If product has only one item, use that item's images
+ * 2. If product has multiple items:
+ *    - If none of the itemDefiningAttributes is "Color", use the first item's images
+ *    - If "Color" is an itemDefiningAttribute, use the first item with the selected color (or first color if none selected)
+ *    - When the user selects a different color, find the first item with that color and use its images
+ */
+export function getItemForImages(
+  product: Product,
+  items: Item[],
+  selectedAttributes: Record<string, string> = {}
+): Item | null {
+  if (!items || items.length === 0) {
+    return null;
+  }
+
+  // Case 1: Single item - use that item
+  if (items.length === 1) {
+    return items[0];
+  }
+
+  // Case 2: Multiple items - check if Color is a defining attribute
+  const hasColorAttribute = product.itemDefiningSpecifications?.some(
+    spec => spec.name.toLowerCase() === 'color'
+  ) || false;
+
+  if (!hasColorAttribute) {
+    // Case 2a: No Color attribute - use first item (sorted by position)
+    return items.sort((a, b) => a.position - b.position)[0];
+  }
+
+  // Case 2b: Has Color attribute
+  const selectedColor = selectedAttributes['Color'] || selectedAttributes['color'];
+  
+  if (selectedColor) {
+    // User has selected a color - find first item with that color
+    const itemWithSelectedColor = items.find(item => 
+      item.itemDefiningSpecificationValues.some(spec => 
+        spec.name.toLowerCase() === 'color' && spec.value === selectedColor
+      )
+    );
+    
+    if (itemWithSelectedColor) {
+      return itemWithSelectedColor;
+    }
+  }
+
+  // Fall back to first item with first available color value
+  const colorValues = getAvailableSpecificationValues(product.id, 'Color') || 
+                     getAvailableSpecificationValues(product.id, 'color') || [];
+  
+  if (colorValues.length > 0) {
+    const firstColor = colorValues[0];
+    const itemWithFirstColor = items.find(item =>
+      item.itemDefiningSpecificationValues.some(spec =>
+        spec.name.toLowerCase() === 'color' && spec.value === firstColor
+      )
+    );
+    
+    if (itemWithFirstColor) {
+      return itemWithFirstColor;
+    }
+  }
+
+  // Final fallback - return first item by position
+  return items.sort((a, b) => a.position - b.position)[0];
+}
+
+/**
+ * Get images from an item, with fallback to product images if item has no images
+ */
+export function getImagesForDisplay(item: Item | null, product: Product) {
+  // If we have an item and it has images, use those
+  if (item && item.images && item.images.length > 0) {
+    return item.images;
+  }
+
+  // Fallback to product images
+  return product.images || [];
+}

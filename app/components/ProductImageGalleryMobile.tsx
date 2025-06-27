@@ -1,17 +1,28 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Product } from '../models/product';
+import { Item } from '../models/item';
+import { getItemForImages, getImagesForDisplay } from '../utils/attributeHelpers';
+import { useProductPageContext } from './ProductPageContext';
 import Image from 'next/image';
 
 interface ProductImageGalleryMobileProps {
   product: Product;
+  items?: Item[];
 }
 
-export default function ProductImageGalleryMobile({ product }: ProductImageGalleryMobileProps) {
+export default function ProductImageGalleryMobile({ 
+  product, 
+  items = []
+}: ProductImageGalleryMobileProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
-  const images = product.images || [];
+  const { selectedAttributes } = useProductPageContext();
+  
+  // Determine which item's images to use
+  const itemForImages = getItemForImages(product, items, selectedAttributes);
+  const images = getImagesForDisplay(itemForImages, product);
   
   // Use placeholder if no images
   const displayImages = images.length > 0 ? images : [{
@@ -21,6 +32,13 @@ export default function ProductImageGalleryMobile({ product }: ProductImageGalle
     type: 'image' as const,
     order: 1
   }];
+
+  // Reset selected image index when images change
+  useEffect(() => {
+    setSelectedImageIndex(0);
+    setImageLoading(true);
+    setImageError(false);
+  }, [itemForImages?.id, images.length]);
 
   const handleImageLoad = useCallback(() => {
     setImageLoading(false);
