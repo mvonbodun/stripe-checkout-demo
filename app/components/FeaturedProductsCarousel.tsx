@@ -7,12 +7,10 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 interface FeaturedProductsCarouselProps {
   products: Product[];
-  onAddToCart: (product: Product) => void;
 }
 
 const FeaturedProductsCarousel: React.FC<FeaturedProductsCarouselProps> = ({
-  products,
-  onAddToCart
+  products
 }) => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -152,7 +150,6 @@ const FeaturedProductsCarousel: React.FC<FeaturedProductsCarouselProps> = ({
             >
               <ProductCard
                 product={product}
-                onAddToCart={onAddToCart}
               />
             </div>
           ))}

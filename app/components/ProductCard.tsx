@@ -2,14 +2,13 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '../models/product';
-import { formatPrice } from '../models/common';
+import Price from './Price';
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (product: Product) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Use placeholder image since the mock data has non-existent image paths
   const placeholderImage = `https://placehold.co/200x200/e5e7eb/6b7280?text=${encodeURIComponent(product.name.split(' ').slice(0, 2).join(' '))}`;
 
@@ -45,22 +44,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           </div>
         )}
         
-        {/* Bottom section with price and button - anchored to bottom */}
+        {/* Bottom section with price - anchored to bottom */}
         <div className="mt-auto">
           {/* Pricing */}
           <div className="mb-4 text-center">
             <span className="font-bold text-lg text-primary">
-              {formatPrice(product.basePrice)}
+              <Price amount={product.basePrice} />
             </span>
           </div>
-
-          {/* Add to Cart Button */}
-          <button
-            className="btn btn-primary w-full"
-            onClick={() => onAddToCart(product)}
-          >
-            Add to Cart
-          </button>
         </div>
       </div>
     </div>

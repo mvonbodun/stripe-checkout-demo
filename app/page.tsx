@@ -1,11 +1,8 @@
 'use client';
 
-import { useCart } from './cart-context';
-import { useMiniCartUI } from './mini-cart-ui-context';
 import FeaturedProductsCarousel from './components/FeaturedProductsCarousel';
 import Hero, { HeroData } from './components/Hero';
 import { mockProducts, Product } from './models/product';
-import { getValidTaxCode } from './models/common';
 import { useState, useEffect } from 'react';
 
 const HERO_DATA: HeroData[] = [
@@ -39,8 +36,6 @@ const HERO_DATA: HeroData[] = [
 ];
 
 export default function Home() {
-	const { dispatch } = useCart();
-	const { openMiniCart } = useMiniCartUI();
 	const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
 	// Generate random products on client-side to avoid hydration mismatch
@@ -52,34 +47,6 @@ export default function Home() {
 		
 		setFeaturedProducts(getRandomProducts(mockProducts, 8));
 	}, []);
-
-	const addToCart = (product: Product) => {
-		// Create placeholder image for cart item
-		const placeholderImage = `https://placehold.co/100x100/e5e7eb/6b7280?text=${encodeURIComponent(product.name.split(' ').slice(0, 2).join(' '))}`;
-		
-		dispatch({
-			type: 'ADD_ITEM',
-			item: {
-				id: '', // Will be generated in reducer
-				item_id: `${product.id}_default`, // Required: Use default item ID for generic products
-				product_id: product.id, // Use string ID directly instead of parseInt
-				name: product.name,
-				sku: product.id, // Required: Use product ID as SKU for generic products
-				attributes: product.features?.slice(0, 3) || [], // Use features as attributes (backward compatibility)
-				selectedSpecifications: [], // Empty for generic product adds
-				image: placeholderImage, // Use placeholder instead of non-existent image
-				price: product.basePrice,
-				quantity: 1,
-				taxcode: getValidTaxCode(product.taxCode), // Use utility function for tax code validation
-				line_subtotal: 0, // Will be calculated in reducer
-				line_shipping_total: 0,
-				line_tax_total: 0,
-				line_shipping_tax_total: 0,
-				line_grand_total: 0, // Will be calculated in reducer
-			},
-		});
-		openMiniCart();
-	};
 
 	return (
 		<div className="min-h-screen bg-base-100">
@@ -95,7 +62,6 @@ export default function Home() {
 				{featuredProducts.length > 0 && (
 					<FeaturedProductsCarousel
 						products={featuredProducts}
-						onAddToCart={addToCart}
 					/>
 				)}
 			</div>

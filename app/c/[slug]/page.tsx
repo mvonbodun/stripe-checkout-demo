@@ -4,9 +4,7 @@ import { use, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { findCategoryBySlug, getAllCategories, getAllCategoryIdsInHierarchy } from '../../models/category';
-import { getProductsByCategoryHierarchy, Product } from '../../models/product';
-import { useCart } from '../../cart-context';
-import { useMiniCartUI } from '../../mini-cart-ui-context';
+import { getProductsByCategoryHierarchy } from '../../models/product';
 import Breadcrumb from '../../components/Breadcrumb';
 import { buildCategoryBreadcrumbs } from '../../utils/breadcrumbs';
 import ProductCard from '../../components/ProductCard';
@@ -20,8 +18,6 @@ interface CategoryPageProps {
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = use(params);
   const category = findCategoryBySlug(slug);
-  const { dispatch } = useCart();
-  const { openMiniCart } = useMiniCartUI();
   const [imageError, setImageError] = useState(false);
 
   if (!category) {
@@ -34,33 +30,6 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   // Get products based on category hierarchy
   const categoryIds = getAllCategoryIdsInHierarchy(category.id);
   const products = getProductsByCategoryHierarchy(categoryIds);
-
-  // Function to handle adding product to cart
-  const handleAddToCart = (product: Product) => {
-    // Create placeholder image for cart item (consistent with home page)
-    const placeholderImage = `https://placehold.co/100x100/e5e7eb/6b7280?text=${encodeURIComponent(product.name.split(' ').slice(0, 2).join(' '))}`;
-    
-    const cartItem = {
-      id: crypto.randomUUID(),
-      item_id: `${product.id}_default`, // Required: Use default item ID for generic products
-      product_id: product.id,
-      name: product.name,
-      price: product.basePrice,
-      sku: product.id, // Required: Use product ID as SKU for generic products
-      quantity: 1,
-      image: placeholderImage, // Use placeholder like home page
-      attributes: product.features?.slice(0, 3) || [], // Use features as attributes (backward compatibility)
-      selectedSpecifications: [], // Empty for generic product adds
-      line_subtotal: product.basePrice,
-      line_shipping_total: 0,
-      line_tax_total: 0,
-      line_shipping_tax_total: 0,
-      line_grand_total: product.basePrice,
-    };
-    
-    dispatch({ type: 'ADD_ITEM', item: cartItem });
-    openMiniCart(); // Open the mini cart after adding the item
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -142,7 +111,6 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onAddToCart={handleAddToCart}
                 />
               ))}
             </div>
