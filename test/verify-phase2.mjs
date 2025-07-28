@@ -4,11 +4,11 @@
 import {
   buildAttributeCombinationMatrix,
   calculateAttributeAvailability
-} from './app/utils/attributeCombinations.js';
+} from '../app/utils/attributeCombinations.js';
 
 import {
   getAttributesForProduct
-} from './app/utils/attributeHelpers.js';
+} from '../app/utils/attributeHelpers.js';
 
 // Mock data for testing enhanced component
 const mockItems = [

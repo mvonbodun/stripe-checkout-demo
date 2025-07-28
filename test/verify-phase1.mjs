@@ -5,7 +5,7 @@ import {
   buildAttributeCombinationMatrix,
   calculateAttributeAvailability,
   isValidCombination
-} from './app/utils/attributeCombinations.js';
+} from '../app/utils/attributeCombinations.js';
 
 // Mock data for testing
 const mockItems = [

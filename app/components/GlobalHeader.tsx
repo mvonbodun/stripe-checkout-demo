@@ -5,7 +5,7 @@ import CartIcon from "./CartIcon";
 import HeaderPromotion from "./HeaderPromotion";
 import HeaderLogo from "./HeaderLogo";
 import HeaderStoreLocation from "./HeaderStoreLocation";
-import HeaderSearchBar from "./HeaderSearchBar";
+import EnhancedHeaderSearchBar from "./enhanced/EnhancedHeaderSearchBar";
 import HelpIcon from "./HelpIcon";
 import MyAccountIcon from "./MyAccountIcon";
 import HamburgerMenu from "./HamburgerMenu";
@@ -161,7 +161,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChang
             </div>
 
             {/* Center Section - Expandable Search */}
-            <HeaderSearchBar />
+            <EnhancedHeaderSearchBar />
 
             {/* Right Section - Fixed */}
             <div className="flex items-center space-x-4 flex-shrink-0">
@@ -219,7 +219,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onMobileHeaderProgressChang
         }}
       >
         <div className="max-w-7xl mx-auto h-full px-3 flex items-center">
-          <HeaderSearchBar className="mx-0" />
+          <EnhancedHeaderSearchBar className="mx-0" />
         </div>
       </div>
 

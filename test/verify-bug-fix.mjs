@@ -8,10 +8,10 @@ async function verifyBugFix() {
 
   try {
     // Import the fixed functions
-    const { buildAttributeCombinationMatrix, calculateAttributeAvailability } = await import('./app/utils/attributeCombinations.js');
-    const { findProductBySlug } = await import('./app/models/product.js');
-    const { getItemsByProduct } = await import('./app/models/item.js');
-    const { getAttributesForProduct } = await import('./app/utils/attributeHelpers.js');
+    const { buildAttributeCombinationMatrix, calculateAttributeAvailability } = await import('../app/utils/attributeCombinations.js');
+    const { findProductBySlug } = await import('../app/models/product.js');
+    const { getItemsByProduct } = await import('../app/models/item.js');
+    const { getAttributesForProduct } = await import('../app/utils/attributeHelpers.js');
 
     console.log('✅ All imports successful');
 

@@ -9,9 +9,9 @@ async function testPhase3Integration() {
 
   try {
     // Import all the components and utilities
-    const { buildProductAttributeData } = await import('./app/utils/productAttributeData.js');
-    const { findProductBySlug } = await import('./app/models/product.js');
-    const { getItemsByProduct } = await import('./app/models/item.js');
+    const { buildProductAttributeData } = await import('../app/utils/productAttributeData.js');
+    const { findProductBySlug } = await import('../app/models/product.js');
+    const { getItemsByProduct } = await import('../app/models/item.js');
 
     console.log('✅ All imports successful');
 
