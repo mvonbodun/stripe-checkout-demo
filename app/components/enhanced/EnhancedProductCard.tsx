@@ -6,11 +6,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function EnhancedProductCard({ hit }: { hit: any }) {
+  const firstVariant = hit.variants && hit.variants.length > 0 ? hit.variants[0] : null;
+
+  const imageUrl = firstVariant?.image || hit.image || '/next.svg';
+  const price = firstVariant?.price || hit.price;
+  const color = firstVariant?.attributes?.color;
+
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
       <div className="aspect-w-3 aspect-h-4 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
         <Image
-          src={hit.image || '/next.svg'}
+          src={imageUrl}
           alt={hit.name}
           width={500}
           height={500}
@@ -24,11 +30,14 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
             <Highlight attribute="name" hit={hit} />
           </Link>
         </h3>
+        {color && <p className="text-sm text-gray-500">{color}</p>}
         <p className="text-sm text-gray-500">
           <Snippet attribute="description" hit={hit} />
         </p>
         <div className="flex flex-1 flex-col justify-end">
-          <p className="text-base font-medium text-gray-900">${hit.price}</p>
+          {typeof price === 'number' && (
+            <p className="text-base font-medium text-gray-900">${price.toFixed(2)}</p>
+          )}
         </div>
       </div>
     </div>
