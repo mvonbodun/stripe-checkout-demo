@@ -9,34 +9,38 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
   // Console log to debug the data structure
   console.log('Hit data:', hit);
   
-  // Handle different possible variant structures
-  const variants = hit.variants || hit.itemVariants || [];
-  const firstVariant = Array.isArray(variants) && variants.length > 0 ? variants[0] : null;
+  // Get first variant - variants should be an array
+  const firstVariant = hit.variants && Array.isArray(hit.variants) && hit.variants.length > 0 ? hit.variants[0] : null;
   
-  // Try multiple possible image sources
-  const imageUrl = 
-    firstVariant?.image || 
-    firstVariant?.imageUrl || 
-    firstVariant?.images?.[0] ||
-    hit.image || 
-    hit.imageUrl ||
-    hit.images?.[0] ||
-    '/next.svg';
+  // Debug the variant data specifically
+  console.log('First variant:', firstVariant);
   
-  // Try multiple possible price sources
-  const price = 
-    firstVariant?.price || 
-    firstVariant?.salePrice ||
-    firstVariant?.listPrice ||
-    hit.price || 
-    hit.salePrice ||
-    hit.listPrice;
+  // Image from first variant - based on actual data structure
+  let imageUrl = '/next.svg'; // Default fallback
   
-  // Get color from variant attributes
-  const color = 
-    firstVariant?.attributes?.color || 
-    firstVariant?.color ||
-    firstVariant?.attributes?.Color;
+  if (firstVariant) {
+    // Check the actual property structure: variants[0].image_urls[0]
+    if (firstVariant.image_urls && Array.isArray(firstVariant.image_urls) && firstVariant.image_urls.length > 0) {
+      imageUrl = firstVariant.image_urls[0];
+    }
+  }
+  
+  console.log('Final imageUrl:', imageUrl);
+  
+  // Price from first variant - based on actual data structure
+  let price = null;
+  
+  if (firstVariant) {
+    // Check the actual property structure: variants[0].price.amount
+    if (firstVariant.price && typeof firstVariant.price.amount === 'number') {
+      price = firstVariant.price.amount;
+    }
+  }
+  
+  console.log('Final price:', price);
+  
+  // Get color from variant attributes - based on actual data structure
+  const color = firstVariant?.defining_attributes?.color;
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
@@ -67,6 +71,11 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
           </Link>
         </h3>
         
+        {/* Price - moved to appear just below product name */}
+        {typeof price === 'number' && (
+          <p className="text-lg font-bold text-gray-900">${price.toFixed(2)}</p>
+        )}
+        
         {/* Color if available */}
         {color && (
           <p className="text-xs text-gray-500">
@@ -81,19 +90,12 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
           </p>
         )}
         
-        <div className="flex flex-1 flex-col justify-end">
-          {/* Price */}
-          {typeof price === 'number' && (
-            <p className="text-lg font-bold text-gray-900">${price.toFixed(2)}</p>
-          )}
-          
-          {/* Category */}
-          {hit.category && Array.isArray(hit.category) && hit.category.length > 0 && (
-            <p className="text-xs text-gray-400 mt-1">
-              {hit.category[hit.category.length - 1]}
-            </p>
-          )}
-        </div>
+        {/* Category */}
+        {hit.category && Array.isArray(hit.category) && hit.category.length > 0 && (
+          <p className="text-xs text-gray-400 mt-auto">
+            {hit.category[hit.category.length - 1]}
+          </p>
+        )}
       </div>
     </div>
   );
