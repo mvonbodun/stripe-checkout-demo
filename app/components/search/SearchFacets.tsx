@@ -270,11 +270,11 @@ export default function SearchFacets() {
           classNames={{
             root: '',
             noRefinementRoot: 'text-gray-500 text-sm font-medium',
-            list: 'space-y-1',
+            list: 'space-y-0',
             item: '',
             selectedItem: '',
-            link: 'flex items-center justify-between py-1 px-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors font-medium',
-            selectedItemLink: 'text-blue-600 bg-blue-50 font-semibold',
+            link: 'flex items-center justify-between p-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors font-medium',
+            selectedItemLink: 'text-blue-600 bg-blue-50 font-medium',
             label: 'flex-1 truncate',
             count: 'text-gray-500 text-xs ml-2 bg-gray-100 px-2 py-0.5 rounded-full font-medium'
           }}
@@ -305,7 +305,7 @@ export default function SearchFacets() {
             root: '',
             noRefinementRoot: 'text-gray-500 text-sm',
             searchBox: 'mb-4 brand-search-box',
-            list: 'space-y-1 max-h-64 overflow-y-auto',
+            list: 'space-y-0 max-h-64 overflow-y-auto',
             item: '',
             selectedItem: 'bg-blue-50',
             label: 'flex items-center cursor-pointer p-2 hover:bg-gray-50 rounded transition-colors',
@@ -340,7 +340,7 @@ export default function SearchFacets() {
           classNames={{
             root: '',
             noRefinementRoot: 'text-gray-500 text-sm font-medium',
-            list: 'space-y-1 max-h-64 overflow-y-auto',
+            list: 'space-y-0 max-h-64 overflow-y-auto',
             item: '',
             selectedItem: 'bg-blue-50',
             label: 'flex items-center cursor-pointer p-2 hover:bg-gray-50 rounded transition-colors',
@@ -370,8 +370,8 @@ export default function SearchFacets() {
           classNames={{
             root: '',
             noRefinementRoot: 'text-gray-500 text-sm font-medium',
-            list: 'flex flex-wrap gap-2',
-            item: '',
+            list: 'flex flex-wrap -m-2',
+            item: 'm-2',
             selectedItem: '',
             label: 'cursor-pointer',
             checkbox: 'sr-only',
