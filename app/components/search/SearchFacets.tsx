@@ -326,6 +326,61 @@ export default function SearchFacets() {
         />
       </div>
 
+      {/* Color Filter (if available) */}
+      <div className="border-b border-gray-200 pb-6">
+        <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+          Color
+        </h4>
+        <RefinementList
+          attribute="variants.defining_attributes.color"
+          limit={15}
+          showMore={true}
+          showMoreLimit={30}
+          sortBy={['count:desc', 'name:asc']}
+          classNames={{
+            root: '',
+            noRefinementRoot: 'text-gray-500 text-sm font-medium',
+            list: 'space-y-1 max-h-64 overflow-y-auto',
+            item: '',
+            selectedItem: 'bg-blue-50',
+            label: 'flex items-center cursor-pointer p-2 hover:bg-gray-50 rounded transition-colors',
+            checkbox: 'mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500',
+            labelText: 'flex-1 text-sm text-gray-700 truncate font-medium',
+            count: 'text-gray-500 text-xs ml-2 bg-gray-100 px-2 py-0.5 rounded-full font-medium',
+            showMore: 'mt-3 w-full text-center',
+            disabledShowMore: 'text-gray-400 cursor-not-allowed'
+          }}
+          translations={{
+            showMoreButtonText({ isShowingMore }) {
+              return isShowingMore ? 'Show less colors' : 'Show more colors';
+            }
+          }}
+        />
+      </div>
+
+      {/* Size Filter (if available) */}
+      <div className="pb-6">
+        <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+          Size
+        </h4>
+        <RefinementList
+          attribute="variants.defining_attributes.size"
+          limit={10}
+          sortBy={['name:asc']}
+          classNames={{
+            root: '',
+            noRefinementRoot: 'text-gray-500 text-sm font-medium',
+            list: 'flex flex-wrap gap-2',
+            item: '',
+            selectedItem: '',
+            label: 'cursor-pointer',
+            checkbox: 'sr-only',
+            labelText: 'px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors font-medium',
+            count: 'sr-only'
+          }}
+        />
+      </div>
+
       {/* Price Range */}
       <div className="border-b border-gray-200 pb-6">
         <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
@@ -347,61 +402,6 @@ export default function SearchFacets() {
           translations={{
             separatorElementText: 'to',
             submitButtonText: 'Go'
-          }}
-        />
-      </div>
-
-      {/* Color Filter (if available) */}
-      <div className="border-b border-gray-200 pb-6">
-        <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
-          Color
-        </h4>
-        <RefinementList
-          attribute="variants.defining_attributes.color"
-          limit={15}
-          showMore={true}
-          showMoreLimit={30}
-          sortBy={['count:desc', 'name:asc']}
-          classNames={{
-            root: '',
-            noRefinementRoot: 'text-gray-500 text-sm font-medium',
-            list: 'grid grid-cols-2 gap-1',
-            item: '',
-            selectedItem: 'bg-blue-50 text-blue-700',
-            label: 'flex items-center cursor-pointer p-2 hover:bg-gray-50 rounded transition-colors text-sm',
-            checkbox: 'mr-2 h-3 w-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500',
-            labelText: 'flex-1 text-gray-700 truncate text-xs font-medium',
-            count: 'text-gray-500 text-xs ml-1 font-medium',
-            showMore: 'col-span-2 mt-2',
-            disabledShowMore: 'text-gray-400 cursor-not-allowed'
-          }}
-          translations={{
-            showMoreButtonText({ isShowingMore }) {
-              return isShowingMore ? 'Show less colors' : 'Show more colors';
-            }
-          }}
-        />
-      </div>
-
-      {/* Size Filter (if available) */}
-      <div className="pb-6">
-        <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
-          Screen Size
-        </h4>
-        <RefinementList
-          attribute="variants.defining_attributes.size"
-          limit={10}
-          sortBy={['name:asc']}
-          classNames={{
-            root: '',
-            noRefinementRoot: 'text-gray-500 text-sm font-medium',
-            list: 'flex flex-wrap gap-2',
-            item: '',
-            selectedItem: '',
-            label: 'cursor-pointer',
-            checkbox: 'sr-only',
-            labelText: 'px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors font-medium',
-            count: 'sr-only'
           }}
         />
       </div>
