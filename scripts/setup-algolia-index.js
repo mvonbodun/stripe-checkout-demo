@@ -4,6 +4,7 @@
 import algoliasearch from 'algoliasearch';
 import dotenv from 'dotenv';
 import { mockProducts } from '../app/models/product.js';
+import { mockCategories, findCategoryById } from '../app/models/category.js';
 
 // Load environment variables
 dotenv.config({ path: '.env.local' });

@@ -6,9 +6,129 @@ import {
   HierarchicalMenu, 
   RangeInput, 
   CurrentRefinements,
-  ClearRefinements 
+  ClearRefinements,
+  useHierarchicalMenu,
+  useStats,
+  useHits
 } from 'react-instantsearch';
 import DynamicFacets from './DynamicFacets';
+
+// Debug component to check hierarchical menu data
+function HierarchicalMenuDebug() {
+  const { items, createURL, refine, canRefine } = useHierarchicalMenu({
+    attributes: [
+      'categories.lvl0',
+      'categories.lvl1', 
+      'categories.lvl2'
+    ]
+  });
+
+  const { nbHits, query, processingTimeMS } = useStats();
+
+  useEffect(() => {
+    console.log('🔍 HierarchicalMenu Debug - Full Details:', {
+      canRefine,
+      itemsCount: items.length,
+      items: items,
+      searchStats: { 
+        nbHits, 
+        query, 
+        processingTimeMS,
+        hasResults: nbHits > 0 
+      },
+      hierarchicalAttributes: [
+        'categories.lvl0',
+        'categories.lvl1', 
+        'categories.lvl2'
+      ]
+    });
+
+    // Also log the raw structure of each item
+    if (items.length > 0) {
+      console.log('🔍 First hierarchical item structure:', items[0]);
+      console.log('🔍 All hierarchical items:', items.map(item => ({
+        label: item.label,
+        value: item.value,
+        count: item.count,
+        isRefined: item.isRefined,
+        data: item.data
+      })));
+    } else {
+      console.log('🔍 No hierarchical items found');
+    }
+  }, [items, canRefine, nbHits, query, processingTimeMS]);
+
+  return (
+    <div style={{ 
+      padding: '10px', 
+      background: '#ffebcd', 
+      margin: '10px 0',
+      fontSize: '12px',
+      border: '2px solid #ff6b35',
+      borderRadius: '5px'
+    }}>
+      <strong>🔍 HierarchicalMenu Debug Info:</strong>
+      <br />Can Refine: {canRefine ? 'Yes' : 'No'}
+      <br />Items Count: {items.length}
+      <br />Search Hits: {nbHits}
+      <br />Query: "{query}"
+      <br />Processing Time: {processingTimeMS}ms
+      {items.length > 0 && (
+        <>
+          <br /><strong>Items:</strong>
+          {items.slice(0, 5).map((item, index) => (
+            <div key={index} style={{ marginLeft: '10px', fontSize: '11px' }}>
+              - {item.label} ({item.count})
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+// Debug component to check actual search hits data
+function SearchHitsDebug() {
+  const { hits } = useHits();
+
+  useEffect(() => {
+    console.log('🔍 Search Hits Debug:', {
+      hitsCount: hits.length,
+      firstHit: hits[0],
+      categoryData: hits.slice(0, 3).map(hit => ({
+        objectID: hit.objectID,
+        name: hit.name,
+        'categories.lvl0': hit['categories.lvl0'],
+        'categories.lvl1': hit['categories.lvl1'], 
+        'categories.lvl2': hit['categories.lvl2'],
+        categories: hit.categories
+      }))
+    });
+  }, [hits]);
+
+  return (
+    <div style={{ 
+      padding: '10px', 
+      background: '#e6f3ff', 
+      margin: '10px 0',
+      fontSize: '12px',
+      border: '2px solid #007acc',
+      borderRadius: '5px'
+    }}>
+      <strong>🔍 Search Hits Debug Info:</strong>
+      <br />Hits Count: {hits.length}
+      {hits.length > 0 && (
+        <>
+          <br /><strong>First Hit Categories:</strong>
+          <br />categories.lvl0: {JSON.stringify(hits[0]['categories.lvl0'])}
+          <br />categories.lvl1: {JSON.stringify(hits[0]['categories.lvl1'])}
+          <br />categories.lvl2: {JSON.stringify(hits[0]['categories.lvl2'])}
+          <br />categories: {JSON.stringify(hits[0].categories)}
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function SearchFacets() {
   // Add custom styles for the brand search box to match header styling
@@ -140,6 +260,7 @@ export default function SearchFacets() {
         <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
           Categories
         </h4>
+        
         <HierarchicalMenu
           attributes={[
             'categories.lvl0',

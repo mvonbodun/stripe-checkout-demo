@@ -170,7 +170,14 @@ Implemented hierarchical category navigation:
 - Breadcrumb integration with current refinements
 - Category-specific filtering with level support
 - Professional styling and responsive design
+- Fixed Algolia index configuration for hierarchical facets
 ```
+
+**Technical Resolution:**
+- Issue: HierarchicalMenu component not rendering categories
+- Root Cause: Missing hierarchical attributes in Algolia index `attributesForFaceting`
+- Solution: Added `searchable(categories.lvl0)`, `searchable(categories.lvl1)`, `searchable(categories.lvl2)` to index configuration
+- Result: Successfully displays 2 top-level categories (Men, Women) with full hierarchical navigation
 
 ### 4.2 Attribute Facets ✅ COMPLETED
 Created facets for product attributes:
