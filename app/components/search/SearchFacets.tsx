@@ -10,7 +10,8 @@ import {
   useStats,
   useHits,
   useRange,
-  useConnector
+  useConnector,
+  useCurrentRefinements
 } from 'react-instantsearch';
 import connectRatingMenu from 'instantsearch.js/es/connectors/rating-menu/connectRatingMenu';
 import * as Slider from '@radix-ui/react-slider';
@@ -129,6 +130,51 @@ function SearchHitsDebug() {
           <br />categories: {JSON.stringify(hits[0].categories)}
         </>
       )}
+    </div>
+  );
+}
+
+// Custom CurrentRefinements component to show only values (not facet names)
+function CustomCurrentRefinements() {
+  const { items, refine } = useCurrentRefinements();
+
+  if (items.length === 0) {
+    return null;
+  }
+
+  // Flatten all refinements from all facets into a single array
+  const allRefinements = items.flatMap(item => 
+    item.refinements.map(refinement => ({
+      ...refinement,
+      attribute: item.attribute,
+      remove: () => refine(refinement)
+    }))
+  );
+
+  // Limit to 10 refinements
+  const limitedRefinements = allRefinements.slice(0, 10);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {limitedRefinements.map((refinement, index) => (
+          <span 
+            key={`${refinement.attribute}-${refinement.value}-${index}`}
+            className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full"
+          >
+            {refinement.label}
+            <button
+              onClick={refinement.remove}
+              className="ml-2 hover:bg-blue-200 rounded-full p-0.5 transition-colors cursor-pointer"
+              aria-label={`Remove ${refinement.label}`}
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -458,18 +504,7 @@ export default function SearchFacets() {
       </div>
 
       {/* Current Active Filters */}
-      <CurrentRefinements
-        classNames={{
-          root: 'space-y-2',
-          list: 'flex flex-wrap gap-2',
-          item: '',
-          label: 'inline-flex items-center gap-2 px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full',
-          category: 'font-medium',
-          categoryLabel: '',
-          delete: 'ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors'
-        }}
-        transformItems={(items) => items.slice(0, 10)} // Limit displayed refinements
-      />
+      <CustomCurrentRefinements />
 
       {/* Category Hierarchical Navigation */}
       <div className="border-b border-gray-200 pb-6">

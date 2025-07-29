@@ -5,7 +5,7 @@ import { SortBy } from 'react-instantsearch';
 
 export default function SearchSort() {
   return (
-    <div className="flex items-center space-x-4 mb-6">
+    <div className="flex items-center space-x-4">
       <label htmlFor="sort-select" className="text-sm font-medium text-gray-700">
         Sort by:
       </label>

@@ -35,9 +35,6 @@ export default function SearchInterface({ className = '' }: SearchInterfaceProps
       <InitialQueryHandler />
       <div className="bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          {/* Search Stats */}
-          <SearchStats />
-
           {/* Mobile Filter Toggle */}
           <div className="lg:hidden mb-4">
             <button
@@ -55,14 +52,18 @@ export default function SearchInterface({ className = '' }: SearchInterfaceProps
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Filters Sidebar - Phase 4 Faceted Navigation */}
             <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-              <div className="bg-gray-50 rounded-lg p-6 lg:sticky lg:top-4">
+              <div className="bg-gray-50 rounded-lg pt-2 px-6 pb-6 lg:sticky lg:top-4">
                 <SearchFacets />
               </div>
             </div>
 
             {/* Search Results */}
             <div className="lg:col-span-3">
-              <SearchSort />
+              {/* Stats and Sort Row */}
+              <div className="flex items-center justify-between mb-6">
+                <SearchStats />
+                <SearchSort />
+              </div>
               <SearchResults />
               <SearchPagination />
             </div>
