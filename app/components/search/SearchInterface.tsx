@@ -7,6 +7,9 @@ import {
   Stats,
   Pagination,
 } from 'react-instantsearch';
+import SearchStats from './SearchStats';
+import SearchResults from './SearchResults';
+import SearchPagination from './SearchPagination';
 
 interface SearchInterfaceProps {
   className?: string;
@@ -35,7 +38,7 @@ export default function SearchInterface({ className = '' }: SearchInterfaceProps
         </div>
 
         {/* Search Stats */}
-        <Stats />
+        <SearchStats />
 
         {/* Main Search Layout */}
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -49,8 +52,8 @@ export default function SearchInterface({ className = '' }: SearchInterfaceProps
 
           {/* Search Results */}
           <div className="lg:col-span-3">
-            <Hits hitComponent={Hit} />
-            <Pagination />
+            <SearchResults />
+            <SearchPagination />
           </div>
         </div>
       </div>

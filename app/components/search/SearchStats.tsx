@@ -1,34 +1,30 @@
 'use client';
 
 import React from 'react';
-import { useStats } from 'react-instantsearch';
+import { useStats, useClearRefinements } from 'react-instantsearch';
 
 export default function SearchStats() {
-  const { nbHits, nbPages, page, processingTimeMS, query } = useStats();
+  const { nbHits, processingTimeMS, query } = useStats();
+  const { refine, canRefine } = useClearRefinements();
 
   return (
-    <div className="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg">
-      <div className="flex items-center space-x-4 text-sm text-gray-600">
-        {query ? (
+    <div className="flex items-center justify-between text-sm text-gray-600 mb-4 px-1">
+      <div>
+        {query && (
           <>
-            <span>
-              <strong>{nbHits.toLocaleString()}</strong> results for "{query}"
-            </span>
-            <span className="text-gray-400">•</span>
-            <span>
-              {processingTimeMS}ms
-            </span>
+            <span className="font-semibold text-gray-800">{nbHits.toLocaleString()}</span> results found in{' '}
+            <span className="font-semibold text-gray-800">{processingTimeMS}ms</span>
           </>
-        ) : (
-          <span>
-            <strong>{nbHits.toLocaleString()}</strong> products available
-          </span>
         )}
       </div>
-
-      <div className="text-sm text-gray-500">
-        Page {page + 1} of {nbPages}
-      </div>
+      {canRefine && (
+        <button
+          onClick={() => refine()}
+          className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
+        >
+          Clear search
+        </button>
+      )}
     </div>
   );
 }
