@@ -65,7 +65,7 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
         
         {/* Product Name with Highlighting */}
         <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
-          <Link href={`/p/${hit.slug || hit.objectID}`}>
+          <Link href={hit.slug || `/p/${hit.objectID}`}>
             <span aria-hidden="true" className="absolute inset-0" />
             <Highlight attribute="name" hit={hit} />
           </Link>
