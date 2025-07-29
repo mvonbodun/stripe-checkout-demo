@@ -56,7 +56,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }
 
   return (
-    <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
+    <InstantSearch 
+      searchClient={searchClient} 
+      indexName={ALGOLIA_INDEX_NAME}
+      future={{
+        preserveSharedStateOnUnmount: true
+      }}
+    >
       <CartProvider>
         <CategoriesProvider>
           <MiniCartUIProvider>
