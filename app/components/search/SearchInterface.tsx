@@ -14,42 +14,12 @@ export default function SearchInterface({ className = '' }: SearchInterfaceProps
   return (
     <div className={`search-interface ${className}`}>
       <div className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Search Header */}
-          <div className="py-8 border-b border-gray-200">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-4">
-                Search Products
-              </h1>
-              <p className="text-lg text-gray-600 mb-6">
-                Find exactly what you're looking for
-              </p>
-            </div>
-            
-            {/* Enhanced Search Box */}
-            <div className="max-w-2xl mx-auto">
-              <SearchBox
-                placeholder="Search for products, brands, categories..."
-                classNames={{
-                  root: 'relative',
-                  form: 'relative flex items-center',
-                  input: 'block w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-lg',
-                  submit: 'absolute right-3 top-1/2 transform -translate-y-1/2',
-                  submitIcon: 'h-5 w-5 text-gray-400 hover:text-gray-600',
-                  reset: 'absolute right-10 top-1/2 transform -translate-y-1/2',
-                  resetIcon: 'h-4 w-4 text-gray-400 hover:text-gray-600',
-                }}
-              />
-            </div>
-          </div>
-
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           {/* Search Stats */}
-          <div className="py-4">
-            <SearchStats />
-          </div>
+          <SearchStats />
 
           {/* Main Search Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 pb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Filters Sidebar - Phase 4 */}
             <div className="lg:col-span-1">
               <div className="bg-gray-50 rounded-lg p-6 sticky top-4">
