@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { SearchBox } from 'react-instantsearch';
+import React, { useState, useEffect } from 'react';
+import { useSearchBox } from 'react-instantsearch';
+import { useSearchParams } from 'next/navigation';
 import SearchStats from './SearchStats';
 import SearchResults from './SearchResults';
 import SearchPagination from './SearchPagination';
@@ -12,11 +13,26 @@ interface SearchInterfaceProps {
   className?: string;
 }
 
+function InitialQueryHandler() {
+  const { refine } = useSearchBox();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const queryParam = searchParams.get('query');
+    if (queryParam) {
+      refine(queryParam);
+    }
+  }, [searchParams, refine]);
+
+  return null;
+}
+
 export default function SearchInterface({ className = '' }: SearchInterfaceProps) {
   const [showFilters, setShowFilters] = useState(false);
 
   return (
     <div className={`search-interface ${className}`}>
+      <InitialQueryHandler />
       <div className="bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           {/* Search Stats */}
