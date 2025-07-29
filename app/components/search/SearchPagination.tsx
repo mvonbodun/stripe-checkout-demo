@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { usePagination } from 'react-instantsearch';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export default function SearchPagination() {
   const {
@@ -20,92 +19,117 @@ export default function SearchPagination() {
 
   const renderPageNumbers = () => {
     const pages = [];
-    // Logic to render a subset of pages if there are too many
-    const startPage = Math.max(0, currentRefinement - 2);
-    const endPage = Math.min(nbPages - 1, currentRefinement + 2);
+    const showPages = 5; // Number of page buttons to show
+    const startPage = Math.max(0, Math.min(currentRefinement - Math.floor(showPages / 2), nbPages - showPages));
+    const endPage = Math.min(nbPages - 1, startPage + showPages - 1);
 
+    // Show first page if we're not at the beginning
     if (startPage > 0) {
-      pages.push(<span key="start-ellipsis" className="px-4 py-2">...</span>);
+      pages.push(
+        <button
+          key={0}
+          onClick={() => refine(0)}
+          className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+        >
+          1
+        </button>
+      );
+      if (startPage > 1) {
+        pages.push(
+          <span key="start-ellipsis" className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700">
+            ...
+          </span>
+        );
+      }
     }
 
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
-        <a
+        <button
           key={i}
-          href={createURL(i)}
-          onClick={(event) => {
-            event.preventDefault();
-            refine(i);
-          }}
+          onClick={() => refine(i)}
           className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
             currentRefinement === i
               ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-              : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0'
+              : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
           }`}
         >
           {i + 1}
-        </a>
+        </button>
       );
     }
 
+    // Show last page if we're not at the end
     if (endPage < nbPages - 1) {
-      pages.push(<span key="end-ellipsis" className="px-4 py-2">...</span>);
+      if (endPage < nbPages - 2) {
+        pages.push(
+          <span key="end-ellipsis" className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700">
+            ...
+          </span>
+        );
+      }
+      pages.push(
+        <button
+          key={nbPages - 1}
+          onClick={() => refine(nbPages - 1)}
+          className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+        >
+          {nbPages}
+        </button>
+      );
     }
+
     return pages;
   };
 
   return (
     <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-8">
+      {/* Mobile view */}
       <div className="flex flex-1 justify-between sm:hidden">
-        <a
-          href={!isFirstPage ? createURL(currentRefinement - 1) : '#'}
-          onClick={(event) => {
-            event.preventDefault();
-            if (!isFirstPage) refine(currentRefinement - 1);
-          }}
+        <button
+          onClick={() => !isFirstPage && refine(currentRefinement - 1)}
+          disabled={isFirstPage}
           className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${isFirstPage ? 'cursor-not-allowed opacity-50' : ''}`}
         >
           Previous
-        </a>
-        <a
-          href={!isLastPage ? createURL(currentRefinement + 1) : '#'}
-          onClick={(event) => {
-            event.preventDefault();
-            if (!isLastPage) refine(currentRefinement + 1);
-          }}
+        </button>
+        <span className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700">
+          Page {currentRefinement + 1} of {nbPages}
+        </span>
+        <button
+          onClick={() => !isLastPage && refine(currentRefinement + 1)}
+          disabled={isLastPage}
           className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${isLastPage ? 'cursor-not-allowed opacity-50' : ''}`}
         >
           Next
-        </a>
+        </button>
       </div>
+      
+      {/* Desktop view */}
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
-        <div>
-          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-            <a
-              href={!isFirstPage ? createURL(currentRefinement - 1) : '#'}
-              onClick={(event) => {
-                event.preventDefault();
-                if (!isFirstPage) refine(currentRefinement - 1);
-              }}
-              className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${isFirstPage ? 'cursor-not-allowed opacity-50' : ''}`}
-            >
-              <span className="sr-only">Previous</span>
-              <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-            </a>
-            {renderPageNumbers()}
-            <a
-              href={!isLastPage ? createURL(currentRefinement + 1) : '#'}
-              onClick={(event) => {
-                event.preventDefault();
-                if (!isLastPage) refine(currentRefinement + 1);
-              }}
-              className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${isLastPage ? 'cursor-not-allowed opacity-50' : ''}`}
-            >
-              <span className="sr-only">Next</span>
-              <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-            </a>
-          </nav>
-        </div>
+        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+          <button
+            onClick={() => !isFirstPage && refine(currentRefinement - 1)}
+            disabled={isFirstPage}
+            className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${isFirstPage ? 'cursor-not-allowed opacity-50' : ''}`}
+          >
+            <span className="sr-only">Previous</span>
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+            </svg>
+          </button>
+          {renderPageNumbers()}
+          <button
+            onClick={() => !isLastPage && refine(currentRefinement + 1)}
+            disabled={isLastPage}
+            className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${isLastPage ? 'cursor-not-allowed opacity-50' : ''}`}
+          >
+            <span className="sr-only">Next</span>
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </nav>
       </div>
     </div>
   );
