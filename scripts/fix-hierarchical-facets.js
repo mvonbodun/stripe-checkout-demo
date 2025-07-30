@@ -17,7 +17,7 @@ const client = algoliasearch(
   process.env.ALGOLIA_ADMIN_API_KEY
 );
 
-const indexName = 'test_vtex_query_suggestions';
+const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index';
 const index = client.initIndex(indexName);
 
 async function fixHierarchicalFacets() {

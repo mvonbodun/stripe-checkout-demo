@@ -22,7 +22,7 @@ async function checkAndSetupIndex() {
     const { items: indices } = await client.listIndices();
     console.log('📋 Available indices:', indices.map(index => index.name));
     
-    const indexName = 'products';
+    const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index';
     const index = client.initIndex(indexName);
     
     // Check if products index exists

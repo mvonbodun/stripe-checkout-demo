@@ -4,6 +4,8 @@ import React from 'react';
 import { Highlight, Snippet } from 'react-instantsearch';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
+import { extractCloudinaryPublicId, isCloudinaryUrl, getFallbackImage } from '../../utils/cloudinaryHelpers';
 
 export default function EnhancedProductCard({ hit }: { hit: any }) {
   // Console log to debug the data structure
@@ -27,6 +29,10 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
   
   console.log('Final imageUrl:', imageUrl);
   
+  // Extract Cloudinary public ID if it's a Cloudinary URL
+  const cloudinaryPublicId = isCloudinaryUrl(imageUrl) ? extractCloudinaryPublicId(imageUrl) : null;
+  console.log('Cloudinary public ID:', cloudinaryPublicId);
+  
   // Price from first variant - based on actual data structure
   let price = null;
   
@@ -45,17 +51,30 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
       <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none sm:h-96 overflow-hidden">
-        <Image
-          src={imageUrl}
-          alt={hit.name || 'Product image'}
-          width={500}
-          height={500}
-          className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
-          onError={(e) => {
-            console.error('Image failed to load:', imageUrl);
-            e.currentTarget.src = '/next.svg';
-          }}
-        />
+        {cloudinaryPublicId ? (
+          <CldImage
+            src={cloudinaryPublicId}
+            alt={hit.name || 'Product image'}
+            width={500}
+            height={500}
+            className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            format="auto"
+            quality="auto"
+          />
+        ) : (
+          <Image
+            src={imageUrl}
+            alt={hit.name || 'Product image'}
+            width={500}
+            height={500}
+            className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
+            onError={(e) => {
+              console.error('Image failed to load:', imageUrl);
+              e.currentTarget.src = getFallbackImage(imageUrl);
+            }}
+          />
+        )}
       </div>
       <div className="flex flex-1 flex-col space-y-2 p-4">
         {/* Brand */}

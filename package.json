@@ -22,6 +22,7 @@
     "daisyui": "^5.0.35",
     "dotenv": "^17.2.1",
     "next": "15.3.2",
+    "next-cloudinary": "^6.16.0",
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

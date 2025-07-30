@@ -1,6 +1,6 @@
 import algoliasearch from 'algoliasearch/lite';
 
-export const ALGOLIA_INDEX_NAME = 'test_vtex_query_suggestions';
+export const ALGOLIA_INDEX_NAME = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index';
 
 // Configuration constants
 export const SEARCH_CONFIG = {
