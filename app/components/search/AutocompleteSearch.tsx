@@ -9,6 +9,8 @@ import { BaseItem } from '@algolia/autocomplete-core';
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches';
 import { createQuerySuggestionsPlugin } from '@algolia/autocomplete-plugin-query-suggestions';
 import { createSearchClient } from '../../lib/algolia';
+import { CldImage } from 'next-cloudinary';
+import { extractCloudinaryPublicId } from '../../utils/cloudinaryHelpers';
 
 import '@algolia/autocomplete-theme-classic';
 
@@ -159,29 +161,62 @@ export default function AutocompleteSearch({
           );
         },
         item({ item }: { item: ProductSuggestion }) {
+          const publicId = item.image ? extractCloudinaryPublicId(item.image) : '';
+          
           return (
             <div className="aa-ItemWrapper">
-              <div className="aa-ItemContent">
-                {item.image && (
-                  <div className="aa-ItemIcon">
+              <div className="aa-ItemContent flex items-center gap-3 py-2">
+                {item.image && publicId ? (
+                  <div className="aa-ItemIcon flex-shrink-0">
+                    <CldImage
+                      src={publicId}
+                      alt={item.name}
+                      width={64}
+                      height={64}
+                      crop="fill"
+                      gravity="center"
+                      format="auto"
+                      quality="auto"
+                      className="w-16 h-16 object-cover rounded-lg autocomplete-product-image"
+                      style={{ 
+                        width: '64px !important', 
+                        height: '64px !important',
+                        minWidth: '64px',
+                        minHeight: '64px',
+                        maxWidth: '64px',
+                        maxHeight: '64px'
+                      }}
+                      data-component="CldImage"
+                    />
+                  </div>
+                ) : item.image ? (
+                  <div className="aa-ItemIcon flex-shrink-0">
                     <img 
                       src={item.image} 
                       alt={item.name}
-                      className="w-10 h-10 object-cover rounded"
+                      className="w-16 h-16 object-cover rounded-lg autocomplete-product-image"
+                      style={{ 
+                        width: '64px !important', 
+                        height: '64px !important',
+                        minWidth: '64px',
+                        minHeight: '64px',
+                        maxWidth: '64px',
+                        maxHeight: '64px'
+                      }}
                     />
                   </div>
-                )}
-                <div className="aa-ItemContentBody">
+                ) : null}
+                <div className="aa-ItemContentBody flex-1 min-w-0">
                   <div className="aa-ItemContentTitle">
-                    <span className="font-medium">{item.name}</span>
+                    <span className="font-medium text-sm leading-tight">{item.name}</span>
                   </div>
                   {item.brand && (
-                    <div className="aa-ItemContentDescription text-sm text-gray-600">
+                    <div className="aa-ItemContentDescription text-xs text-gray-600 mt-0.5">
                       by {item.brand}
                     </div>
                   )}
                   {item.price && (
-                    <div className="aa-ItemContentDescription text-sm font-semibold text-green-600">
+                    <div className="aa-ItemContentDescription text-sm font-semibold text-green-600 mt-1">
                       ${item.price.toFixed(2)}
                     </div>
                   )}
@@ -268,6 +303,52 @@ export default function AutocompleteSearch({
     <div className={`flex-1 px-8 ${className}`}>
       <div className="relative max-w-lg mx-auto">
         <div ref={autocompleteContainer} />
+        <style>{`
+          .aa-ItemWrapper .aa-ItemContent {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 8px 12px !important;
+            min-height: 80px !important;
+          }
+          .aa-ItemIcon {
+            flex-shrink: 0 !important;
+            width: 64px !important;
+            height: 64px !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+          }
+          .aa-ItemIcon img,
+          .aa-ItemIcon > div,
+          .aa-ItemIcon > div > img,
+          .aa-ItemIcon [data-component="CldImage"],
+          .aa-ItemIcon [data-component="CldImage"] img,
+          .autocomplete-product-image {
+            width: 64px !important;
+            height: 64px !important;
+            border-radius: 8px !important;
+            object-fit: cover !important;
+            display: block !important;
+            max-width: 64px !important;
+            max-height: 64px !important;
+            min-width: 64px !important;
+            min-height: 64px !important;
+          }
+          .aa-ItemContentBody {
+            flex: 1 !important;
+            min-width: 0 !important;
+          }
+          .aa-ItemContentTitle {
+            margin-bottom: 2px !important;
+          }
+          .aa-ItemContentDescription {
+            margin: 0 !important;
+            line-height: 1.3 !important;
+          }
+        `}</style>
       </div>
     </div>
   );
