@@ -4,6 +4,14 @@ import React from 'react';
 import { SortBy } from 'react-instantsearch';
 
 export default function SearchSort() {
+  // Get individual index names from environment variables
+  const featuredIndex = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index';
+  const priceAscIndex = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_PRICE_ASC || 'stripe_demo_index_price_asc';
+  const priceDescIndex = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_PRICE_DESC || 'stripe_demo_index_price_desc';
+  const nameAscIndex = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME_ASC || 'stripe_demo_index_name_asc';
+  const nameDescIndex = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME_DESC || 'stripe_demo_index_name_desc';
+  const createdDescIndex = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_CREATED_DESC || 'stripe_demo_index_created_desc';
+  
   return (
     <div className="flex items-center space-x-4">
       <label htmlFor="sort-select" className="text-sm font-medium text-gray-700">
@@ -11,12 +19,12 @@ export default function SearchSort() {
       </label>
       <SortBy
         items={[
-          { label: 'Featured', value: 'test_vtex_query_suggestions' },
-          { label: 'Price: Low to High', value: 'test_vtex_query_suggestions_price_asc' },
-          { label: 'Price: High to Low', value: 'test_vtex_query_suggestions_price_desc' },
-          { label: 'Name: A to Z', value: 'test_vtex_query_suggestions_name_asc' },
-          { label: 'Name: Z to A', value: 'test_vtex_query_suggestions_name_desc' },
-          { label: 'Newest First', value: 'test_vtex_query_suggestions_created_desc' }
+          { label: 'Relevance', value: featuredIndex },
+          { label: 'Price: Low to High', value: priceAscIndex },
+          { label: 'Price: High to Low', value: priceDescIndex },
+          { label: 'Name: A to Z', value: nameAscIndex },
+          { label: 'Name: Z to A', value: nameDescIndex },
+          { label: 'Newest First', value: createdDescIndex }
         ]}
         classNames={{
           root: '',
