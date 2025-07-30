@@ -304,6 +304,13 @@ export default function AutocompleteSearch({
       <div className="relative max-w-lg mx-auto">
         <div ref={autocompleteContainer} />
         <style>{`
+          .aa-Panel {
+            z-index: 9999 !important;
+            position: absolute !important;
+          }
+          .aa-DetachedOverlay {
+            z-index: 9999 !important;
+          }
           .aa-ItemWrapper .aa-ItemContent {
             display: flex !important;
             align-items: center !important;
