@@ -32,6 +32,21 @@ interface ProductSuggestion {
   category?: string[];
 }
 
+interface QuerySuggestion {
+  objectID: string;
+  query: string;
+  category?: string;
+  popularity?: number;
+}
+
+interface CategorySuggestion {
+  objectID: string;
+  name: string;
+  slug: string;
+  level: number;
+  parent?: string;
+}
+
 export default function AutocompleteSearch({ 
   className = '', 
   placeholder = 'Search for products...' 
@@ -50,6 +65,7 @@ export default function AutocompleteSearch({
   // Get search client for autocomplete - memoize to prevent recreation
   const searchClient = useMemo(() => createSearchClient(), []);
   const indexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index';
+  const querySuggestionsIndexName = process.env.NEXT_PUBLIC_ALGOLIA_QUERY_SUGGESTIONS_INDEX;
 
   // Use refs for callbacks to avoid dependency changes
   const handleRecentSearchSelectRef = useRef((item: any) => {
@@ -61,6 +77,15 @@ export default function AutocompleteSearch({
     router.push(`/p/${item.objectID}`);
   });
 
+  const handleQuerySuggestionSelectRef = useRef((item: QuerySuggestion) => {
+    setInstantSearchUiState({ query: item.query });
+    router.push(`/search?query=${encodeURIComponent(item.query)}`);
+  });
+
+  const handleCategorySelectRef = useRef((item: CategorySuggestion) => {
+    router.push(`/c/${item.slug}`);
+  });
+
   // Update refs when router changes
   useEffect(() => {
     handleRecentSearchSelectRef.current = (item: any) => {
@@ -70,6 +95,15 @@ export default function AutocompleteSearch({
     
     handleProductSelectRef.current = (item: ProductSuggestion) => {
       router.push(`/p/${item.objectID}`);
+    };
+
+    handleQuerySuggestionSelectRef.current = (item: QuerySuggestion) => {
+      setInstantSearchUiState({ query: item.query });
+      router.push(`/search?query=${encodeURIComponent(item.query)}`);
+    };
+
+    handleCategorySelectRef.current = (item: CategorySuggestion) => {
+      router.push(`/c/${item.slug}`);
     };
   }, [router]);
 
@@ -125,6 +159,76 @@ export default function AutocompleteSearch({
         };
       },
     });
+
+    // Create query suggestions plugin (only if explicitly configured)
+    let querySuggestionsPlugin = null;
+    
+    // Only create query suggestions plugin if the index name is explicitly provided via env var
+    if (querySuggestionsIndexName && searchClient) {
+      console.info('Attempting to initialize query suggestions plugin with index:', querySuggestionsIndexName);
+      try {
+        querySuggestionsPlugin = createQuerySuggestionsPlugin({
+          searchClient,
+          indexName: querySuggestionsIndexName,
+          getSearchParams() {
+            return {
+              hitsPerPage: 5,
+            };
+          },
+          transformSource({ source }) {
+            return {
+              ...source,
+              sourceId: 'querySuggestions',
+              templates: {
+                ...source.templates,
+                header() {
+                  return (
+                    <Fragment>
+                      <span className="aa-SourceHeaderTitle">Popular searches</span>
+                      <span className="aa-SourceHeaderLine" />
+                    </Fragment>
+                  );
+                },
+                item({ item }: { item: QuerySuggestion }) {
+                  return (
+                    <div className="aa-ItemWrapper">
+                      <div className="aa-ItemContent">
+                        <div className="aa-ItemIcon">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 21l-6 -6"></path>
+                            <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                            <path d="M17 8h0.01"></path>
+                            <path d="M4.05 11a8 8 0 1 1 15.9 0a8 8 0 0 1 -15.9 0"></path>
+                          </svg>
+                        </div>
+                        <div className="aa-ItemContentBody">
+                          <div className="aa-ItemContentTitle">{item.query}</div>
+                          {item.category && (
+                            <div className="aa-ItemContentDescription text-xs text-gray-500">
+                              in {item.category}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                },
+              },
+              onSelect({ item }) {
+                handleQuerySuggestionSelectRef.current(item);
+              },
+            };
+          },
+        });
+        console.info('Query suggestions plugin initialized successfully');
+      } catch (error) {
+        console.warn('Query suggestions plugin failed to initialize:', error);
+        console.info('Autocomplete will work without query suggestions. To enable, ensure the query suggestions index exists in Algolia and the NEXT_PUBLIC_ALGOLIA_QUERY_SUGGESTIONS_INDEX environment variable is set.');
+        querySuggestionsPlugin = null;
+      }
+    } else {
+      console.info('Query suggestions disabled - NEXT_PUBLIC_ALGOLIA_QUERY_SUGGESTIONS_INDEX environment variable not set');
+    }
 
     // Create sources once
     const productSource = {
@@ -231,6 +335,71 @@ export default function AutocompleteSearch({
       },
     };
 
+    // Create category suggestions source
+    const categorySource = {
+      sourceId: 'categories',
+      getItems({ query }: { query: string }) {
+        if (!query) return [];
+        
+        return searchClient.search([{
+          indexName,
+          query,
+          params: {
+            hitsPerPage: 3,
+            attributesToRetrieve: ['objectID', 'name', 'slug', 'level', 'category'],
+            filters: 'level:1 OR level:2', // Only show top-level categories
+          },
+        }]).then(({ results }) => {
+          const searchResult = results[0] as any;
+          const hits = searchResult?.hits || [];
+          // Filter for category-type results and transform
+          return hits
+            .filter((hit: any) => hit.level && hit.slug)
+            .map((hit: any) => ({
+              objectID: hit.objectID,
+              name: hit.name,
+              slug: hit.slug,
+              level: hit.level,
+              parent: hit.category?.[0] || null,
+            }));
+        }).catch(() => []);
+      },
+      templates: {
+        header() {
+          return (
+            <Fragment>
+              <span className="aa-SourceHeaderTitle">Categories</span>
+              <span className="aa-SourceHeaderLine" />
+            </Fragment>
+          );
+        },
+        item({ item }: { item: CategorySuggestion }) {
+          return (
+            <div className="aa-ItemWrapper">
+              <div className="aa-ItemContent">
+                <div className="aa-ItemIcon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M4 4h16v16H4z"></path>
+                    <path d="M4 4l16 16"></path>
+                    <path d="M20 4l-16 16"></path>
+                  </svg>
+                </div>
+                <div className="aa-ItemContentBody">
+                  <div className="aa-ItemContentTitle">{item.name}</div>
+                  <div className="aa-ItemContentDescription text-xs text-gray-500">
+                    Category {item.parent && `in ${item.parent}`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        },
+      },
+      onSelect({ item }: { item: CategorySuggestion }) {
+        handleCategorySelectRef.current(item);
+      },
+    };
+
     autocompleteInstanceRef.current = autocomplete({
       container: autocompleteContainer.current,
       placeholder,
@@ -238,9 +407,11 @@ export default function AutocompleteSearch({
       openOnFocus: true,
       detachedMediaQuery: 'none', // Keep attached on all devices
       getSources() {
-        return [productSource];
+        return [productSource, categorySource];
       },
-      plugins: [recentSearchesPlugin],
+      plugins: querySuggestionsPlugin 
+        ? [recentSearchesPlugin, querySuggestionsPlugin]
+        : [recentSearchesPlugin],
       onReset() {
         setInstantSearchUiState({ query: '' });
       },
