@@ -8,6 +8,7 @@ import SearchResults from './SearchResults';
 import SearchPagination from './SearchPagination';
 import SearchFacets from './SearchFacets';
 import SearchSort from './SearchSort';
+import AnalyticsDashboard from '../analytics/AnalyticsDashboard';
 
 interface SearchInterfaceProps {
   className?: string;
@@ -52,8 +53,13 @@ export default function SearchInterface({ className = '' }: SearchInterfaceProps
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Filters Sidebar - Phase 4 Faceted Navigation */}
             <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-              <div className="bg-gray-50 rounded-lg pt-2 px-6 pb-6 lg:sticky lg:top-4">
-                <SearchFacets />
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg pt-2 px-6 pb-6 lg:sticky lg:top-4">
+                  <SearchFacets />
+                </div>
+                
+                {/* Analytics Dashboard - Phase 5.2 Search Analytics */}
+                <AnalyticsDashboard className="lg:sticky lg:top-4" />
               </div>
             </div>
 

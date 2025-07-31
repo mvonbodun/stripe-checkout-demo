@@ -6,8 +6,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { extractCloudinaryPublicId, isCloudinaryUrl, getFallbackImage } from '../../utils/cloudinaryHelpers';
+import { useClickTracking } from '../../contexts/AnalyticsContext';
 
-export default function EnhancedProductCard({ hit }: { hit: any }) {
+interface EnhancedProductCardProps {
+  hit: any;
+  position?: number;
+  queryID?: string;
+}
+
+export default function EnhancedProductCard({ hit, position, queryID }: EnhancedProductCardProps) {
+  const { trackProductClick } = useClickTracking();
+  
   // Console log to debug the data structure
   console.log('Hit data:', hit);
   
@@ -48,6 +57,13 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
   // Get color from variant attributes - based on actual data structure
   const color = firstVariant?.defining_attributes?.color;
 
+  // Handle click tracking
+  const handleProductClick = () => {
+    if (position && queryID) {
+      trackProductClick(hit.objectID, position, 'Product Clicked from Search');
+    }
+  };
+
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
       <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none sm:h-96 overflow-hidden">
@@ -84,7 +100,7 @@ export default function EnhancedProductCard({ hit }: { hit: any }) {
         
         {/* Product Name with Highlighting */}
         <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
-          <Link href={hit.slug || `/p/${hit.objectID}`}>
+          <Link href={hit.slug || `/p/${hit.objectID}`} onClick={handleProductClick}>
             <span aria-hidden="true" className="absolute inset-0" />
             <Highlight attribute="name" hit={hit} />
           </Link>

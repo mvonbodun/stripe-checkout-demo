@@ -1,11 +1,41 @@
 'use client';
 
-import React from 'react';
-import { useHits } from 'react-instantsearch';
+import React, { useEffect } from 'react';
+import { useHits, useSearchBox } from 'react-instantsearch';
+import { useAnalytics, useSearchPerformanceTracking } from '../../contexts/AnalyticsContext';
 import EnhancedProductCard from '../enhanced/EnhancedProductCard';
 
 export default function SearchResults() {
-  const { hits } = useHits();
+  const { hits, results } = useHits();
+  const { query } = useSearchBox();
+  const { analytics, setCurrentQuery } = useAnalytics();
+  const { trackView } = useSearchPerformanceTracking();
+
+  // Track view events and set current query ID for analytics
+  useEffect(() => {
+    if (results && results.queryID && query) {
+      // Set the current query ID for other components to use
+      setCurrentQuery(query, results.queryID);
+      
+      // Track view events for visible products
+      if (hits.length > 0) {
+        const viewEvents = hits.map((hit, index) => ({
+          objectID: hit.objectID,
+          position: index + 1,
+          queryID: results.queryID,
+        }));
+        
+        analytics.trackView(viewEvents);
+        trackView();
+        
+        console.debug('Tracked view events for search results:', {
+          query,
+          queryID: results.queryID,
+          hitCount: hits.length
+        });
+      }
+    }
+  }, [hits, results, query, setCurrentQuery, trackView]);
 
   if (hits.length === 0) {
     return (
@@ -33,8 +63,13 @@ export default function SearchResults() {
     <div className="space-y-6">
       {/* Results Grid */}
       <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-        {hits.map((hit) => (
-          <EnhancedProductCard key={hit.objectID} hit={hit} />
+        {hits.map((hit, index) => (
+          <EnhancedProductCard 
+            key={hit.objectID} 
+            hit={hit} 
+            position={index + 1}
+            queryID={results?.queryID}
+          />
         ))}
       </div>
       

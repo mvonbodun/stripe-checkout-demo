@@ -1,6 +1,7 @@
 'use client';
 import { useCart } from '../cart-context';
 import { useMiniCartUI } from '../mini-cart-ui-context';
+import { useConversionTracking } from '../contexts/AnalyticsContext';
 import { Product } from '../models/product';
 import { Item } from '../models/item';
 
@@ -23,6 +24,7 @@ export default function AddToCartButton({
 }: AddToCartButtonProps) {
   const { dispatch } = useCart();
   const { openMiniCart } = useMiniCartUI();
+  const { trackAddToCart } = useConversionTracking();
 
   const handleAddToCart = () => {
     if (disabled) return;
@@ -64,6 +66,19 @@ export default function AddToCartButton({
     };
     
     dispatch({ type: 'ADD_ITEM', item: cartItem });
+    
+    // Track add to cart event for analytics
+    try {
+      trackAddToCart(
+        product.id, // objectID
+        itemToAdd.price, // value
+        'USD', // currency
+        quantity // quantity
+      );
+    } catch (error) {
+      console.warn('Failed to track add to cart event:', error);
+    }
+    
     openMiniCart();
   };
 
