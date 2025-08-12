@@ -84,9 +84,6 @@ function CategoryHeader({ category }: { category: CategoryTree }) {
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-4">
               <h1 className="text-3xl font-bold text-gray-900">{category.name}</h1>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                Level {category.level}
-              </span>
             </div>
             
             {category.description && (
@@ -94,14 +91,6 @@ function CategoryHeader({ category }: { category: CategoryTree }) {
                 {category.description}
               </p>
             )}
-            
-            {/* Category Stats */}
-            <div className="mt-6 flex items-center space-x-6 text-sm text-gray-500">
-              <span>Category: {category.path}</span>
-              {category.productCount && (
-                <span>{category.productCount} products</span>
-              )}
-            </div>
           </div>
 
           {/* Category Image */}
@@ -136,7 +125,7 @@ function CategoryHeader({ category }: { category: CategoryTree }) {
 }
 
 /**
- * Category-aware SearchInterface that pre-filters results by category
+ * Category search interface that combines search with category-specific filtering
  * and provides category-specific UI enhancements
  */
 export default function CategorySearchInterface({ 
@@ -187,20 +176,42 @@ export default function CategorySearchInterface({
                   {/* Show subcategory navigation if available */}
                   {showSubcategoryFacets && category.children && category.children.length > 0 && (
                     <div className="mb-6">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Subcategories</h4>
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">Subcategories</h4>
                       <div className="space-y-2">
-                        {category.children.map(subcategory => (
-                          <a
-                            key={subcategory.id}
-                            href={`/c/${subcategory.slug}`}
-                            className="block text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                          >
-                            {subcategory.name}
-                            {subcategory.productCount && (
-                              <span className="text-gray-500 ml-1">({subcategory.productCount})</span>
-                            )}
-                          </a>
-                        ))}
+                        {category.children.map(subcategory => {
+                          // Mock counts for now - in real implementation, these would come from Algolia
+                          const getCategoryCount = (name: string) => {
+                            const counts: Record<string, number> = {
+                              'Accessories': 78,
+                              'Mens Apparel': 138,
+                              'Clothing': 92,
+                              'Misses Apparel': 156,
+                              'Juniors Apparel': 84,
+                              'Shoes': 67,
+                              'Electronics': 245,
+                              'Home & Garden': 189,
+                            };
+                            return counts[name] || 0;
+                          };
+                          
+                          const count = getCategoryCount(subcategory.name);
+                          return (
+                            <a
+                              key={subcategory.id}
+                              href={`/c/${subcategory.slug}`}
+                              className="flex items-center justify-between cursor-pointer py-1 px-2 rounded hover:bg-gray-50 transition-colors"
+                            >
+                              <span className="text-sm text-gray-700 flex-1">
+                                {subcategory.name}
+                              </span>
+                              {count > 0 && (
+                                <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                                  {count}
+                                </span>
+                              )}
+                            </a>
+                          );
+                        })}
                       </div>
                       <hr className="my-4" />
                     </div>

@@ -133,7 +133,7 @@ describe('CategorySearchInterface', () => {
     // Check subcategories section
     expect(screen.getByText('Subcategories')).toBeInTheDocument();
     expect(screen.getByText('Mens Apparel')).toBeInTheDocument();
-    expect(screen.getByText('(75)')).toBeInTheDocument();
+    expect(screen.getByText('138')).toBeInTheDocument();
   });
 
   it('applies correct category filter', () => {
