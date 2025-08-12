@@ -82,20 +82,18 @@ Home > Men > Mens Apparel > Casual Shirts
 /    /c/men  /c/men/mens-apparel  /c/men/mens-apparel/casual-shirts
 ```
 
-### 6. Backward Compatibility & Migration
+### 6. Simplified Route Structure
 
-**Old Route Redirect Logic (`/app/c/[slug]/page.tsx`):**
-- ✅ Detects categories available in backend service
-- ✅ Automatically redirects from old single-level URLs to new hierarchical URLs  
-- ✅ Falls back to old mock data for categories not yet in backend
-- ✅ Loading state during redirect process
-- ✅ Maintains existing functionality for legacy categories
+**Route Consolidation:**
+- ✅ **Single Route**: `[...slug]` handles all category URL patterns
+- ✅ **No Redundancy**: Removed old `[slug]` route that was no longer needed
+- ✅ **Automatic Compatibility**: New route handles both single and multi-level URLs seamlessly
+- ✅ **Clean Architecture**: One route, one responsibility
 
-**Migration Strategy:**
-```
-Old URL: /c/mens-apparel
-New URL: /c/men/mens-apparel (automatic redirect)
-```
+**Route Behavior:**
+- Single level: `/c/men` → `slug = ['men']` 
+- Two levels: `/c/men/mens-apparel` → `slug = ['men', 'mens-apparel']`
+- Three levels: `/c/men/mens-apparel/casual-shirts` → `slug = ['men', 'mens-apparel', 'casual-shirts']`
 
 ## 🔧 Technical Achievements
 
@@ -137,7 +135,12 @@ const category = findCategoryBySlugPath(slugPath, categories);
 ### Modified Files
 - ✅ `/app/components/HeaderCategoriesNavigation.tsx` - Updated URL generation
 - ✅ `/app/utils/breadcrumbs.ts` - Added CategoryTree breadcrumb support
-- ✅ `/app/c/[slug]/page.tsx` - Added redirect logic for backward compatibility
+
+### Removed Files
+- ✅ `/app/c/[slug]/` - **Removed entire directory** (old single-level route no longer needed)
+  - `/app/c/[slug]/page.tsx` - Redundant with new catch-all route
+  - `/app/c/[slug]/layout.tsx` - Functionality moved to new route
+  - `/app/c/[slug]/not-found.tsx` - Replaced with enhanced version
 
 ### No Breaking Changes
 - ✅ Existing old URLs continue to work via redirect

@@ -171,7 +171,7 @@ function getCategoryAlgoliaField(categoryPath: string): { field: string, value: 
 - `/app/utils/breadcrumbs.ts` - Update for new URL structure
 
 ### Removed Files
-- `/app/c/[slug]/page.tsx` - Replace with catch-all route
+- `/app/c/[slug]/` - **✅ REMOVED** - Old single-level route replaced by catch-all route
 
 ## Testing Strategy
 
