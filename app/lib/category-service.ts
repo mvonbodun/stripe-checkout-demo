@@ -109,7 +109,7 @@ export class CategoryService {
       name: node.name,
       slug: this.normalizeSlug(node.slug),
       level: Math.min(Math.max(node.level, 1), 3) as 1 | 2 | 3, // Ensure level is 1, 2, or 3
-      path: this.buildPath(node),
+      path: node.path || this.buildPath(node), // Use backend path or fallback to generated path
       active: true, // Default to active since backend doesn't provide this
       order: 0, // Default order
       status: Status.ACTIVE,

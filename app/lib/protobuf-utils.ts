@@ -39,6 +39,7 @@ export interface CategoryTreeNode {
   level: number;
   productCount: number;
   children: CategoryTreeNode[];
+  path: string;
 }
 
 export interface Status {
