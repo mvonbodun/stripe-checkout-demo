@@ -107,7 +107,7 @@ export class CategoryService {
     return {
       id: node.id,
       name: node.name,
-      slug: node.slug,
+      slug: this.normalizeSlug(node.slug),
       level: Math.min(Math.max(node.level, 1), 3) as 1 | 2 | 3, // Ensure level is 1, 2, or 3
       path: this.buildPath(node),
       active: true, // Default to active since backend doesn't provide this
@@ -132,6 +132,13 @@ export class CategoryService {
   private buildPath(node: CategoryTreeNode, ancestors: string[] = []): string {
     const currentPath = [...ancestors, node.name];
     return currentPath.join(' > ');
+  }
+
+  /**
+   * Normalize slug by removing leading slashes to prevent double slashes in URLs
+   */
+  private normalizeSlug(slug: string): string {
+    return slug.startsWith('/') ? slug.substring(1) : slug;
   }
 
   /**
