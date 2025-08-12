@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package catalog_messages;
+
+import "status.proto";
+import "category.proto";
+import "google/protobuf/timestamp.proto";
+
+message ProductCreateRequest {
+    string name = 1;
+    optional string long_description = 2;
+    optional string brand = 3;
+    optional string slug = 4;
+    string product_ref = 5; // Changed to mandatory string
+    optional string product_type = 6;
+    optional string seo_title = 7;
+    optional string seo_description = 8;
+    optional string seo_keywords = 9;
+    bool display_on_site = 10;
+    optional string tax_code = 11;
+    repeated string related_products = 12;
+    optional Reviews reviews = 13;
+    optional HierarchicalCategories hierarchical_categories = 14;
+    repeated string list_categories = 15;
+    map<string, string> defining_attributes = 16;
+    map<string, string> descriptive_attributes = 17;
+    optional string default_variant = 18;
+    repeated ProductVariant variants = 19;
+}
+
+message ProductCreateResponse {
+    optional Product product = 1;
+    Status status = 2;
+}
+
+message ProductGetRequest {
+    string id = 1;
+}
+
+message ProductGetResponse {
+    optional Product product = 1;
+    Status status = 2;
+}
+
+message ProductUpdateRequest {
+    string id = 1;
+    Product product = 2;
+}
+
+message ProductUpdateResponse {
+    optional Product product = 1;
+    Status status = 2;
+}
+
+message ProductDeleteRequest {
+    string id = 1;
+}
+
+message ProductDeleteResponse {
+    Status status = 1;
+}
+
+message ProductSearchRequest {
+    optional string query = 1;
+    repeated string categories = 2;
+    optional string brand = 3;
+    optional int32 limit = 4;
+    optional int32 offset = 5;
+}
+
+message ProductSearchResponse {
+    repeated Product products = 1;
+    int32 total_count = 2;
+    Status status = 3;
+}
+
+message ProductExportRequest {
+    optional int32 batch_size = 1;
+    optional int32 offset = 2;
+}
+
+message ProductExportResponse {
+    repeated Product products = 1;
+    int32 total_count = 2;
+    Status status = 3;
+}
+
+message Product {
+    optional string id = 1;
+    string name = 2;
+    optional string long_description = 3;
+    optional string brand = 4;
+    optional string slug = 5;
+    string product_ref = 6; // Changed to mandatory string
+    optional string product_type = 7;
+    optional string seo_title = 8;
+    optional string seo_description = 9;
+    optional string seo_keywords = 10;
+    bool display_on_site = 11;
+    optional string tax_code = 12;
+    repeated string related_products = 13;
+    optional Reviews reviews = 14;
+    optional HierarchicalCategories hierarchical_categories = 15;
+    repeated string list_categories = 16;
+    optional google.protobuf.Timestamp created_at = 17;
+    optional google.protobuf.Timestamp updated_at = 18;
+    optional string created_by = 19;
+    optional string updated_by = 20;
+    map<string, string> defining_attributes = 21;
+    map<string, string> descriptive_attributes = 22;
+    optional string default_variant = 23;
+    repeated ProductVariant variants = 24;
+}
+
+message Reviews {
+    float bayesian_avg = 1;
+    int32 count = 2;
+    int32 rating = 3;
+}
+
+message HierarchicalCategories {
+    optional string lvl0 = 1;
+    optional string lvl1 = 2;
+    optional string lvl2 = 3;
+}
+
+message ProductVariant {
+    string sku = 1;
+    map<string, string> defining_attributes = 2;
+    optional string abbreviated_color = 3;
+    optional string abbreviated_size = 4; // Added field from sample data
+    optional double height = 5; // Added dimension fields
+    optional double width = 6;
+    optional double length = 7;
+    optional double weight = 8;
+    optional string weight_unit = 9;
+    optional Packaging packaging = 10; // Added packaging information
+    repeated string image_urls = 11; // Changed from single image to array of URLs
+}
+
+message Packaging {
+    optional double height = 1;
+    optional double width = 2;
+    optional double length = 3;
+    optional double weight = 4;
+    optional string weight_unit = 5;
+}
+
+// Catalog Service Definition
+service CatalogService {
+    // Product methods
+    rpc CreateProduct(ProductCreateRequest) returns (ProductCreateResponse);
+    rpc GetProduct(ProductGetRequest) returns (ProductGetResponse);
+    rpc UpdateProduct(ProductUpdateRequest) returns (ProductUpdateResponse);
+    rpc DeleteProduct(ProductDeleteRequest) returns (ProductDeleteResponse);
+    rpc SearchProducts(ProductSearchRequest) returns (ProductSearchResponse);
+    rpc ExportProducts(ProductExportRequest) returns (ProductExportResponse);
+    
+    // Category methods  
+    rpc CreateCategory(CreateCategoryRequest) returns (CategoryResponse);
+    rpc GetCategory(GetCategoryRequest) returns (CategoryResponse);
+    rpc GetCategoryBySlug(GetCategoryBySlugRequest) returns (CategoryResponse);
+    rpc UpdateCategory(UpdateCategoryRequest) returns (CategoryResponse);
+    rpc DeleteCategory(DeleteCategoryRequest) returns (Status);
+    rpc GetCategoryTree(CategoryTreeRequest) returns (CategoryTreeResponse);
+    rpc GetCategoryPath(GetCategoryPathRequest) returns (CategoryPathResponse);
+    rpc GetChildren(GetChildrenRequest) returns (GetChildrenResponse);
+    rpc GetDescendants(GetDescendantsRequest) returns (GetDescendantsResponse);
+    rpc MoveCategory(MoveCategoryRequest) returns (Status);
+    rpc ExportCategories(CategoryExportRequest) returns (CategoryExportResponse);
+    rpc ImportCategories(CategoryImportRequest) returns (CategoryImportResponse);
+    rpc ReorderChildren(ReorderChildrenRequest) returns (Status);
+}

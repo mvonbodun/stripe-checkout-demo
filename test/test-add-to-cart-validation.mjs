@@ -3,7 +3,7 @@
  * Tests the core validation logic for different scenarios
  */
 
-import { validateAddToCartState, requiresAttributeSelection, getMissingAttributes } from './app/utils/addToCartValidation.ts';
+import { validateAddToCartState, requiresAttributeSelection, getMissingAttributes } from '../app/utils/addToCartValidation.ts';
 
 // Mock data for testing
 const mockProduct = {

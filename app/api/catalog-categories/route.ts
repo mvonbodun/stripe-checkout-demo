@@ -6,6 +6,7 @@ import {
   findCategoryById,
   findCategoryBySlug 
 } from '../../models/category';
+import { categoryService } from '../../lib/category-service';
 
 export async function GET(request: Request) {
   try {
@@ -15,6 +16,24 @@ export async function GET(request: Request) {
     const slug = searchParams.get('slug');
     const tree = searchParams.get('tree');
     const id = searchParams.get('id');
+    const health = searchParams.get('health');
+
+    // Health check for backend service
+    if (health === 'true') {
+      try {
+        const healthStatus = await categoryService.healthCheck();
+        return NextResponse.json(healthStatus);
+      } catch (error) {
+        return NextResponse.json(
+          { 
+            healthy: false, 
+            message: 'Health check failed',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          },
+          { status: 503 }
+        );
+      }
+    }
 
     // Get single category by ID
     if (id) {
@@ -36,8 +55,38 @@ export async function GET(request: Request) {
 
     // Get category tree
     if (tree === 'true') {
-      const categoryTree = getCategoryTree();
-      return NextResponse.json(categoryTree);
+      try {
+        // Extract query parameters for backend service
+        const maxDepth = searchParams.get('maxDepth');
+        const includeInactive = searchParams.get('includeInactive');
+        const rebuildCache = searchParams.get('rebuildCache');
+
+        const options = {
+          ...(maxDepth && { maxDepth: parseInt(maxDepth) }),
+          ...(includeInactive && { includeInactive: includeInactive === 'true' }),
+          ...(rebuildCache && { rebuildCache: rebuildCache === 'true' })
+        };
+
+        console.log('Fetching category tree from backend service with options:', options);
+        
+        const categoryTree = await categoryService.getCategoryTree(options);
+        
+        console.log(`Successfully retrieved ${categoryTree.length} top-level categories from backend`);
+        
+        return NextResponse.json(categoryTree);
+      } catch (error) {
+        console.error('Backend service failed, falling back to mock data:', error);
+        
+        // Fallback to mock data
+        const categoryTree = getCategoryTree();
+        
+        // Add a header to indicate fallback mode
+        const response = NextResponse.json(categoryTree);
+        response.headers.set('X-Data-Source', 'fallback-mock');
+        response.headers.set('X-Backend-Error', error instanceof Error ? error.message : 'Unknown error');
+        
+        return response;
+      }
     }
 
     // Get categories by level
