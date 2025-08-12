@@ -1,13 +1,14 @@
 'use client';
 
-import { use, useState } from 'react';
-import { notFound } from 'next/navigation';
+import { use, useState, useEffect } from 'react';
+import { notFound, redirect } from 'next/navigation';
 import Image from 'next/image';
-import { findCategoryBySlug, getAllCategories, getAllCategoryIdsInHierarchy } from '../../models/category';
+import { findCategoryBySlug, getAllCategories, getAllCategoryIdsInHierarchy, CategoryTree } from '../../models/category';
 import { getProductsByCategoryHierarchy } from '../../models/product';
 import Breadcrumb from '../../components/Breadcrumb';
 import { buildCategoryBreadcrumbs } from '../../utils/breadcrumbs';
 import ProductCard from '../../components/ProductCard';
+import { useCategories } from '../../categories-context';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -17,8 +18,52 @@ interface CategoryPageProps {
 
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = use(params);
-  const category = findCategoryBySlug(slug);
+  const { categories, buildCategoryUrl } = useCategories();
+  const [redirecting, setRedirecting] = useState(false);
   const [imageError, setImageError] = useState(false);
+  
+  // Try to find category in new backend service data first
+  useEffect(() => {
+    if (categories && categories.length > 0) {
+      // Try to find the category by slug in the new backend data
+      const findCategoryBySlugInTree = (categories: CategoryTree[], targetSlug: string): CategoryTree | null => {
+        for (const category of categories) {
+          if (category.slug === targetSlug) {
+            return category;
+          }
+          if (category.children) {
+            const found = findCategoryBySlugInTree(category.children, targetSlug);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      
+      const backendCategory = findCategoryBySlugInTree(categories, slug);
+      if (backendCategory) {
+        console.log('Redirecting from old URL to new hierarchical URL');
+        setRedirecting(true);
+        // Redirect to the new hierarchical URL
+        redirect(buildCategoryUrl(backendCategory));
+        return;
+      }
+    }
+  }, [categories, slug, buildCategoryUrl]);
+
+  // If redirecting, show loading state
+  if (redirecting) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to new URL...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback to old logic for categories not in backend service yet
+  const category = findCategoryBySlug(slug);
 
   if (!category) {
     notFound();

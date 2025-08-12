@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { CategoryTree } from "../models/category";
+import { useCategories } from "../categories-context";
 
 interface HeaderCategoriesNavigationProps {
   categories: CategoryTree[];
@@ -23,6 +24,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
   isLoading,
   className = "",
 }) => {
+  const { buildCategoryUrl } = useCategories();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -147,7 +149,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                 onMouseLeave={handleMouseLeave}
               >
                 <Link
-                  href={`/c/${category.slug}`}
+                  href={buildCategoryUrl(category)}
                   className={`
                     header-nav text-base font-medium text-gray-700 hover:text-blue-600 
                     transition-all duration-200 whitespace-nowrap py-4 px-3 
@@ -191,7 +193,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                       {activeCategory.children.map((level2Category) => (
                         <div key={level2Category.id} className="space-y-4">
                           <Link
-                            href={`/c/${level2Category.slug}`}
+                            href={buildCategoryUrl(level2Category)}
                             className="block text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
                             onClick={handleCategoryClick}
                             onBlur={handleBlur}
@@ -205,7 +207,7 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                               {level2Category.children.map((level3Category) => (
                                 <li key={level3Category.id}>
                                   <Link
-                                    href={`/c/${level3Category.slug}`}
+                                    href={buildCategoryUrl(level3Category)}
                                     className="block text-sm text-gray-600 hover:text-blue-600 transition-colors py-1"
                                     onClick={handleCategoryClick}
                                     onBlur={handleBlur}

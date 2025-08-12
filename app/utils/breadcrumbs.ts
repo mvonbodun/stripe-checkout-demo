@@ -1,5 +1,6 @@
-import { Category } from '../models/category';
+import { Category, CategoryTree } from '../models/category';
 import { BreadcrumbItem } from '../components/Breadcrumb';
+import { buildCategorySlugUrl } from './category-lookup';
 
 /**
  * Helper function to build breadcrumb items from category hierarchy
@@ -28,8 +29,47 @@ export function buildCategoryBreadcrumbs(
   hierarchy.forEach((cat, index) => {
     breadcrumbs.push({
       label: cat.name,
-      href: `/c/${cat.slug}`,
+      href: `/c/${cat.slug}`, // Keep old format for backward compatibility
       isActive: index === hierarchy.length - 1 // Only the current category is active
+    });
+  });
+
+  return breadcrumbs;
+}
+
+/**
+ * Helper function to build breadcrumb items from CategoryTree hierarchy  
+ * Used for new category pages with hierarchical URLs
+ */
+export function buildCategoryTreeBreadcrumbs(
+  category: CategoryTree
+): BreadcrumbItem[] {
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Home', href: '/', isActive: false }
+  ];
+
+  // Parse the category path to build breadcrumb hierarchy
+  const pathParts = category.path.split(' > ');
+  let currentPath = '';
+  
+  pathParts.forEach((part, index) => {
+    if (index > 0) {
+      currentPath += ' > ';
+    }
+    currentPath += part;
+    
+    // For intermediate levels, we need to find the category to get proper URL
+    // For now, we'll use a simplified approach
+    const isLast = index === pathParts.length - 1;
+    
+    breadcrumbs.push({
+      label: part,
+      href: isLast ? buildCategorySlugUrl(category) : buildCategorySlugUrl({
+        ...category,
+        path: currentPath,
+        name: part
+      } as CategoryTree),
+      isActive: isLast
     });
   });
 
