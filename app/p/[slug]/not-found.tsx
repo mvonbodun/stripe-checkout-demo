@@ -42,7 +42,7 @@ export default function ProductNotFound() {
           
           <div className="text-sm text-gray-500">
             or{' '}
-            <Link href="/c/electronics" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/search" className="text-blue-600 hover:text-blue-700 font-medium">
               browse all products
             </Link>
           </div>

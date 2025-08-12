@@ -64,13 +64,13 @@ function CategoryFilterHandler({ category }: { category: CategoryTree }) {
  * Category header component with breadcrumbs, title, and description
  */
 function CategoryHeader({ category }: { category: CategoryTree }) {
-  const { categories } = useCategories();
+  const { categories, buildCategoryUrl } = useCategories();
   const [imageError, setImageError] = useState(false);
   
-  // Generate breadcrumbs
+  // Generate breadcrumbs using proper hierarchical URLs
   const breadcrumbs = getCategoryBreadcrumbPath(category, categories).map(cat => ({
     label: cat.name,
-    href: `/c/${cat.slug}`
+    href: buildCategoryUrl(cat)
   }));
 
   return (
