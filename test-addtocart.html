@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add to Cart Test</title>
+</head>
+<body>
+    <h1>Testing Add to Cart Button State</h1>
+    
+    <script>
+        // Open the product page and test attribute selection
+        async function testAddToCart() {
+            console.log('Opening product page...');
+            
+            // Wait a moment for the page to load
+            setTimeout(() => {
+                console.log('Page should be loaded, check the browser for Add to Cart button state');
+                console.log('Try selecting color and size options to see if button becomes enabled');
+            }, 2000);
+        }
+        
+        testAddToCart();
+        
+        // Auto-refresh the product page
+        setTimeout(() => {
+            window.open('http://localhost:3000/p/a--byer-shutter-crochet-back-tank-top-p000220054', '_blank');
+        }, 1000);
+    </script>
+</body>
+</html>

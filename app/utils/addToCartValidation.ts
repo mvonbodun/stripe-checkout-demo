@@ -11,6 +11,24 @@ import { Product } from '../models/product';
 import { Item, findItemBySpecificationValues } from '../models/item';
 import { getAttributesForProduct } from './attributeHelpers';
 
+/**
+ * Helper function to find an item by specification values within a given array
+ * This is needed because findItemBySpecificationValues looks at mock data, 
+ * but we need to search within the actual items passed from backend
+ */
+function findItemBySpecificationValuesInArray(
+  items: Item[], 
+  specValues: Record<string, string>
+): Item | undefined {
+  return items.find(item => {
+    // Check if all provided specification values match this item
+    return Object.entries(specValues).every(([specName, specValue]) => {
+      const itemSpec = item.itemDefiningSpecificationValues.find(s => s.name === specName);
+      return itemSpec && itemSpec.value === specValue;
+    });
+  });
+}
+
 export interface AddToCartValidationResult {
   /** Whether the Add To Cart button should be enabled */
   isEnabled: boolean;
@@ -76,7 +94,17 @@ export function validateAddToCartState(
   }
 
   // All attributes selected - check if combination is valid
-  const selectedItem = findItemBySpecificationValues(product.id, selectedOptions);
+  const selectedItem = findItemBySpecificationValuesInArray(items, selectedOptions);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Add to Cart Validation Debug:', {
+      productId: product.id,
+      selectedOptions,
+      itemsCount: items.length,
+      selectedItem: selectedItem ? selectedItem.id : null,
+      isEnabled: !!selectedItem
+    });
+  }
 
   if (selectedItem) {
     return {
