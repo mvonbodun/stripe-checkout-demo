@@ -4,6 +4,11 @@ import { getRelatedProducts } from '../../models/product';
 import { getItemsByProduct } from '../../models/item';
 import { findCategoryById, getAllCategories } from '../../models/category';
 import { buildProductAttributeData } from '../../utils/productAttributeData';
+import { 
+  mapProductVariantsToItems, 
+  enhanceProductForAttributeSelection, 
+  debugDataMapping 
+} from '../../utils/dataMapping';
 import Breadcrumb from '../../components/Breadcrumb';
 import { buildProductBreadcrumbs } from '../../utils/breadcrumbs';
 import ProductImageGallery from '../../components/ProductImageGallery';
@@ -28,31 +33,41 @@ export default async function ProductPage({ params }: ProductPageProps) {
     console.log(`Loading product page for slug: ${slug}`);
     
     // Fetch product from backend service (with fallback to hardcoded data)
-    const product = await productService.getProductBySlug(slug, true); // Include variants
+    const productData = await productService.getProductBySlug(slug, true); // Include variants
 
-    if (!product) {
+    if (!productData) {
       console.log(`Product not found for slug: ${slug}`);
       notFound();
     }
 
-    console.log(`Successfully loaded product: ${product.name}`);
+    console.log(`Successfully loaded product: ${productData.name}`);
 
-    // For now, still use hardcoded functions for items, categories, and related products
+    // Enhanced data mapping for Phase 3: Convert backend data to Item format for AttributeSelector
+    const enhancedProduct = enhanceProductForAttributeSelection(productData as any);
+    const items = mapProductVariantsToItems(productData as any);
+    
+    // Debug the data mapping
+    if (process.env.NODE_ENV === 'development') {
+      debugDataMapping(productData as any, items);
+    }
+
+    console.log(`Mapped ${items.length} variants to items for attribute selection`);
+
+    // For now, still use hardcoded functions for categories and related products
     // These will be migrated in future phases as their backend services become available
-    const items = getItemsByProduct(product.id);
     const allCategories = getAllCategories();
-    const primaryCategory = findCategoryById(product.categoryId);
-    const relatedProducts = getRelatedProducts(product.id, product.categoryId);
+    const primaryCategory = findCategoryById(enhancedProduct.categoryId);
+    const relatedProducts = getRelatedProducts(enhancedProduct.id, enhancedProduct.categoryId);
 
-    // Phase 3: Pre-calculate attribute data at page level
-    const attributeData = buildProductAttributeData(product, items);
+    // Phase 3: Pre-calculate attribute data at page level using enhanced data
+    const attributeData = buildProductAttributeData(enhancedProduct, items);
 
     // Build breadcrumbs
     const breadcrumbItems = primaryCategory 
-      ? buildProductBreadcrumbs(product.name, product.slug, primaryCategory, allCategories)
+      ? buildProductBreadcrumbs(enhancedProduct.name, enhancedProduct.slug, primaryCategory, allCategories)
       : [
           { label: 'Home', href: '/', isActive: false },
-          { label: product.name, href: `/p/${product.slug}`, isActive: true }
+          { label: enhancedProduct.name, href: `/p/${enhancedProduct.slug}`, isActive: true }
         ];
 
     return (
@@ -65,17 +80,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="block lg:hidden">
             {/* Mobile Layout: Following specified order */}
             {/* 1. Brand, Product Name, Star Rating & Q&A */}
-            <ProductInfoMobile product={product} />
+            <ProductInfoMobile product={enhancedProduct} />
             
             {/* 2. Main Product Image */}
             <div className="mt-6">
-              <ProductImageGalleryMobile product={product} items={items} />
+              <ProductImageGalleryMobile product={enhancedProduct} items={items} />
             </div>
             
             {/* 3. Attributes, Quantity, Add to Cart, Trust Icons, SKU, Weight, Dimensions */}
             <div className="mt-6">
               <EnhancedProductInfoMobileBottom 
-                product={product} 
+                product={enhancedProduct} 
                 items={items} 
                 attributeData={attributeData}
               />
@@ -85,18 +100,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
           {/* Desktop Layout */}
           <div className="hidden lg:grid lg:grid-cols-2 gap-6 lg:gap-8 mt-4 sm:mt-6">
             {/* Left: Image Gallery */}
-            <ProductImageGallery product={product} items={items} />
+            <ProductImageGallery product={enhancedProduct} items={items} />
             
             {/* Right: Product Info */}
             <EnhancedProductInfo 
-              product={product} 
+              product={enhancedProduct} 
               items={items} 
               attributeData={attributeData}
             />
           </div>
           
           {/* Product Details Tabs */}
-          <ProductTabs product={product} />
+          <ProductTabs product={enhancedProduct} />
           
           {/* Related Products */}
           {relatedProducts.length > 0 && (
