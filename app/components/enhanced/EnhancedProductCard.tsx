@@ -100,7 +100,7 @@ export default function EnhancedProductCard({ hit, position, queryID }: Enhanced
         
         {/* Product Name with Highlighting */}
         <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
-          <Link href={hit.slug || `/p/${hit.objectID}`} onClick={handleProductClick}>
+          <Link href={hit.slug ? `/p/${hit.slug}` : `/p/${hit.objectID}`} onClick={handleProductClick}>
             <span aria-hidden="true" className="absolute inset-0" />
             <Highlight attribute="name" hit={hit} />
           </Link>

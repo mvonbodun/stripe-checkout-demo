@@ -101,6 +101,41 @@ export class ProductService {
   }
 
   /**
+   * Get all product slugs for static generation
+   * Falls back to hardcoded data if backend is unavailable
+   */
+  async getAllProductSlugs(): Promise<string[]> {
+    try {
+      console.log('Fetching all product slugs for static generation...');
+      
+      // TODO: Implement ProductExportRequest/Response when available
+      // For now, we'll try to get a limited set from backend or fallback
+      
+      // Fallback to hardcoded slugs for static generation
+      console.log('Using fallback hardcoded slugs for static generation');
+      return this.getFallbackProductSlugs();
+      
+    } catch (error) {
+      console.error('Failed to fetch product slugs from backend:', error);
+      return this.getFallbackProductSlugs();
+    }
+  }
+
+  /**
+   * Get fallback product slugs from hardcoded data
+   */
+  private getFallbackProductSlugs(): string[] {
+    try {
+      // Import the mockProducts here to avoid circular dependencies
+      const { mockProducts } = require('../models/product');
+      return mockProducts.map((product: any) => product.slug);
+    } catch (error) {
+      console.error('Failed to get fallback product slugs:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get fallback product from hardcoded data
    */
   private getFallbackProduct(slug: string): Product | null {

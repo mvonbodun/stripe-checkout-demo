@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { findProductBySlug, getRelatedProducts } from '../../models/product';
+import { productService } from '../../lib/product-service';
+import { getRelatedProducts } from '../../models/product';
 import { getItemsByProduct } from '../../models/item';
 import { findCategoryById, getAllCategories } from '../../models/category';
 import { buildProductAttributeData } from '../../utils/productAttributeData';
@@ -22,81 +23,95 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = findProductBySlug(slug);
+  
+  try {
+    console.log(`Loading product page for slug: ${slug}`);
+    
+    // Fetch product from backend service (with fallback to hardcoded data)
+    const product = await productService.getProductBySlug(slug, true); // Include variants
 
-  if (!product) {
-    notFound();
-  }
+    if (!product) {
+      console.log(`Product not found for slug: ${slug}`);
+      notFound();
+    }
 
-  // Load items data for the product
-  const items = getItemsByProduct(product.id);
+    console.log(`Successfully loaded product: ${product.name}`);
 
-  // Phase 3: Pre-calculate attribute data at page level
-  const attributeData = buildProductAttributeData(product, items);
+    // For now, still use hardcoded functions for items, categories, and related products
+    // These will be migrated in future phases as their backend services become available
+    const items = getItemsByProduct(product.id);
+    const allCategories = getAllCategories();
+    const primaryCategory = findCategoryById(product.categoryId);
+    const relatedProducts = getRelatedProducts(product.id, product.categoryId);
 
-  // Get category and breadcrumb data
-  const allCategories = getAllCategories();
-  const primaryCategory = findCategoryById(product.categoryId);
-  const relatedProducts = getRelatedProducts(product.id, product.categoryId);
+    // Phase 3: Pre-calculate attribute data at page level
+    const attributeData = buildProductAttributeData(product, items);
 
-  // Build breadcrumbs
-  const breadcrumbItems = primaryCategory 
-    ? buildProductBreadcrumbs(product.name, product.slug, primaryCategory, allCategories)
-    : [
-        { label: 'Home', href: '/', isActive: false },
-        { label: product.name, href: `/p/${product.slug}`, isActive: true }
-      ];
+    // Build breadcrumbs
+    const breadcrumbItems = primaryCategory 
+      ? buildProductBreadcrumbs(product.name, product.slug, primaryCategory, allCategories)
+      : [
+          { label: 'Home', href: '/', isActive: false },
+          { label: product.name, href: `/p/${product.slug}`, isActive: true }
+        ];
 
-  return (
-    <ProductPageProvider>
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
-        {/* Breadcrumbs */}
-        <Breadcrumb items={breadcrumbItems} className="mb-4 sm:mb-6" />
-        
-        {/* Mobile-First Layout */}
-        <div className="block lg:hidden">
-          {/* Mobile Layout: Following specified order */}
-          {/* 1. Brand, Product Name, Star Rating & Q&A */}
-          <ProductInfoMobile product={product} />
+    return (
+      <ProductPageProvider>
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+          {/* Breadcrumbs */}
+          <Breadcrumb items={breadcrumbItems} className="mb-4 sm:mb-6" />
           
-          {/* 2. Main Product Image */}
-          <div className="mt-6">
-            <ProductImageGalleryMobile product={product} items={items} />
+          {/* Mobile-First Layout */}
+          <div className="block lg:hidden">
+            {/* Mobile Layout: Following specified order */}
+            {/* 1. Brand, Product Name, Star Rating & Q&A */}
+            <ProductInfoMobile product={product} />
+            
+            {/* 2. Main Product Image */}
+            <div className="mt-6">
+              <ProductImageGalleryMobile product={product} items={items} />
+            </div>
+            
+            {/* 3. Attributes, Quantity, Add to Cart, Trust Icons, SKU, Weight, Dimensions */}
+            <div className="mt-6">
+              <EnhancedProductInfoMobileBottom 
+                product={product} 
+                items={items} 
+                attributeData={attributeData}
+              />
+            </div>
           </div>
           
-          {/* 3. Attributes, Quantity, Add to Cart, Trust Icons, SKU, Weight, Dimensions */}
-          <div className="mt-6">
-            <EnhancedProductInfoMobileBottom 
+          {/* Desktop Layout */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-6 lg:gap-8 mt-4 sm:mt-6">
+            {/* Left: Image Gallery */}
+            <ProductImageGallery product={product} items={items} />
+            
+            {/* Right: Product Info */}
+            <EnhancedProductInfo 
               product={product} 
               items={items} 
               attributeData={attributeData}
             />
           </div>
-        </div>
-        
-        {/* Desktop Layout */}
-        <div className="hidden lg:grid lg:grid-cols-2 gap-6 lg:gap-8 mt-4 sm:mt-6">
-          {/* Left: Image Gallery */}
-          <ProductImageGallery product={product} items={items} />
           
-          {/* Right: Product Info */}
-          <EnhancedProductInfo 
-            product={product} 
-            items={items} 
-            attributeData={attributeData}
-          />
+          {/* Product Details Tabs */}
+          <ProductTabs product={product} />
+          
+          {/* Related Products */}
+          {relatedProducts.length > 0 && (
+            <div className="mt-12 sm:mt-16">
+              <RelatedProducts products={relatedProducts} />
+            </div>
+          )}
         </div>
-        
-        {/* Product Details Tabs */}
-        <ProductTabs product={product} />
-        
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-12 sm:mt-16">
-            <RelatedProducts products={relatedProducts} />
-          </div>
-        )}
-      </div>
-    </ProductPageProvider>
-  );
+      </ProductPageProvider>
+    );
+  } catch (error) {
+    console.error(`Error loading product page for slug ${slug}:`, error);
+    notFound();
+  }
 }
+
+// Enable Incremental Static Regeneration
+export const revalidate = 3600; // Revalidate every hour
