@@ -1,24 +1,24 @@
 /**
- * Protocol Buffer utilities for category service
- * Handles encoding/decoding of protobuf messages
+ * Protocol Buffer utilities for catalog service
+ * Handles encoding/decoding of protobuf messages for categories and products
  */
 
 import * as protobuf from 'protobufjs';
 import path from 'path';
 
 // Load protocol buffer definitions
-let categoryRoot: protobuf.Root | null = null;
+let catalogRoot: protobuf.Root | null = null;
 
 async function loadProtoDefinitions(): Promise<protobuf.Root> {
-  if (categoryRoot) {
-    return categoryRoot;
+  if (catalogRoot) {
+    return catalogRoot;
   }
 
   try {
-    // Load the category.proto file
-    const protoPath = path.join(process.cwd(), 'proto', 'category.proto');
-    categoryRoot = await protobuf.load(protoPath);
-    return categoryRoot;
+    // Load the catalog.proto file (includes both category and product definitions)
+    const protoPath = path.join(process.cwd(), 'proto', 'catalog.proto');
+    catalogRoot = await protobuf.load(protoPath);
+    return catalogRoot;
   } catch (error) {
     console.error('Failed to load protobuf definitions:', error);
     throw new Error('Unable to load protocol buffer definitions');
@@ -26,6 +26,8 @@ async function loadProtoDefinitions(): Promise<protobuf.Root> {
 }
 
 // TypeScript interfaces matching protobuf messages
+
+// Category interfaces
 export interface CategoryTreeRequest {
   maxDepth?: number;
   includeInactive?: boolean;
@@ -42,15 +44,87 @@ export interface CategoryTreeNode {
   path: string;
 }
 
+export interface CategoryTreeResponse {
+  tree: CategoryTreeNode[];
+  status: Status;
+}
+
+// Product interfaces
+export interface ProductGetBySlugRequest {
+  slug: string;
+}
+
+export interface ProductGetBySlugResponse {
+  product?: Product;
+  status: Status;
+}
+
+export interface Product {
+  id?: string;
+  name: string;
+  longDescription?: string;
+  brand?: string;
+  slug?: string;
+  productRef: string;
+  productType?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  displayOnSite: boolean;
+  taxCode?: string;
+  relatedProducts: string[];
+  reviews?: Reviews;
+  hierarchicalCategories?: HierarchicalCategories;
+  listCategories: string[];
+  createdAt?: any;
+  updatedAt?: any;
+  createdBy?: string;
+  updatedBy?: string;
+  definingAttributes: { [key: string]: string };
+  descriptiveAttributes: { [key: string]: string };
+  defaultVariant?: string;
+  variants: ProductVariant[];
+}
+
+export interface ProductVariant {
+  sku: string;
+  definingAttributes: { [key: string]: string };
+  abbreviatedColor?: string;
+  abbreviatedSize?: string;
+  height?: number;
+  width?: number;
+  length?: number;
+  weight?: number;
+  weightUnit?: string;
+  packaging?: Packaging;
+  imageUrls: string[];
+}
+
+export interface Reviews {
+  bayesianAvg: number;
+  count: number;
+  rating: number;
+}
+
+export interface HierarchicalCategories {
+  lvl0?: string;
+  lvl1?: string;
+  lvl2?: string;
+}
+
+export interface Packaging {
+  height?: number;
+  width?: number;
+  length?: number;
+  weight?: number;
+  weightUnit?: string;
+}
+
+// Common interfaces
 export interface Status {
   code: number;
   message: string;
   details?: any[];
-}
-
-export interface CategoryTreeResponse {
-  tree: CategoryTreeNode[];
-  status: Status;
 }
 
 // Utility functions for encoding/decoding
@@ -124,5 +198,54 @@ export class ProtobufUtils {
       includeInactive: false,
       rebuildCache: false
     };
+  }
+
+  /**
+   * Encode ProductGetBySlugRequest to protobuf
+   */
+  static async encodeProductGetBySlugRequest(request: ProductGetBySlugRequest): Promise<Uint8Array> {
+    try {
+      const root = await this.getRoot();
+      const ProductGetBySlugRequestType = root.lookupType('catalog_messages.ProductGetBySlugRequest');
+      
+      // Create message instance
+      const message = ProductGetBySlugRequestType.create({
+        slug: request.slug
+      });
+
+      // Encode to buffer
+      return ProductGetBySlugRequestType.encode(message).finish();
+    } catch (error) {
+      console.error('Failed to encode ProductGetBySlugRequest:', error);
+      throw new Error('Failed to encode protobuf message');
+    }
+  }
+
+  /**
+   * Decode ProductGetBySlugResponse from protobuf
+   */
+  static async decodeProductGetBySlugResponse(buffer: Uint8Array): Promise<ProductGetBySlugResponse> {
+    try {
+      const root = await this.getRoot();
+      const ProductGetBySlugResponseType = root.lookupType('catalog_messages.ProductGetBySlugResponse');
+      
+      // Decode the buffer
+      const message = ProductGetBySlugResponseType.decode(buffer);
+      
+      // Convert to plain object and return
+      const plainObject = ProductGetBySlugResponseType.toObject(message, {
+        longs: String,
+        enums: String,
+        bytes: String,
+        defaults: true,
+        arrays: true,
+        objects: true
+      });
+
+      return plainObject as ProductGetBySlugResponse;
+    } catch (error) {
+      console.error('Failed to decode ProductGetBySlugResponse:', error);
+      throw new Error('Failed to decode protobuf message');
+    }
   }
 }

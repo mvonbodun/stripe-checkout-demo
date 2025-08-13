@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProductBySlug } from '../../../../models/product';
-import { getItemsByProduct } from '../../../../models/item';
+import { productService } from '../../../../lib/product-service';
 
 export async function GET(
   request: Request,
@@ -11,27 +10,23 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const includeVariants = searchParams.get('includeVariants') === 'true';
 
-    const product = getProductBySlug(slug);
+    console.log(`API: Fetching product by slug: ${slug}, includeVariants: ${includeVariants}`);
+
+    const product = await productService.getProductBySlug(slug, includeVariants);
     
     if (!product) {
+      console.log(`API: Product not found for slug: ${slug}`);
       return NextResponse.json(
         { error: 'Product not found' },
         { status: 404 }
       );
     }
 
-    // If variants are requested, include them
-    if (includeVariants) {
-      const variants = getItemsByProduct(product.id);
-      return NextResponse.json({
-        ...product,
-        variants
-      });
-    }
-
+    console.log(`API: Successfully fetched product: ${product.name}`);
     return NextResponse.json(product);
+
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('API: Error fetching product:', error);
     return NextResponse.json(
       { error: 'Failed to fetch product' },
       { status: 500 }
