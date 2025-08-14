@@ -134,7 +134,7 @@ export default function EnhancedProductCard({ hit, position, queryID }: Enhanced
         
         {/* Price - moved to appear just below product name */}
         {typeof price === 'number' && (
-          <p className="text-lg font-bold text-gray-900">${'{'}price.toFixed(2){'}'}</p>
+          <p className="text-lg font-bold text-gray-900">${price.toFixed(2)}</p>
         )}
         
         {/* Color if available */}
