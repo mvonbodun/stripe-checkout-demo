@@ -1,11 +1,15 @@
 import './globals.css';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import ClientLayout from './components/ClientLayout';
 
 export const metadata: Metadata = {
   title: 'Stripe Checkout Demo',
   description: 'A modern e-commerce demo built with Next.js, Stripe, and Tailwind CSS',
-  viewport: 'width=device-width, initial-scale=1',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
