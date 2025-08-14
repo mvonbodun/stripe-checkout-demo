@@ -127,8 +127,9 @@ export default function AutocompleteSearch({
 
   // Clear search input when navigating away from search-related pages
   useEffect(() => {
-    // Only clear if there's a search query and we're not on a search-related page
-    if (instantSearchUiState.query && !pathname.startsWith('/search') && !pathname.startsWith('/c/')) {
+    // Only preserve search on the search results page (/search)
+    // Clear search everywhere else including category pages (/c/), home (/), product pages (/p/), etc.
+    if (instantSearchUiState.query && !pathname.startsWith('/search')) {
       setInstantSearchUiState({ query: '' });
       
       // Also update the autocomplete input directly if instance exists
