@@ -14,6 +14,7 @@ import {
 import { Product, ProductVariant } from '../models/product';
 import { Status } from '../models/common';
 import { getProductBySlug as getHardcodedProduct } from '../models/product';
+import { InventoryService } from './inventory-service';
 
 export class ProductService {
   private static instance: ProductService | null = null;
@@ -35,8 +36,12 @@ export class ProductService {
   /**
    * Get product by slug from backend service
    */
-  async getProductBySlug(slug: string, includeVariants: boolean = false): Promise<Product | null> {
-    const cacheKey = `${slug}_${includeVariants}`;
+  async getProductBySlug(
+    slug: string, 
+    includeVariants: boolean = false, 
+    includeInventory: boolean = false
+  ): Promise<Product | null> {
+    const cacheKey = `${slug}_${includeVariants}_${includeInventory}`;
     
     // Check cache first
     const cached = this.cache.get(cacheKey);
@@ -75,7 +80,12 @@ export class ProductService {
       }
 
       // Transform to frontend Product format
-      const product = this.transformToProduct(response.product, includeVariants);
+      let product = this.transformToProduct(response.product, includeVariants);
+
+      // Integrate inventory data if requested
+      if (includeInventory && product) {
+        product = await this.integrateInventoryData(product);
+      }
 
       // Cache the result
       this.cache.set(cacheKey, {
@@ -354,6 +364,74 @@ export class ProductService {
       required: true,
       order: 0
     }));
+  }
+
+  /**
+   * Integrate inventory data into product and variants
+   */
+  private async integrateInventoryData(product: Product): Promise<Product> {
+    try {
+      const inventoryService = InventoryService.getInstance();
+      
+      // Collect all SKUs from the product and its variants
+      const skus: string[] = [];
+      
+      // Check if this product has variants (ProductWithVariants type)
+      const productWithVariants = product as Product & { variants?: ProductVariant[] };
+      if (productWithVariants.variants && Array.isArray(productWithVariants.variants)) {
+        productWithVariants.variants.forEach((variant: ProductVariant) => {
+          if (variant.sku) {
+            skus.push(variant.sku);
+          }
+        });
+      }
+
+      if (skus.length === 0) {
+        console.log(`No SKUs found for product ${product.slug}, skipping inventory integration`);
+        return product;
+      }
+
+      // Get inventory data for all SKUs
+      const inventoryData = await inventoryService.getInventoryBySKUs(skus);
+
+      // Update variants with inventory data if variants exist
+      if (productWithVariants.variants && Array.isArray(productWithVariants.variants)) {
+        productWithVariants.variants = productWithVariants.variants.map((variant: ProductVariant) => {
+          const inventoryInfo = inventoryData.get(variant.sku);
+          if (inventoryInfo) {
+            return {
+              ...variant,
+              inventoryQuantity: inventoryInfo.totalQuantity,
+              inventoryTracking: inventoryInfo.totalQuantity > 0
+            };
+          }
+          return variant;
+        });
+
+        // Calculate product-level inventory aggregates
+        const totalInventory = productWithVariants.variants.reduce((sum: number, variant: ProductVariant) => 
+          sum + (variant.inventoryQuantity || 0), 0
+        );
+        
+        const inStock = productWithVariants.variants.some((variant: ProductVariant) => 
+          (variant.inventoryQuantity || 0) > 0
+        );
+
+        // Update product with calculated inventory data
+        return {
+          ...product,
+          totalInventory,
+          inStock
+        };
+      }
+
+      return product;
+
+    } catch (error) {
+      console.error('Failed to integrate inventory data:', error);
+      // Return product without inventory data if integration fails
+      return product;
+    }
   }
 
   /**

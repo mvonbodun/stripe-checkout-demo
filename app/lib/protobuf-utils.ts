@@ -8,6 +8,7 @@ import path from 'path';
 
 // Load protocol buffer definitions
 let catalogRoot: protobuf.Root | null = null;
+let inventoryRoot: protobuf.Root | null = null;
 
 async function loadProtoDefinitions(): Promise<protobuf.Root> {
   if (catalogRoot) {
@@ -22,6 +23,22 @@ async function loadProtoDefinitions(): Promise<protobuf.Root> {
   } catch (error) {
     console.error('Failed to load protobuf definitions:', error);
     throw new Error('Unable to load protocol buffer definitions');
+  }
+}
+
+async function loadInventoryProtoDefinitions(): Promise<protobuf.Root> {
+  if (inventoryRoot) {
+    return inventoryRoot;
+  }
+
+  try {
+    // Load the inventory.proto file
+    const protoPath = path.join(process.cwd(), 'proto', 'inventory', 'inventory.proto');
+    inventoryRoot = await protobuf.load(protoPath);
+    return inventoryRoot;
+  } catch (error) {
+    console.error('Failed to load inventory protobuf definitions:', error);
+    throw new Error('Unable to load inventory protocol buffer definitions');
   }
 }
 
@@ -245,6 +262,50 @@ export class ProtobufUtils {
       return plainObject as ProductGetBySlugResponse;
     } catch (error) {
       console.error('Failed to decode ProductGetBySlugResponse:', error);
+      throw new Error('Failed to decode protobuf message');
+    }
+  }
+
+  /**
+   * Encode InventoryGetAllLocationsBySkuRequest to protobuf
+   */
+  static async encodeInventoryGetAllLocationsBySkuRequest(requestData: {
+    skus: string[];
+  }): Promise<Uint8Array> {
+    try {
+      const root = await loadInventoryProtoDefinitions();
+      const RequestType = root.lookupType('inventory.InventoryGetAllLocationsBySkuRequest');
+      
+      const message = RequestType.create(requestData);
+      return RequestType.encode(message).finish();
+    } catch (error) {
+      console.error('Failed to encode InventoryGetAllLocationsBySkuRequest:', error);
+      throw new Error('Failed to encode protobuf message');
+    }
+  }
+
+  /**
+   * Decode InventoryGetAllLocationsBySkuResponse from protobuf
+   */
+  static async decodeInventoryGetAllLocationsBySkuResponse(buffer: Uint8Array): Promise<unknown> {
+    try {
+      const root = await loadInventoryProtoDefinitions();
+      const ResponseType = root.lookupType('inventory.InventoryGetAllLocationsBySkuResponse');
+      
+      // Decode the buffer
+      const message = ResponseType.decode(buffer);
+      
+      // Convert to plain object and return
+      return ResponseType.toObject(message, {
+        longs: String,
+        enums: String,
+        bytes: String,
+        defaults: true,
+        arrays: true,
+        objects: true
+      });
+    } catch (error) {
+      console.error('Failed to decode InventoryGetAllLocationsBySkuResponse:', error);
       throw new Error('Failed to decode protobuf message');
     }
   }
