@@ -387,7 +387,7 @@ export default function AutocompleteSearch({
     autocompleteInstanceRef.current = autocomplete<ProductSuggestion | CategorySuggestion>({
       container: autocompleteContainer.current!,
       placeholder,
-      initialState: { query },
+      initialState: { query: '' },
       openOnFocus: true,
       detachedMediaQuery: 'none', // Keep attached on all devices
       getSources(): Array<AutocompleteSource<ProductSuggestion | CategorySuggestion>> {
@@ -426,7 +426,7 @@ export default function AutocompleteSearch({
         panelRootRef.current = null;
       }
     };
-  }, [searchClient, indexName, querySuggestionsIndexName, router, placeholder, query]);
+  }, [searchClient, indexName, querySuggestionsIndexName, router, placeholder]);
 
   if (!searchClient) {
     // Fallback to basic search input if Algolia is not available
