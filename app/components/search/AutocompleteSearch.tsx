@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import type { Root } from 'react-dom/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useSearchBox, usePagination } from 'react-instantsearch';
 import { autocomplete } from '@algolia/autocomplete-js';
 import type { AutocompleteSource, AutocompleteApi } from '@algolia/autocomplete-js';
@@ -73,6 +73,7 @@ export default function AutocompleteSearch({
   const panelRootRef = useRef<Root | null>(null);
   const autocompleteInstanceRef = useRef<AutocompleteApi<ProductSuggestion | CategorySuggestion> | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   const { query, refine: setQuery } = useSearchBox();
   const { refine: setPage } = usePagination();
@@ -123,6 +124,20 @@ export default function AutocompleteSearch({
       router.push(`/c/${item.slug}`);
     };
   }, [router]);
+
+  // Clear search input when navigating away from search-related pages
+  useEffect(() => {
+    // Only clear if there's a search query and we're not on a search-related page
+    if (instantSearchUiState.query && !pathname.startsWith('/search') && !pathname.startsWith('/c/')) {
+      setInstantSearchUiState({ query: '' });
+      
+      // Also update the autocomplete input directly if instance exists
+      if (autocompleteInstanceRef.current) {
+        autocompleteInstanceRef.current.setQuery('');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]); // Intentionally excluding instantSearchUiState.query to avoid clearing on every keystroke
 
   useEffect(() => {
     setQuery(instantSearchUiState.query);
