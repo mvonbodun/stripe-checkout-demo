@@ -2,11 +2,18 @@
 
 import React, { useEffect, useState } from 'react';
 
+interface DebugInfo {
+  appId?: string;
+  searchKey: 'present' | 'missing';
+  nodeEnv?: string;
+  browserContext: boolean;
+}
+
 export default function AlgoliaDebugPage() {
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
 
   useEffect(() => {
-    const info = {
+    const info: DebugInfo = {
       appId: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
       searchKey: process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY ? 'present' : 'missing',
       nodeEnv: process.env.NODE_ENV,

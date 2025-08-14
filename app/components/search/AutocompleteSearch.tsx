@@ -1,12 +1,11 @@
 'use client';
 
-import React, { createElement, Fragment, useEffect, useRef, useState, useMemo } from 'react';
-import { createRoot, Root } from 'react-dom/client';
+import React, { Fragment, useEffect, useRef, useState, useMemo } from 'react';
+import type { Root } from 'react-dom/client';
 import { useRouter } from 'next/navigation';
 import { useSearchBox, usePagination } from 'react-instantsearch';
 import { autocomplete } from '@algolia/autocomplete-js';
-// import { AutocompleteOptions } from '@algolia/autocomplete-js';
-// import { BaseItem } from '@algolia/autocomplete-core';
+import type { AutocompleteSource, AutocompleteApi } from '@algolia/autocomplete-js';
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches';
 import { createQuerySuggestionsPlugin } from '@algolia/autocomplete-plugin-query-suggestions';
 import { createSearchClient } from '../../lib/algolia';
@@ -49,6 +48,7 @@ interface ProductSuggestion {
   image?: string;
   price?: number;
   category?: string[];
+  [key: string]: unknown;
 }
 
 interface QuerySuggestion {
@@ -64,6 +64,7 @@ interface CategorySuggestion {
   slug: string;
   level: number;
   parent?: string;
+  [key: string]: unknown;
 }
 
 export default function AutocompleteSearch({ 
@@ -72,9 +73,7 @@ export default function AutocompleteSearch({
 }: AutocompleteSearchProps) {
   const autocompleteContainer = useRef<HTMLDivElement>(null);
   const panelRootRef = useRef<Root | null>(null);
-  const rootRef = useRef<HTMLElement | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const autocompleteInstanceRef = useRef<any>(null);
+  const autocompleteInstanceRef = useRef<AutocompleteApi<ProductSuggestion | CategorySuggestion> | null>(null);
   const router = useRouter();
 
   const { query, refine: setQuery } = useSearchBox();
@@ -88,7 +87,6 @@ export default function AutocompleteSearch({
   const querySuggestionsIndexName = process.env.NEXT_PUBLIC_ALGOLIA_QUERY_SUGGESTIONS_INDEX;
 
   // Use refs for callbacks to avoid dependency changes
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleRecentSearchSelectRef = useRef((item: { label: string }) => {
     setInstantSearchUiState({ query: item.label });
     router.push(`/search?query=${encodeURIComponent(item.label)}`);
@@ -252,7 +250,7 @@ export default function AutocompleteSearch({
     }
 
     // Create sources once
-    const productSource = {
+    const productSource: AutocompleteSource<ProductSuggestion> = {
       sourceId: 'products',
       getItems({ query }: { query: string }) {
         if (!query) return [];
@@ -267,13 +265,20 @@ export default function AutocompleteSearch({
         }]).then(({ results }) => {
           const searchResult = results[0] as unknown;
           const hits = (searchResult as SearchResult)?.hits || [];
-          return hits.map((hit: SearchHit) => ({
-            ...hit,
-            // Extract first image URL from variants
-            image: hit.variants?.[0]?.image_urls?.[0] || null,
-            // Extract first price from variants  
-            price: hit.variants?.[0]?.price?.amount || null,
-          }));
+          return hits.map((hit: SearchHit) => {
+            const brandVal = (hit as Record<string, unknown>).brand;
+            const categoryVal = (hit as Record<string, unknown>).category;
+            const amount = hit.variants?.[0]?.price?.amount;
+            const imageUrl = hit.variants?.[0]?.image_urls?.[0];
+            return {
+              objectID: hit.objectID || '',
+              name: hit.name || '',
+              brand: typeof brandVal === 'string' ? brandVal : undefined,
+              image: typeof imageUrl === 'string' ? imageUrl : undefined,
+              price: typeof amount === 'number' ? amount : undefined,
+              category: Array.isArray(categoryVal) ? (categoryVal as string[]) : undefined,
+            } as ProductSuggestion;
+          });
         }).catch(() => []);
       },
       templates: {
@@ -340,9 +345,9 @@ export default function AutocompleteSearch({
                       by {item.brand}
                     </div>
                   )}
-                  {item.price && (
+                  {typeof item.price === 'number' && (
                     <div className="aa-ItemContentDescription text-sm font-semibold text-green-600 mt-1">
-                      ${item.price.toFixed(2)}
+                      ${'{'}item.price.toFixed(2){'}'}
                     </div>
                   )}
                 </div>
@@ -357,12 +362,12 @@ export default function AutocompleteSearch({
     };
 
     // Create category suggestions source
-    const categorySource = {
+    const categorySource: AutocompleteSource<CategorySuggestion> = {
       sourceId: 'categories',
       getItems({ query }: { query: string }) {
         if (!query) return [];
         
-        return searchClient.search([{
+        return searchClient.search([{ 
           indexName,
           query,
           params: {
@@ -377,12 +382,12 @@ export default function AutocompleteSearch({
           return hits
             .filter((hit: SearchHit) => hit.level && hit.slug)
             .map((hit: SearchHit) => ({
-              objectID: hit.objectID,
-              name: hit.name,
-              slug: hit.slug,
-              level: hit.level,
-              parent: hit.category?.[0] || null,
-            }));
+              objectID: hit.objectID || '',
+              name: hit.name || '',
+              slug: hit.slug || '',
+              level: hit.level || 0,
+              parent: hit.category?.[0] || undefined,
+            } as CategorySuggestion));
         }).catch(() => []);
       },
       templates: {
@@ -399,16 +404,12 @@ export default function AutocompleteSearch({
             <div className="aa-ItemWrapper">
               <div className="aa-ItemContent">
                 <div className="aa-ItemIcon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M4 4h16v16H4z"></path>
-                    <path d="M4 4l16 16"></path>
-                    <path d="M20 4l-16 16"></path>
-                  </svg>
+                  {/* icon */}
                 </div>
                 <div className="aa-ItemContentBody">
                   <div className="aa-ItemContentTitle">{item.name}</div>
                   <div className="aa-ItemContentDescription text-xs text-gray-500">
-                    Category {item.parent && `in ${item.parent}`}
+                    Category {item.parent && `in ${'${'}item.parent{'}'}`}
                   </div>
                 </div>
               </div>
@@ -421,15 +422,17 @@ export default function AutocompleteSearch({
       },
     };
 
-    autocompleteInstanceRef.current = autocomplete({
-      container: autocompleteContainer.current,
+    autocompleteInstanceRef.current = autocomplete<ProductSuggestion | CategorySuggestion>({
+      container: autocompleteContainer.current!,
       placeholder,
       initialState: { query },
       openOnFocus: true,
       detachedMediaQuery: 'none', // Keep attached on all devices
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getSources() {
-        return [productSource, categorySource];
+      getSources(): Array<AutocompleteSource<ProductSuggestion | CategorySuggestion>> {
+        return [
+          productSource as AutocompleteSource<ProductSuggestion | CategorySuggestion>,
+          categorySource as AutocompleteSource<ProductSuggestion | CategorySuggestion>,
+        ];
       },
       plugins: querySuggestionsPlugin 
         ? [recentSearchesPlugin, querySuggestionsPlugin]
@@ -448,20 +451,7 @@ export default function AutocompleteSearch({
         if (prevState.query !== state.query) {
           setInstantSearchUiState({ query: state.query });
         }
-      },
-      renderer: { createElement, Fragment, render: () => {} },
-      render({ children }, root) {
-        if (!panelRootRef.current || rootRef.current !== root) {
-          rootRef.current = root;
-          
-          // Safely unmount the previous root
-          if (panelRootRef.current) {
-            panelRootRef.current.unmount();
-          }
-          panelRootRef.current = createRoot(root);
-        }
-        panelRootRef.current.render(children);
-      },
+      }
     });
 
     return () => {

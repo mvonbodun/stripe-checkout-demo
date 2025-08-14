@@ -6,9 +6,9 @@ import {
   HierarchicalMenu, 
   // CurrentRefinements,
   ClearRefinements,
-  useHierarchicalMenu,
-  useStats,
-  useHits,
+  // useHierarchicalMenu,
+  // useStats,
+  // useHits,
   useRange,
   useConnector,
   useCurrentRefinements
@@ -16,125 +16,6 @@ import {
 import connectRatingMenu from 'instantsearch.js/es/connectors/rating-menu/connectRatingMenu';
 import * as Slider from '@radix-ui/react-slider';
 import DynamicFacets from './DynamicFacets';
-
-// Debug component to check hierarchical menu data
-// function HierarchicalMenuDebug() {
-function UnusedHierarchicalMenuDebug() {
-  const { items, createURL, refine, canRefine } = useHierarchicalMenu({
-    attributes: [
-      'categories.lvl0',
-      'categories.lvl1', 
-      'categories.lvl2'
-    ]
-  });
-
-  const { nbHits, query, processingTimeMS } = useStats();
-
-  useEffect(() => {
-    console.log('🔍 HierarchicalMenu Debug - Full Details:', {
-      canRefine,
-      itemsCount: items.length,
-      items: items,
-      searchStats: { 
-        nbHits, 
-        query, 
-        processingTimeMS,
-        hasResults: nbHits > 0 
-      },
-      hierarchicalAttributes: [
-        'categories.lvl0',
-        'categories.lvl1', 
-        'categories.lvl2'
-      ]
-    });
-
-    // Also log the raw structure of each item
-    if (items.length > 0) {
-      console.log('🔍 First hierarchical item structure:', items[0]);
-      console.log('🔍 All hierarchical items:', items.map(item => ({
-        label: item.label,
-        value: item.value,
-        count: item.count,
-        isRefined: item.isRefined,
-        data: item.data
-      })));
-    } else {
-      console.log('🔍 No hierarchical items found');
-    }
-  }, [items, canRefine, nbHits, query, processingTimeMS]);
-
-  return (
-    <div style={{ 
-      padding: '10px', 
-      background: '#ffebcd', 
-      margin: '10px 0',
-      fontSize: '12px',
-      border: '2px solid #ff6b35',
-      borderRadius: '5px'
-    }}>
-      <strong>🔍 HierarchicalMenu Debug Info:</strong>
-      <br />Can Refine: {canRefine ? 'Yes' : 'No'}
-      <br />Items Count: {items.length}
-      <br />Search Hits: {nbHits}
-      <br />Query: "{query}"
-      <br />Processing Time: {processingTimeMS}ms
-      {items.length > 0 && (
-        <>
-          <br /><strong>Items:</strong>
-          {items.slice(0, 5).map((item, index) => (
-            <div key={index} style={{ marginLeft: '10px', fontSize: '11px' }}>
-              - {item.label} ({item.count})
-            </div>
-          ))}
-        </>
-      )}
-    </div>
-  );
-}
-
-// Debug component to check actual search hits data
-// function SearchHitsDebug() {
-function UnusedSearchHitsDebug() {
-  const { hits } = useHits();
-
-  useEffect(() => {
-    console.log('🔍 Search Hits Debug:', {
-      hitsCount: hits.length,
-      firstHit: hits[0],
-      categoryData: hits.slice(0, 3).map(hit => ({
-        objectID: hit.objectID,
-        name: hit.name,
-        'categories.lvl0': hit['categories.lvl0'],
-        'categories.lvl1': hit['categories.lvl1'], 
-        'categories.lvl2': hit['categories.lvl2'],
-        categories: hit.categories
-      }))
-    });
-  }, [hits]);
-
-  return (
-    <div style={{ 
-      padding: '10px', 
-      background: '#e6f3ff', 
-      margin: '10px 0',
-      fontSize: '12px',
-      border: '2px solid #007acc',
-      borderRadius: '5px'
-    }}>
-      <strong>🔍 Search Hits Debug Info:</strong>
-      <br />Hits Count: {hits.length}
-      {hits.length > 0 && (
-        <>
-          <br /><strong>First Hit Categories:</strong>
-          <br />categories.lvl0: {JSON.stringify(hits[0]['categories.lvl0'])}
-          <br />categories.lvl1: {JSON.stringify(hits[0]['categories.lvl1'])}
-          <br />categories.lvl2: {JSON.stringify(hits[0]['categories.lvl2'])}
-          <br />categories: {JSON.stringify(hits[0].categories)}
-        </>
-      )}
-    </div>
-  );
-}
 
 // Custom CurrentRefinements component to show only values (not facet names)
 function CustomCurrentRefinements() {
@@ -182,13 +63,14 @@ function CustomCurrentRefinements() {
 }
 
 // Custom useRatingMenu hook
-function useRatingMenu(props: any) {
+type RatingMenuProps = { attribute: string } & Record<string, unknown>;
+function useRatingMenu(props: RatingMenuProps) {
   return useConnector(connectRatingMenu, props);
 }
 
 // Custom RatingMenu component
 function RatingMenu({ attribute }: { attribute: string }) {
-  const { items, refine, createURL } = useRatingMenu({ attribute });
+  const { items, refine } = useRatingMenu({ attribute });
 
   return (
     <div className="space-y-2">
@@ -222,174 +104,68 @@ function RatingMenu({ attribute }: { attribute: string }) {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.499z"
+                      d="M11.48 3.499a.562.562 0 00-1.96 0L7.48 8.499l-4.5.375c-.552.046-.774.74-.355 1.104L6.5 13.5l-1.094 4.593c-.129.54.461.96.923.636L12 16.5l4.671 2.73c.462.324 1.052-.096.923-.636L16.5 13.5l3.875-3.522c.419-.364.197-1.058-.355-1.104l-4.5-.375-2.04-4.5z"
                     />
                   )}
                 </svg>
               ))}
             </div>
-            <span className="font-medium">
-              {item.value} & Up
-            </span>
+            <span className="text-sm">{item.label} & up</span>
           </div>
-          <span className="text-gray-500 text-xs bg-gray-100 px-2 py-0.5 rounded-full font-medium">
-            {item.count}
-          </span>
+          <span className="text-xs text-gray-500">{item.count}</span>
         </button>
       ))}
     </div>
   );
 }
 
-// Custom Price Range Slider Component using Radix UI
-function PriceRangeSlider({ attribute }: { attribute: string }) {
-  const { start, range, canRefine, refine } = useRange({ attribute });
-  const { min = 0, max = 1000 } = range;
-  const [value, setValue] = useState<[number, number]>([min, max]);
-  const [isRefining, setIsRefining] = useState(false);
-  const refinementTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+// Price range slider using useRange hook
+function PriceRange({ attribute = 'price' }: { attribute?: string }) {
+  const { start, range, refine } = useRange({ attribute });
+  const [min, setMin] = useState(start[0] ?? range.min ?? 0);
+  const [max, setMax] = useState(start[1] ?? range.max ?? 0);
 
-  // Calculate current refined values
-  const from = Math.max(min, Number.isFinite(start[0]) ? start[0] || min : min);
-  const to = Math.min(max, Number.isFinite(start[1]) ? start[1] || max : max);
-
-  // Sync local state with Algolia state
   useEffect(() => {
-    console.log('Syncing state:', { from, to, min, max, newValue: [from, to] });
-    setValue([from, to]);
-    setIsRefining(false); // Clear refining state when Algolia state updates
-  }, [from, to]);
+    setMin(start[0] ?? range.min ?? 0);
+    setMax(start[1] ?? range.max ?? 0);
+  }, [start, range]);
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (refinementTimeoutRef.current) {
-        clearTimeout(refinementTimeoutRef.current);
-      }
-    };
+  const debouncedRefine = useRef<NodeJS.Timeout | null>(null);
+
+  const onValueChange = useCallback((values: number[]) => {
+    setMin(values[0]);
+    setMax(values[1]);
   }, []);
 
-  // Handle value changes during dragging
-  const handleValueChange = (newValue: number[]) => {
-    console.log('Price slider value change:', { 
-      newValue: [newValue[0], newValue[1]], 
-      currentValue: value,
-      difference: [newValue[0] - value[0], newValue[1] - value[1]]
-    });
-    setValue([newValue[0], newValue[1]]);
-  };
-
-  // Debounced refinement function
-  const debouncedRefine = useCallback((newValue: [number, number]) => {
-    if (refinementTimeoutRef.current) {
-      clearTimeout(refinementTimeoutRef.current);
-    }
-    
-    refinementTimeoutRef.current = setTimeout(() => {
-      const [minVal, maxVal] = newValue;
-      console.log('Debounced price refinement:', { 
-        newValue: [minVal, maxVal], 
-        currentRange: [from, to],
-        bounds: [min, max]
-      });
-      
-      // Only refine if values have actually changed from current refinement
-      if (minVal !== from || maxVal !== to) {
-        setIsRefining(true);
-        // Check if we're clearing the filter (back to full range)
-        if (minVal === min && maxVal === max) {
-          console.log('Clearing price refinement');
-          refine([undefined, undefined]);
-        } else {
-          console.log('Applying price refinement:', [minVal, maxVal]);
-          refine([minVal, maxVal]);
-        }
-      } else {
-        console.log('No change in price range, skipping refinement');
-      }
-    }, 300); // 300ms debounce
-  }, [from, to, min, max, refine]);
-
-  // Handle final value commit when user releases slider
-  const handleValueCommit = (newValue: number[]) => {
-    // Clear any pending debounced calls
-    if (refinementTimeoutRef.current) {
-      clearTimeout(refinementTimeoutRef.current);
-    }
-    
-    const [minVal, maxVal] = newValue;
-    console.log('Price slider commit (immediate):', { 
-      newValue: [minVal, maxVal], 
-      currentRange: [from, to],
-      bounds: [min, max],
-      shouldRefine: minVal !== from || maxVal !== to,
-      minChanged: minVal !== from,
-      maxChanged: maxVal !== to
-    });
-    
-    // Only refine if values have actually changed from current refinement
-    if (minVal !== from || maxVal !== to) {
-      setIsRefining(true);
-      // Check if we're clearing the filter (back to full range)
-      if (minVal === min && maxVal === max) {
-        console.log('Clearing price refinement');
-        refine([undefined, undefined]);
-      } else {
-        console.log('Applying price refinement:', [minVal, maxVal]);
-        refine([minVal, maxVal]);
-      }
-    } else {
-      console.log('No change in price range, skipping refinement');
-    }
-  };
-
-  if (!canRefine || min === undefined || max === undefined) {
-    return (
-      <div className="text-gray-500 text-sm">No price range available</div>
-    );
-  }
-
-  // Ensure value is always a valid array with 2 elements
-  const sliderValue = Array.isArray(value) && value.length === 2 ? value : [min, max];
+  const onValueCommit = useCallback((values: number[]) => {
+    if (debouncedRefine.current) clearTimeout(debouncedRefine.current);
+    debouncedRefine.current = setTimeout(() => {
+      // useRange refine expects a 2-length tuple [min, max]
+      refine([values[0], values[1]] as [number, number]);
+    }, 150);
+  }, [refine]);
 
   return (
-    <div className="space-y-4">
-      {/* Price Range Display */}
-      <div className="flex justify-between text-sm text-gray-600 font-medium">
-        <span>${sliderValue[0]}</span>
-        <span>${sliderValue[1]}</span>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-gray-700">${'{'}min{'}'}</span>
+        <span className="text-sm text-gray-700">${'{'}max{'}'}</span>
       </div>
-      
-      {/* Refining Indicator */}
-      {isRefining && (
-        <div className="text-xs text-blue-600 text-center">
-          Updating prices...
-        </div>
-      )}
-      
-      {/* Radix UI Range Slider */}
       <Slider.Root
-        className="relative flex items-center select-none touch-none w-full h-5"
-        min={min}
-        max={max}
-        value={sliderValue}
-        onValueChange={handleValueChange}
-        onValueCommit={handleValueCommit}
-        disabled={!canRefine || isRefining}
+        className="relative flex w-full touch-none select-none items-center"
+        min={range.min ?? 0}
+        max={range.max ?? 0}
         step={1}
+        value={[min, max]}
+        onValueChange={onValueChange}
+        onValueCommit={onValueCommit}
       >
-        <Slider.Track className="bg-gray-200 relative grow rounded-full h-[3px]">
-          <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
+        <Slider.Track className="relative h-1.5 w-full grow rounded-full bg-gray-200">
+          <Slider.Range className="absolute h-full rounded-full bg-blue-500" />
         </Slider.Track>
-        <Slider.Thumb className="block w-5 h-5 bg-white shadow-lg border-2 border-blue-500 rounded-full hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" />
-        <Slider.Thumb className="block w-5 h-5 bg-white shadow-lg border-2 border-blue-500 rounded-full hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" />
+        <Slider.Thumb className="block h-4 w-4 rounded-full bg-white shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <Slider.Thumb className="block h-4 w-4 rounded-full bg-white shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </Slider.Root>
-      
-      {/* Min/Max Labels */}
-      <div className="flex justify-between text-xs text-gray-500">
-        <span>${min}</span>
-        <span>${max}</span>
-      </div>
     </div>
   );
 }
@@ -647,7 +423,7 @@ export default function SearchFacets() {
         <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
           Price Range
         </h4>
-        <PriceRangeSlider attribute="variants.price.amount" />
+        <PriceRange attribute="variants.price.amount" />
       </div>
 
       {/* Additional Dynamic Facets */}

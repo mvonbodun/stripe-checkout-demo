@@ -2,19 +2,19 @@
 
 import React from 'react';
 import { Highlight, Snippet } from 'react-instantsearch';
-import { Hit } from 'instantsearch.js';
+import type { Hit } from 'instantsearch.js';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { extractCloudinaryPublicId, isCloudinaryUrl, getFallbackImage } from '../../utils/cloudinaryHelpers';
 import { useClickTracking } from '../../contexts/AnalyticsContext';
 
-interface VariantPrice {
+export interface VariantPrice {
   amount: number;
   currency?: string;
 }
 
-interface ProductVariant {
+export interface ProductVariant {
   image_urls?: string[];
   price?: VariantPrice;
   defining_attributes?: {
@@ -25,17 +25,17 @@ interface ProductVariant {
   [key: string]: unknown;
 }
 
-interface SearchHit extends Hit {
-  objectID: string;
-  name: string;
-  slug: string;
+export type ProductHit = Hit<{
+  name?: string;
+  slug?: string;
   brand?: string;
   description?: string;
   variants?: ProductVariant[];
-}
+  category?: string[];
+}>;
 
 interface EnhancedProductCardProps {
-  hit: SearchHit;
+  hit: ProductHit;
   position?: number;
   queryID?: string;
 }
@@ -113,7 +113,7 @@ export default function EnhancedProductCard({ hit, position, queryID }: Enhanced
             className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
             onError={(e) => {
               console.error('Image failed to load:', imageUrl);
-              e.currentTarget.src = getFallbackImage(imageUrl);
+              e.currentTarget.src = getFallbackImage();
             }}
           />
         )}
@@ -134,7 +134,7 @@ export default function EnhancedProductCard({ hit, position, queryID }: Enhanced
         
         {/* Price - moved to appear just below product name */}
         {typeof price === 'number' && (
-          <p className="text-lg font-bold text-gray-900">${price.toFixed(2)}</p>
+          <p className="text-lg font-bold text-gray-900">${'{'}price.toFixed(2){'}'}</p>
         )}
         
         {/* Color if available */}

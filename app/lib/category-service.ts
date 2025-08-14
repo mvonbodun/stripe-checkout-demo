@@ -162,7 +162,7 @@ export class CategoryService {
   /**
    * Health check - test backend connectivity
    */
-  async healthCheck(): Promise<{ healthy: boolean; message: string; details?: any }> {
+  async healthCheck(): Promise<{ healthy: boolean; message: string; details?: unknown }> {
     try {
       // Try to connect to NATS
       await natsClient.connect();

@@ -10,7 +10,6 @@ export default function SearchPagination() {
     isFirstPage,
     isLastPage,
     refine,
-    createURL,
   } = usePagination();
 
   if (nbPages <= 1) {
@@ -18,7 +17,7 @@ export default function SearchPagination() {
   }
 
   const renderPageNumbers = () => {
-    const pages = [];
+    const pages: JSX.Element[] = [];
     const showPages = 5; // Number of page buttons to show
     const startPage = Math.max(0, Math.min(currentRefinement - Math.floor(showPages / 2), nbPages - showPages));
     const endPage = Math.min(nbPages - 1, startPage + showPages - 1);
@@ -83,54 +82,32 @@ export default function SearchPagination() {
   };
 
   return (
-    <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-8">
-      {/* Mobile view */}
-      <div className="flex flex-1 justify-between sm:hidden">
+    <div className="flex items-center justify-center mt-8">
+      <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
         <button
-          onClick={() => !isFirstPage && refine(currentRefinement - 1)}
+          onClick={() => refine(currentRefinement - 1)}
           disabled={isFirstPage}
-          className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${isFirstPage ? 'cursor-not-allowed opacity-50' : ''}`}
+          className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
         >
-          Previous
+          <span className="sr-only">Previous</span>
+          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L9.06 10l3.71 3.71a.75.75 0 11-1.06 1.06l-4.24-4.25a.75.75 0 010-1.06l4.24-4.25a.75.75 0 011.06-.02z" clipRule="evenodd" />
+          </svg>
         </button>
-        <span className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700">
-          Page {currentRefinement + 1} of {nbPages}
-        </span>
+
+        {renderPageNumbers()}
+
         <button
-          onClick={() => !isLastPage && refine(currentRefinement + 1)}
+          onClick={() => refine(currentRefinement + 1)}
           disabled={isLastPage}
-          className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${isLastPage ? 'cursor-not-allowed opacity-50' : ''}`}
+          className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
         >
-          Next
+          <span className="sr-only">Next</span>
+          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L10.94 10 7.23 6.29a.75.75 0 111.06-1.06l4.24 4.25a.75.75 0 010 1.06l-4.24 4.25a.75.75 0 01-1.06.02z" clipRule="evenodd" />
+          </svg>
         </button>
-      </div>
-      
-      {/* Desktop view */}
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
-        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-          <button
-            onClick={() => !isFirstPage && refine(currentRefinement - 1)}
-            disabled={isFirstPage}
-            className={`relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${isFirstPage ? 'cursor-not-allowed opacity-50' : ''}`}
-          >
-            <span className="sr-only">Previous</span>
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-            </svg>
-          </button>
-          {renderPageNumbers()}
-          <button
-            onClick={() => !isLastPage && refine(currentRefinement + 1)}
-            disabled={isLastPage}
-            className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${isLastPage ? 'cursor-not-allowed opacity-50' : ''}`}
-          >
-            <span className="sr-only">Next</span>
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-            </svg>
-          </button>
-        </nav>
-      </div>
+      </nav>
     </div>
   );
 }

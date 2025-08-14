@@ -8,6 +8,15 @@ interface CategoryFacetsProps {
   className?: string;
 }
 
+// Define the minimal shape we use from hierarchical items
+interface HierarchicalItem {
+  value: string;
+  label: string;
+  count: number;
+  isRefined: boolean;
+  data?: HierarchicalItem[];
+}
+
 export default function CategoryFacets({ className = '' }: CategoryFacetsProps) {
   const {
     items,
@@ -26,7 +35,7 @@ export default function CategoryFacets({ className = '' }: CategoryFacetsProps) 
     return null;
   }
 
-  const renderCategoryItem = (item: any, level: number = 0) => (
+  const renderCategoryItem = (item: HierarchicalItem, level = 0) => (
     <div key={item.value} className={`pl-${level * 4}`}>
       <div
         className={`
@@ -60,7 +69,7 @@ export default function CategoryFacets({ className = '' }: CategoryFacetsProps) 
       {/* Render children if expanded */}
       {item.isRefined && item.data && item.data.length > 0 && (
         <div className="ml-4 mt-1">
-          {item.data.map((child: any) => renderCategoryItem(child, level + 1))}
+          {item.data.map((child: HierarchicalItem) => renderCategoryItem(child, level + 1))}
         </div>
       )}
     </div>
@@ -76,7 +85,7 @@ export default function CategoryFacets({ className = '' }: CategoryFacetsProps) 
       </h4>
       
       <div className="space-y-1">
-        {items.map((item) => renderCategoryItem(item))}
+        {items.map((item) => renderCategoryItem(item as unknown as HierarchicalItem))}
       </div>
     </div>
   );

@@ -3,10 +3,10 @@
 import React, { useEffect } from 'react';
 import { useHits, useSearchBox } from 'react-instantsearch';
 import { useAnalytics, useSearchPerformanceTracking } from '../../contexts/AnalyticsContext';
-import EnhancedProductCard from '../enhanced/EnhancedProductCard';
+import EnhancedProductCard, { ProductHit } from '../enhanced/EnhancedProductCard';
 
 export default function SearchResults() {
-  const { hits, results } = useHits();
+  const { hits, results } = useHits<ProductHit>();
   const { query } = useSearchBox();
   const { analytics, setCurrentQuery } = useAnalytics();
   const { trackView } = useSearchPerformanceTracking();
@@ -35,7 +35,7 @@ export default function SearchResults() {
         });
       }
     }
-  }, [hits, results, query, setCurrentQuery, trackView]);
+  }, [hits, results, query, setCurrentQuery, trackView, analytics]);
 
   if (hits.length === 0) {
     return (

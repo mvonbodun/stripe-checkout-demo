@@ -204,7 +204,7 @@ export class AnalyticsService {
     }
 
     try {
-      const eventData: any = {
+      const eventData: Record<string, unknown> = {
         userToken: this.userToken,
         index: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index',
         eventName: event.eventName || 'Product Added to Cart',
@@ -238,7 +238,7 @@ export class AnalyticsService {
     }
 
     try {
-      const eventData: any = {
+      const eventData: Record<string, unknown> = {
         userToken: this.userToken,
         index: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index',
         eventName: event.eventName || 'Product Purchased',
@@ -265,21 +265,21 @@ export class AnalyticsService {
   }
 
   // Custom event tracking
-  public trackCustomEvent(eventType: string, data: any): void {
+  public trackCustomEvent(eventType: string, data: Record<string, unknown>): void {
     if (!this.initialized) {
       console.warn('Analytics not initialized, skipping custom event');
       return;
     }
 
     try {
-      const eventData = {
+      const eventData: Record<string, unknown> = {
         userToken: this.userToken,
         index: process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'stripe_demo_index',
         eventName: eventType,
         ...data,
       };
 
-      aa('sendEvents', [eventData]);
+      aa('sendEvents', [eventData as unknown as import('search-insights').InsightsEvent]);
       
       console.debug('Custom event tracked:', { eventType, data });
     } catch (error) {

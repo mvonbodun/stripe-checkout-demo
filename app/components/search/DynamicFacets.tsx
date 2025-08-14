@@ -10,12 +10,10 @@ interface DynamicFacetsProps {
 export default function DynamicFacets({ className = '' }: DynamicFacetsProps) {
   // Define additional attributes that might be available dynamically
   // const dynamicAttributes = [
-  const _unusedDynamicAttributes = [
-    'specifications.name',
-    'features',
-    'variants.attributes.storage',
-    'variants.attributes.color'
-  ];
+  //   'specifications.name',
+  //   'features',
+  //   'variants.attributes.storage',
+  // ];
 
   return (
     <div className={`space-y-6 ${className}`}>
