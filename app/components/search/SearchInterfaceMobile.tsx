@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SearchBox } from 'react-instantsearch';
+// import { SearchBox } from 'react-instantsearch';
 import SearchStats from './SearchStats';
 import SearchResults from './SearchResults';
 import SearchPagination from './SearchPagination';

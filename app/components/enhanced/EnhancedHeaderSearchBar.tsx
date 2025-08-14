@@ -1,7 +1,10 @@
 'use client';
 
 import React from 'react';
-import { SearchBox } from 'react-instantsearch';
+// import { InstantSearch } from 'react-instantsearch';
+// import { createSearchClient } from '../../lib/algolia';
+// import { SearchBox } from 'react-instantsearch';
+// import AutocompleteSearch from '../search/AutocompleteSearch';
 import { useRouter } from 'next/navigation';
 import { useSearchBox } from 'react-instantsearch';
 

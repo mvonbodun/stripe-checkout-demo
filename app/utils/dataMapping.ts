@@ -3,9 +3,10 @@
  * Phase 3: Enhanced data mapping for attribute selection support
  */
 
-import { Product, ProductVariant, ProductWithVariants } from '../models/product';
+import { Product, ProductVariant, ProductWithVariants, VariantOption } from '../models/product';
 import { Item } from '../models/item';
-import { Status, ItemDefiningSpecificationValue } from '../models/common';
+import { ItemDefiningSpecificationValue } from '../models/common';
+// import { Status } from '../models/common';
 
 /**
  * Convert ProductVariant to Item format for attribute selection
@@ -76,7 +77,7 @@ export function enhanceProductForAttributeSelection(product: ProductWithVariants
   
   if (product.variants && Array.isArray(product.variants)) {
     product.variants.forEach((variant: ProductVariant) => {
-      variant.options?.forEach((option: any) => {
+      variant.options?.forEach((option: VariantOption) => {
         allSpecNames.add(option.name);
       });
     });

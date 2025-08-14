@@ -7,7 +7,7 @@ import Image from 'next/image';
 import SearchStats from './SearchStats';
 import SearchResults from './SearchResults';
 import SearchPagination from './SearchPagination';
-import SearchFacets from './SearchFacets';
+// import SearchFacets from './SearchFacets';
 import CategoryAwareFacets from './CategoryAwareFacets';
 import SearchSort from './SearchSort';
 import AnalyticsDashboard from '../analytics/AnalyticsDashboard';

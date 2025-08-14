@@ -1,6 +1,14 @@
 /**
- * Utility functions for working with Cloudinary URLs and Next Cloudinary
+ * Utility functions for working with Cloudinary URLs and Next Cloudinary/**
+ * Get fallback image when original fails to load
+ * 
+ * @param _originalUrl - Original image URL (unused but kept for API consistency)
+ * @returns Fallback image path
  */
+export function getFallbackImage(): string {
+  // You can customize this based on your needs
+  return '/next.svg';
+}
 
 /**
  * Extracts the public ID from a Cloudinary URL
@@ -75,13 +83,3 @@ export function isCloudinaryUrl(url: string): boolean {
   }
 }
 
-/**
- * Gets the fallback image path for non-Cloudinary images
- * 
- * @param originalUrl - Original image URL
- * @returns Fallback image path
- */
-export function getFallbackImage(originalUrl?: string): string {
-  // You can customize this based on your needs
-  return '/next.svg';
-}

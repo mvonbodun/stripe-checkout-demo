@@ -9,7 +9,8 @@ interface DynamicFacetsProps {
 
 export default function DynamicFacets({ className = '' }: DynamicFacetsProps) {
   // Define additional attributes that might be available dynamically
-  const dynamicAttributes = [
+  // const dynamicAttributes = [
+  const _unusedDynamicAttributes = [
     'specifications.name',
     'features',
     'variants.attributes.storage',

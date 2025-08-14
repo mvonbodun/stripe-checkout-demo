@@ -146,7 +146,7 @@ export class NatsClient {
   /**
    * Get connection statistics
    */
-  getStats(): any {
+  getStats(): { connected: boolean; stats?: unknown; pendingRequests?: number } {
     if (!this.connection) {
       return { connected: false };
     }

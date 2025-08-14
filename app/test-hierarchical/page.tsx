@@ -3,10 +3,15 @@
 import React, { useEffect, useState } from 'react';
 import { createSearchClient, ALGOLIA_INDEX_NAME } from '../lib/algolia';
 
+interface AlgoliaSearchResults {
+  hits?: unknown[];
+  [key: string]: unknown;
+}
+
 export default function TestHierarchicalPage() {
-  const [searchResults, setSearchResults] = useState<any>(null);
+  const [searchResults, setSearchResults] = useState<AlgoliaSearchResults | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [facetResults, setFacetResults] = useState<any>(null);
+  const [facetResults, setFacetResults] = useState<unknown>(null);
 
   useEffect(() => {
     async function testAlgoliaHierarchical() {

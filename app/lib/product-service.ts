@@ -7,8 +7,9 @@ import { natsClient } from './nats-client';
 import { 
   ProtobufUtils, 
   ProductGetBySlugRequest, 
-  ProductGetBySlugResponse,
-  Product as ProtoProduct
+  // ProductGetBySlugResponse,
+  Product as ProtoProduct,
+  ProductVariant as ProtoProductVariant
 } from './protobuf-utils';
 import { Product, ProductVariant } from '../models/product';
 import { Status } from '../models/common';
@@ -127,8 +128,9 @@ export class ProductService {
   private getFallbackProductSlugs(): string[] {
     try {
       // Import the mockProducts here to avoid circular dependencies
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { mockProducts } = require('../models/product');
-      return mockProducts.map((product: any) => product.slug);
+      return mockProducts.map((product: { slug: string }) => product.slug);
     } catch (error) {
       console.error('Failed to get fallback product slugs:', error);
       return [];
@@ -217,7 +219,7 @@ export class ProductService {
   /**
    * Transform protobuf ProductVariant to frontend ProductVariant
    */
-  private transformVariant(protoVariant: any): ProductVariant {
+  private transformVariant(protoVariant: ProtoProductVariant): ProductVariant {
     return {
       id: protoVariant.sku,
       productId: '', // Will be set by parent
@@ -250,7 +252,7 @@ export class ProductService {
       // Physical attributes
       weight: protoVariant.weight ? {
         value: protoVariant.weight,
-        unit: protoVariant.weightUnit || 'oz'
+        unit: (protoVariant.weightUnit || 'oz') as 'lb' | 'kg' | 'g' | 'oz'
       } : undefined,
       
       dimensions: (protoVariant.height || protoVariant.width || protoVariant.length) ? {
@@ -270,7 +272,7 @@ export class ProductService {
   /**
    * Generate variant name from defining attributes
    */
-  private generateVariantName(protoVariant: any): string {
+  private generateVariantName(protoVariant: ProtoProductVariant): string {
     const attributes = protoVariant.definingAttributes || {};
     const parts: string[] = [];
     

@@ -16,7 +16,7 @@ async function loadProtoDefinitions(): Promise<protobuf.Root> {
 
   try {
     // Load the catalog.proto file (includes both category and product definitions)
-    const protoPath = path.join(process.cwd(), 'proto', 'catalog.proto');
+    const protoPath = path.join(process.cwd(), 'proto', 'catalog', 'catalog.proto');
     catalogRoot = await protobuf.load(protoPath);
     return catalogRoot;
   } catch (error) {
@@ -76,8 +76,8 @@ export interface Product {
   reviews?: Reviews;
   hierarchicalCategories?: HierarchicalCategories;
   listCategories: string[];
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
   createdBy?: string;
   updatedBy?: string;
   definingAttributes: { [key: string]: string };
@@ -124,7 +124,7 @@ export interface Packaging {
 export interface Status {
   code: number;
   message: string;
-  details?: any[];
+  details?: unknown[];
 }
 
 // Utility functions for encoding/decoding

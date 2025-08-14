@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { productService } from '../../lib/product-service';
-import { getRelatedProducts } from '../../models/product';
-import { getItemsByProduct } from '../../models/item';
+import { getRelatedProducts, ProductWithVariants } from '../../models/product';
+// import { getItemsByProduct } from '../../models/item';
 import { findCategoryById, getAllCategories } from '../../models/category';
 import { buildProductAttributeData } from '../../utils/productAttributeData';
 import { 
@@ -43,12 +43,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
     console.log(`Successfully loaded product: ${productData.name}`);
 
     // Enhanced data mapping for Phase 3: Convert backend data to Item format for AttributeSelector
-    const enhancedProduct = enhanceProductForAttributeSelection(productData as any);
-    const items = mapProductVariantsToItems(productData as any);
+    const enhancedProduct = enhanceProductForAttributeSelection(productData as ProductWithVariants);
+    const items = mapProductVariantsToItems(productData as ProductWithVariants);
     
     // Debug the data mapping
     if (process.env.NODE_ENV === 'development') {
-      debugDataMapping(productData as any, items);
+      debugDataMapping(productData as ProductWithVariants, items);
     }
 
     console.log(`Mapped ${items.length} variants to items for attribute selection`);

@@ -1,14 +1,19 @@
 'use client';
 
 import React from 'react';
-import { 
-  RefinementList, 
-  HierarchicalMenu, 
+import {
+  RefinementList,
+  // HierarchicalMenu,
+  // useHierarchicalMenu,
+  // useRefinementList,
+  // Slider,
+  // useRange,
+  // DynamicWidgets,
   CurrentRefinements,
   ClearRefinements,
-  RangeInput
+  RangeInput,
 } from 'react-instantsearch';
-import * as Slider from '@radix-ui/react-slider';
+// import { useRouter } from 'next/navigation';
 import DynamicFacets from './DynamicFacets';
 import SearchFacets from './SearchFacets';
 
@@ -24,7 +29,7 @@ interface CategoryAwareFacetsProps {
  */
 export default function CategoryAwareFacets({ 
   hideCategoryHierarchy = false,
-  currentCategoryLevel,
+  // currentCategoryLevel,
   className = ''
 }: CategoryAwareFacetsProps) {
   

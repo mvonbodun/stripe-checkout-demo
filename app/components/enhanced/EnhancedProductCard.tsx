@@ -2,14 +2,40 @@
 
 import React from 'react';
 import { Highlight, Snippet } from 'react-instantsearch';
+import { Hit } from 'instantsearch.js';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { extractCloudinaryPublicId, isCloudinaryUrl, getFallbackImage } from '../../utils/cloudinaryHelpers';
 import { useClickTracking } from '../../contexts/AnalyticsContext';
 
+interface VariantPrice {
+  amount: number;
+  currency?: string;
+}
+
+interface ProductVariant {
+  image_urls?: string[];
+  price?: VariantPrice;
+  defining_attributes?: {
+    color?: string;
+    size?: string;
+    [key: string]: string | undefined;
+  };
+  [key: string]: unknown;
+}
+
+interface SearchHit extends Hit {
+  objectID: string;
+  name: string;
+  slug: string;
+  brand?: string;
+  description?: string;
+  variants?: ProductVariant[];
+}
+
 interface EnhancedProductCardProps {
-  hit: any;
+  hit: SearchHit;
   position?: number;
   queryID?: string;
 }
@@ -43,7 +69,7 @@ export default function EnhancedProductCard({ hit, position, queryID }: Enhanced
   console.log('Cloudinary public ID:', cloudinaryPublicId);
   
   // Price from first variant - based on actual data structure
-  let price = null;
+  let price: number | null = null;
   
   if (firstVariant) {
     // Check the actual property structure: variants[0].price.amount

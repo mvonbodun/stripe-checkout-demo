@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { 
   RefinementList, 
   HierarchicalMenu, 
-  CurrentRefinements,
+  // CurrentRefinements,
   ClearRefinements,
   useHierarchicalMenu,
   useStats,
@@ -18,7 +18,8 @@ import * as Slider from '@radix-ui/react-slider';
 import DynamicFacets from './DynamicFacets';
 
 // Debug component to check hierarchical menu data
-function HierarchicalMenuDebug() {
+// function HierarchicalMenuDebug() {
+function UnusedHierarchicalMenuDebug() {
   const { items, createURL, refine, canRefine } = useHierarchicalMenu({
     attributes: [
       'categories.lvl0',
@@ -92,7 +93,8 @@ function HierarchicalMenuDebug() {
 }
 
 // Debug component to check actual search hits data
-function SearchHitsDebug() {
+// function SearchHitsDebug() {
+function UnusedSearchHitsDebug() {
   const { hits } = useHits();
 
   useEffect(() => {

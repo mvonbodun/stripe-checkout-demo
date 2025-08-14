@@ -12,7 +12,7 @@ export default function CategoryFacets({ className = '' }: CategoryFacetsProps) 
   const {
     items,
     refine,
-    createURL,
+    // createURL,
     canRefine,
   } = useHierarchicalMenu({
     attributes: [

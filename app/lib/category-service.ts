@@ -7,7 +7,7 @@ import { natsClient } from './nats-client';
 import { 
   ProtobufUtils, 
   CategoryTreeRequest, 
-  CategoryTreeResponse, 
+  // CategoryTreeResponse, 
   CategoryTreeNode 
 } from './protobuf-utils';
 import { CategoryTree } from '../models/category';

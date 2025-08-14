@@ -4,8 +4,9 @@ import React, { createElement, Fragment, useEffect, useRef, useState, useMemo } 
 import { createRoot, Root } from 'react-dom/client';
 import { useRouter } from 'next/navigation';
 import { useSearchBox, usePagination } from 'react-instantsearch';
-import { autocomplete, AutocompleteOptions } from '@algolia/autocomplete-js';
-import { BaseItem } from '@algolia/autocomplete-core';
+import { autocomplete } from '@algolia/autocomplete-js';
+// import { AutocompleteOptions } from '@algolia/autocomplete-js';
+// import { BaseItem } from '@algolia/autocomplete-core';
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches';
 import { createQuerySuggestionsPlugin } from '@algolia/autocomplete-plugin-query-suggestions';
 import { createSearchClient } from '../../lib/algolia';
@@ -13,6 +14,24 @@ import { CldImage } from 'next-cloudinary';
 import { extractCloudinaryPublicId } from '../../utils/cloudinaryHelpers';
 
 import '@algolia/autocomplete-theme-classic';
+
+interface SearchHit {
+  objectID?: string;
+  name?: string;
+  slug?: string;
+  level?: number;
+  category?: string[];
+  variants?: {
+    image_urls?: string[];
+    price?: { amount: number };
+  }[];
+  [key: string]: unknown;
+}
+
+interface SearchResult {
+  hits?: SearchHit[];
+  [key: string]: unknown;
+}
 
 interface AutocompleteSearchProps {
   className?: string;
@@ -54,6 +73,7 @@ export default function AutocompleteSearch({
   const autocompleteContainer = useRef<HTMLDivElement>(null);
   const panelRootRef = useRef<Root | null>(null);
   const rootRef = useRef<HTMLElement | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const autocompleteInstanceRef = useRef<any>(null);
   const router = useRouter();
 
@@ -68,7 +88,8 @@ export default function AutocompleteSearch({
   const querySuggestionsIndexName = process.env.NEXT_PUBLIC_ALGOLIA_QUERY_SUGGESTIONS_INDEX;
 
   // Use refs for callbacks to avoid dependency changes
-  const handleRecentSearchSelectRef = useRef((item: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleRecentSearchSelectRef = useRef((item: { label: string }) => {
     setInstantSearchUiState({ query: item.label });
     router.push(`/search?query=${encodeURIComponent(item.label)}`);
   });
@@ -88,7 +109,7 @@ export default function AutocompleteSearch({
 
   // Update refs when router changes
   useEffect(() => {
-    handleRecentSearchSelectRef.current = (item: any) => {
+    handleRecentSearchSelectRef.current = (item: { label: string }) => {
       setInstantSearchUiState({ query: item.label });
       router.push(`/search?query=${encodeURIComponent(item.label)}`);
     };
@@ -244,9 +265,9 @@ export default function AutocompleteSearch({
             attributesToRetrieve: ['objectID', 'name', 'brand', 'variants.image_urls', 'variants.price.amount', 'category'],
           },
         }]).then(({ results }) => {
-          const searchResult = results[0] as any;
-          const hits = searchResult?.hits || [];
-          return hits.map((hit: any) => ({
+          const searchResult = results[0] as unknown;
+          const hits = (searchResult as SearchResult)?.hits || [];
+          return hits.map((hit: SearchHit) => ({
             ...hit,
             // Extract first image URL from variants
             image: hit.variants?.[0]?.image_urls?.[0] || null,
@@ -350,12 +371,12 @@ export default function AutocompleteSearch({
             filters: 'level:1 OR level:2', // Only show top-level categories
           },
         }]).then(({ results }) => {
-          const searchResult = results[0] as any;
-          const hits = searchResult?.hits || [];
+          const searchResult = results[0] as unknown;
+          const hits = (searchResult as SearchResult)?.hits || [];
           // Filter for category-type results and transform
           return hits
-            .filter((hit: any) => hit.level && hit.slug)
-            .map((hit: any) => ({
+            .filter((hit: SearchHit) => hit.level && hit.slug)
+            .map((hit: SearchHit) => ({
               objectID: hit.objectID,
               name: hit.name,
               slug: hit.slug,
@@ -406,7 +427,8 @@ export default function AutocompleteSearch({
       initialState: { query },
       openOnFocus: true,
       detachedMediaQuery: 'none', // Keep attached on all devices
-      getSources() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getSources() {
         return [productSource, categorySource];
       },
       plugins: querySuggestionsPlugin 

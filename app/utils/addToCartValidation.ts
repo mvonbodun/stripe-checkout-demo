@@ -8,7 +8,8 @@
  */
 
 import { Product } from '../models/product';
-import { Item, findItemBySpecificationValues } from '../models/item';
+import { Item } from '../models/item';
+// import { findItemBySpecificationValues } from '../models/item';
 import { getAttributesForProduct } from './attributeHelpers';
 
 /**
