@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Fragment, useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import type { Root } from 'react-dom/client';
 import { useRouter } from 'next/navigation';
 import { useSearchBox, usePagination } from 'react-instantsearch';
@@ -9,8 +9,6 @@ import type { AutocompleteSource, AutocompleteApi } from '@algolia/autocomplete-
 import { createLocalStorageRecentSearchesPlugin } from '@algolia/autocomplete-plugin-recent-searches';
 import { createQuerySuggestionsPlugin } from '@algolia/autocomplete-plugin-query-suggestions';
 import { createSearchClient } from '../../lib/algolia';
-import { CldImage } from 'next-cloudinary';
-import { extractCloudinaryPublicId } from '../../utils/cloudinaryHelpers';
 
 import '@algolia/autocomplete-theme-classic';
 
@@ -146,30 +144,30 @@ export default function AutocompleteSearch({
           ...source,
           templates: {
             ...source.templates,
-            header() {
-              return (
-                <Fragment>
-                  <span className="aa-SourceHeaderTitle">Recent searches</span>
-                  <span className="aa-SourceHeaderLine" />
-                </Fragment>
-              );
+            header(params) {
+              const { html } = params as any;
+              return html`
+                <span class="aa-SourceHeaderTitle">Recent searches</span>
+                <span class="aa-SourceHeaderLine"></span>
+              `;
             },
-            item({ item }) {
-              return (
-                <div className="aa-ItemWrapper">
-                  <div className="aa-ItemContent">
-                    <div className="aa-ItemIcon">
+            item(params) {
+              const { item, html } = params as any;
+              return html`
+                <div class="aa-ItemWrapper">
+                  <div class="aa-ItemContent">
+                    <div class="aa-ItemIcon">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="M21 21l-4.35-4.35"></path>
                       </svg>
                     </div>
-                    <div className="aa-ItemContentBody">
-                      <div className="aa-ItemContentTitle">{item.label}</div>
+                    <div class="aa-ItemContentBody">
+                      <div class="aa-ItemContentTitle">${item.label}</div>
                     </div>
                   </div>
                 </div>
-              );
+              `;
             },
           },
           onSelect({ item }) {
@@ -200,19 +198,19 @@ export default function AutocompleteSearch({
               sourceId: 'querySuggestions',
               templates: {
                 ...source.templates,
-                header() {
-                  return (
-                    <Fragment>
-                      <span className="aa-SourceHeaderTitle">Popular searches</span>
-                      <span className="aa-SourceHeaderLine" />
-                    </Fragment>
-                  );
+                header(params) {
+                  const { html } = params as any;
+                  return html`
+                    <span class="aa-SourceHeaderTitle">Popular searches</span>
+                    <span class="aa-SourceHeaderLine"></span>
+                  `;
                 },
-                item({ item }: { item: QuerySuggestion }) {
-                  return (
-                    <div className="aa-ItemWrapper">
-                      <div className="aa-ItemContent">
-                        <div className="aa-ItemIcon">
+                item(params) {
+                  const { item, html } = params as any;
+                  return html`
+                    <div class="aa-ItemWrapper">
+                      <div class="aa-ItemContent">
+                        <div class="aa-ItemIcon">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M21 21l-6 -6"></path>
                             <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
@@ -220,17 +218,13 @@ export default function AutocompleteSearch({
                             <path d="M4.05 11a8 8 0 1 1 15.9 0a8 8 0 0 1 -15.9 0"></path>
                           </svg>
                         </div>
-                        <div className="aa-ItemContentBody">
-                          <div className="aa-ItemContentTitle">{item.query}</div>
-                          {item.category && (
-                            <div className="aa-ItemContentDescription text-xs text-gray-500">
-                              in {item.category}
-                            </div>
-                          )}
+                        <div class="aa-ItemContentBody">
+                          <div class="aa-ItemContentTitle">${item.query}</div>
+                          ${item.category ? (html`<div class="aa-ItemContentDescription text-xs text-gray-500">in ${item.category}</div>`) : null}
                         </div>
                       </div>
                     </div>
-                  );
+                  `;
                 },
               },
               onSelect({ item }) {
@@ -282,78 +276,38 @@ export default function AutocompleteSearch({
         }).catch(() => []);
       },
       templates: {
-        header() {
-          return (
-            <Fragment>
-              <span className="aa-SourceHeaderTitle">Products</span>
-              <span className="aa-SourceHeaderLine" />
-            </Fragment>
-          );
+        header(params) {
+          const { html } = params as any;
+          return html`
+            <span class="aa-SourceHeaderTitle">Products</span>
+            <span class="aa-SourceHeaderLine"></span>
+          `;
         },
-        item({ item }: { item: ProductSuggestion }) {
-          const publicId = item.image ? extractCloudinaryPublicId(item.image) : '';
-          
-          return (
-            <div className="aa-ItemWrapper">
-              <div className="aa-ItemContent flex items-center gap-3 py-2">
-                {item.image && publicId ? (
-                  <div className="aa-ItemIcon flex-shrink-0">
-                    <CldImage
-                      src={publicId}
-                      alt={item.name}
-                      width={64}
-                      height={64}
-                      crop="fill"
-                      gravity="center"
-                      format="auto"
-                      quality="auto"
-                      className="w-16 h-16 object-cover rounded-lg autocomplete-product-image"
-                      style={{ 
-                        width: '64px !important', 
-                        height: '64px !important',
-                        minWidth: '64px',
-                        minHeight: '64px',
-                        maxWidth: '64px',
-                        maxHeight: '64px'
-                      }}
-                      data-component="CldImage"
-                    />
-                  </div>
-                ) : item.image ? (
-                  <div className="aa-ItemIcon flex-shrink-0">
+        item(params) {
+          const { item, html } = params as any;
+          return html`
+            <div class="aa-ItemWrapper">
+              <div class="aa-ItemContent flex items-center gap-3 py-2">
+                ${item.image ? (html`
+                  <div class="aa-ItemIcon flex-shrink-0">
                     <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded-lg autocomplete-product-image"
-                      style={{ 
-                        width: '64px !important', 
-                        height: '64px !important',
-                        minWidth: '64px',
-                        minHeight: '64px',
-                        maxWidth: '64px',
-                        maxHeight: '64px'
-                      }}
+                      src="${item.image}"
+                      alt="${item.name}"
+                      class="w-16 h-16 object-cover rounded-lg autocomplete-product-image"
+                      style="width:64px !important; height:64px !important; min-width:64px; min-height:64px; max-width:64px; max-height:64px;"
                     />
                   </div>
-                ) : null}
-                <div className="aa-ItemContentBody flex-1 min-w-0">
-                  <div className="aa-ItemContentTitle">
-                    <span className="font-medium text-sm leading-tight">{item.name}</span>
+                `) : null}
+                <div class="aa-ItemContentBody flex-1 min-w-0">
+                  <div class="aa-ItemContentTitle">
+                    <span class="font-medium text-sm leading-tight">${item.name}</span>
                   </div>
-                  {item.brand && (
-                    <div className="aa-ItemContentDescription text-xs text-gray-600 mt-0.5">
-                      by {item.brand}
-                    </div>
-                  )}
-                  {typeof item.price === 'number' && (
-                    <div className="aa-ItemContentDescription text-sm font-semibold text-green-600 mt-1">
-                      ${'{'}item.price.toFixed(2){'}'}
-                    </div>
-                  )}
+                  ${item.brand ? (html`<div class="aa-ItemContentDescription text-xs text-gray-600 mt-0.5">by ${item.brand}</div>`) : null}
+                  ${typeof item.price === 'number' ? (html`<div class="aa-ItemContentDescription text-sm font-semibold text-green-600 mt-1">$${item.price.toFixed(2)}</div>`) : null}
                 </div>
               </div>
             </div>
-          );
+          `;
         },
       },
       onSelect({ item }: { item: ProductSuggestion }) {
@@ -391,30 +345,28 @@ export default function AutocompleteSearch({
         }).catch(() => []);
       },
       templates: {
-        header() {
-          return (
-            <Fragment>
-              <span className="aa-SourceHeaderTitle">Categories</span>
-              <span className="aa-SourceHeaderLine" />
-            </Fragment>
-          );
+        header(params) {
+          const { html } = params as any;
+          return html`
+            <span class="aa-SourceHeaderTitle">Categories</span>
+            <span class="aa-SourceHeaderLine"></span>
+          `;
         },
-        item({ item }: { item: CategorySuggestion }) {
-          return (
-            <div className="aa-ItemWrapper">
-              <div className="aa-ItemContent">
-                <div className="aa-ItemIcon">
-                  {/* icon */}
-                </div>
-                <div className="aa-ItemContentBody">
-                  <div className="aa-ItemContentTitle">{item.name}</div>
-                  <div className="aa-ItemContentDescription text-xs text-gray-500">
-                    Category {item.parent && `in ${'${'}item.parent{'}'}`}
+        item(params) {
+          const { item, html } = params as any;
+          return html`
+            <div class="aa-ItemWrapper">
+              <div class="aa-ItemContent">
+                <div class="aa-ItemIcon"></div>
+                <div class="aa-ItemContentBody">
+                  <div class="aa-ItemContentTitle">${item.name}</div>
+                  <div class="aa-ItemContentDescription text-xs text-gray-500">
+                    Category ${item.parent ? `in ${item.parent}` : ''}
                   </div>
                 </div>
               </div>
             </div>
-          );
+          `;
         },
       },
       onSelect({ item }: { item: CategorySuggestion }) {
