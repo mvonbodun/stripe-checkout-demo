@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MyAccountIcon from './MyAccountIcon';
@@ -36,9 +36,9 @@ const MobileMenuModal: React.FC<MobileMenuModalProps> = ({
     setCategoryTree(tree);
   }, []);
 
-  const handleBack = () => {
-    setDrillDownStack(drillDownStack.slice(0, -1));
-  };
+  const handleBack = useCallback(() => {
+    setDrillDownStack((prev) => prev.slice(0, -1));
+  }, []);
 
   // Handle escape key press
   useEffect(() => {
@@ -63,7 +63,7 @@ const MobileMenuModal: React.FC<MobileMenuModalProps> = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [open, onClose, drillDownStack, handleBack]);
+  }, [open, onClose, drillDownStack.length, handleBack]);
 
   // Reset drill-down state when modal closes
   useEffect(() => {

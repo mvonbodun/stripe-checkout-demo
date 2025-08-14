@@ -130,6 +130,8 @@ export default function AutocompleteSearch({
   }, [instantSearchUiState, setQuery, setPage]);
 
   // Initialize autocomplete once and keep it stable
+  // We intentionally initialize Autocomplete once. Adding dependencies will re-create the instance and
+  // double-bind events. The callbacks and values used inside are stabilized via refs/memo.
   useEffect(() => {
     if (!autocompleteContainer.current || !searchClient || autocompleteInstanceRef.current) {
       return;
@@ -145,6 +147,7 @@ export default function AutocompleteSearch({
           templates: {
             ...source.templates,
             header(params) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const { html } = params as any;
               return html`
                 <span class="aa-SourceHeaderTitle">Recent searches</span>
@@ -152,6 +155,7 @@ export default function AutocompleteSearch({
               `;
             },
             item(params) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const { item, html } = params as any;
               return html`
                 <div class="aa-ItemWrapper">
@@ -199,6 +203,7 @@ export default function AutocompleteSearch({
               templates: {
                 ...source.templates,
                 header(params) {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const { html } = params as any;
                   return html`
                     <span class="aa-SourceHeaderTitle">Popular searches</span>
@@ -206,6 +211,7 @@ export default function AutocompleteSearch({
                   `;
                 },
                 item(params) {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const { item, html } = params as any;
                   return html`
                     <div class="aa-ItemWrapper">
@@ -277,6 +283,7 @@ export default function AutocompleteSearch({
       },
       templates: {
         header(params) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { html } = params as any;
           return html`
             <span class="aa-SourceHeaderTitle">Products</span>
@@ -284,6 +291,7 @@ export default function AutocompleteSearch({
           `;
         },
         item(params) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { item, html } = params as any;
           return html`
             <div class="aa-ItemWrapper">
@@ -346,6 +354,7 @@ export default function AutocompleteSearch({
       },
       templates: {
         header(params) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { html } = params as any;
           return html`
             <span class="aa-SourceHeaderTitle">Categories</span>
@@ -353,6 +362,7 @@ export default function AutocompleteSearch({
           `;
         },
         item(params) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { item, html } = params as any;
           return html`
             <div class="aa-ItemWrapper">
@@ -416,7 +426,7 @@ export default function AutocompleteSearch({
         panelRootRef.current = null;
       }
     };
-  }, []); // Empty dependency array - only run once
+  }, [searchClient, indexName, querySuggestionsIndexName, router, placeholder, query]);
 
   if (!searchClient) {
     // Fallback to basic search input if Algolia is not available

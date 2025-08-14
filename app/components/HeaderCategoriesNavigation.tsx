@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { CategoryTree } from "../models/category";
 import { useCategories } from "../categories-context";
 
@@ -232,14 +233,20 @@ const HeaderCategoriesNavigation: React.FC<HeaderCategoriesNavigationProps> = ({
                           >
                             <div className="flex items-start space-x-3">
                               <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                                <img 
-                                  src={item.imageUrl} 
+                                {/* Use next/image for optimized images */}
+                                <Image
+                                  src={item.imageUrl}
                                   alt={item.title}
+                                  width={64}
+                                  height={64}
+                                  unoptimized
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                                   onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
+                                    const target = e.currentTarget as HTMLImageElement;
                                     target.style.display = 'none';
-                                    target.parentElement!.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                                    if (target.parentElement) {
+                                      (target.parentElement as HTMLElement).style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                                    }
                                   }}
                                 />
                               </div>
