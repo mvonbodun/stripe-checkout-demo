@@ -5,6 +5,8 @@ import { AttributeCombinationMatrix } from './attributeCombinations';
 /**
  * Enhanced version of getAttributesForProduct that works with items
  * to build the complete attribute list based on actual item data
+ * Now includes smart ordering: Color first, then alphabetical
+ * And smart value sorting: colors alphabetical, sizes numeric if possible
  */
 export function getAttributesForProduct(product: Product, items: Item[]): Record<string, string[]> {
   const attributes: Record<string, string[]> = {};
@@ -20,7 +22,7 @@ export function getAttributesForProduct(product: Product, items: Item[]): Record
     
     // Only return if we found some attributes, otherwise fall back to analyzing items
     if (Object.keys(attributes).length > 0) {
-      return attributes;
+      return sortAttributesAndValues(attributes);
     }
   }
   
@@ -50,7 +52,7 @@ export function getAttributesForProduct(product: Product, items: Item[]): Record
       }
     });
     
-    return attributes;
+    return sortAttributesAndValues(attributes);
   }
   
   // Final fallback: generate attributes based on product type and categories
@@ -76,7 +78,106 @@ export function getAttributesForProduct(product: Product, items: Item[]): Record
     attributes['Screen Size'] = ['55"', '65"', '75"', '85"'];
   }
   
-  return attributes;
+  return sortAttributesAndValues(attributes);
+}
+
+/**
+ * Sort attributes and their values for optimal UX:
+ * 1. Color attribute comes first (if it exists)
+ * 2. Other attributes are sorted alphabetically
+ * 3. Values are sorted logically:
+ *    - Colors: alphabetically
+ *    - Sizes: numerically if all numeric, otherwise alphabetically
+ *    - Everything else: alphabetically
+ */
+function sortAttributesAndValues(attributes: Record<string, string[]>): Record<string, string[]> {
+  const sortedAttributes: Record<string, string[]> = {};
+  
+  // Step 1: Sort attribute keys with Color first, then alphabetically
+  const sortedKeys = Object.keys(attributes).sort((a, b) => {
+    const aIsColor = a.toLowerCase().includes('color') || a.toLowerCase().includes('colour');
+    const bIsColor = b.toLowerCase().includes('color') || b.toLowerCase().includes('colour');
+    
+    // Color comes first
+    if (aIsColor && !bIsColor) return -1;
+    if (!aIsColor && bIsColor) return 1;
+    
+    // Otherwise alphabetical
+    return a.localeCompare(b);
+  });
+  
+  // Step 2: For each attribute, sort its values appropriately
+  sortedKeys.forEach(attributeName => {
+    const values = attributes[attributeName];
+    const sortedValues = sortAttributeValues(attributeName, values);
+    sortedAttributes[attributeName] = sortedValues;
+  });
+  
+  return sortedAttributes;
+}
+
+/**
+ * Sort attribute values based on the attribute type
+ */
+function sortAttributeValues(attributeName: string, values: string[]): string[] {
+  const lowerAttributeName = attributeName.toLowerCase();
+  
+  // Color values: alphabetical
+  if (lowerAttributeName.includes('color') || lowerAttributeName.includes('colour')) {
+    return [...values].sort();
+  }
+  
+  // Size values: try numeric sorting if all values are numeric
+  if (lowerAttributeName.includes('size')) {
+    // Check if all values are numeric (with optional units)
+    const numericPattern = /^(\d+(?:\.\d+)?)\s*([a-zA-Z"']*)?$/;
+    const allNumeric = values.every(value => numericPattern.test(value.trim()));
+    
+    if (allNumeric) {
+      return [...values].sort((a, b) => {
+        const numA = parseFloat(a.match(numericPattern)?.[1] || '0');
+        const numB = parseFloat(b.match(numericPattern)?.[1] || '0');
+        return numA - numB;
+      });
+    }
+  }
+  
+  // Storage/Memory values: try to sort by numeric capacity
+  if (lowerAttributeName.includes('storage') || 
+      lowerAttributeName.includes('memory') || 
+      lowerAttributeName.includes('capacity')) {
+    
+    return [...values].sort((a, b) => {
+      const bytesA = parseStorageSize(a);
+      const bytesB = parseStorageSize(b);
+      return bytesA - bytesB;
+    });
+  }
+  
+  // Default: alphabetical sorting
+  return [...values].sort();
+}
+
+/**
+ * Parse storage size strings to bytes for proper sorting
+ * Handles: 128GB, 1TB, 512 GB SSD, etc.
+ */
+function parseStorageSize(storage: string): number {
+  const cleanStorage = storage.toLowerCase().replace(/[^0-9.kmgt]/g, '');
+  const match = cleanStorage.match(/^(\d+(?:\.\d+)?)(k|m|g|t)?/);
+  
+  if (!match) return 0;
+  
+  const value = parseFloat(match[1]);
+  const unit = match[2];
+  
+  switch (unit) {
+    case 'k': return value * 1024;
+    case 'm': return value * 1024 * 1024;
+    case 'g': return value * 1024 * 1024 * 1024;
+    case 't': return value * 1024 * 1024 * 1024 * 1024;
+    default: return value;
+  }
 }
 
 /**
