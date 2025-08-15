@@ -232,6 +232,8 @@ export default function ProductInfo({
           allAttributes={allAttributes}
           onError={handleAttributeError}
           onStateChange={handleAttributeStateChange}
+          inventoryAware={true}
+          showInventoryCount={true}
         />
       </div>
       

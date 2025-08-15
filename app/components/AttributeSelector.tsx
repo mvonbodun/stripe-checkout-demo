@@ -5,6 +5,7 @@ import { Item } from '../models/item';
 import {
   buildAttributeCombinationMatrix,
   calculateAttributeAvailability,
+  calculateAttributeAvailabilityWithInventory,
   validateAndCleanSelections,
   AttributeAvailability,
   AttributeCombinationMatrix
@@ -21,6 +22,9 @@ interface AttributeSelectorProps {
   allAttributes?: Record<string, string[]>;
   onError?: (error: string) => void;
   onStateChange?: (state: { isLoading: boolean; hasError: boolean }) => void;
+  // Phase 3C: Inventory awareness
+  inventoryAware?: boolean; // Enable inventory-aware selection
+  showInventoryCount?: boolean; // Show inventory count for selected combination
 }
 
 export default function AttributeSelector({ 
@@ -31,7 +35,9 @@ export default function AttributeSelector({
   combinationMatrix: providedMatrix,
   allAttributes: providedAttributes,
   onError,
-  onStateChange
+  onStateChange,
+  inventoryAware = false,
+  showInventoryCount = false
 }: AttributeSelectorProps) {
   const [recentlyChanged, setRecentlyChanged] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
@@ -67,11 +73,21 @@ export default function AttributeSelector({
     }
 
     try {
-      return calculateAttributeAvailability(
-        combinationMatrix,
-        selectedOptions,
-        allAttributes
-      );
+      if (inventoryAware) {
+        return calculateAttributeAvailabilityWithInventory(
+          combinationMatrix,
+          selectedOptions,
+          allAttributes,
+          items,
+          true
+        );
+      } else {
+        return calculateAttributeAvailability(
+          combinationMatrix,
+          selectedOptions,
+          allAttributes
+        );
+      }
     } catch (error) {
       console.error('Error calculating availability:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error calculating availability';
@@ -79,7 +95,7 @@ export default function AttributeSelector({
       onError?.(errorMessage);
       return {};
     }
-  }, [combinationMatrix, selectedOptions, allAttributes, onError]);
+  }, [combinationMatrix, selectedOptions, allAttributes, items, inventoryAware, onError]);
 
   // Notify parent of state changes
   useEffect(() => {
@@ -155,7 +171,32 @@ export default function AttributeSelector({
     onOptionsChange(cleanedOptions);
   };
 
-  // Get CSS classes for option buttons
+  // Calculate inventory for currently selected combination
+  const getSelectedCombinationInventory = () => {
+    if (!inventoryAware || Object.keys(selectedOptions).length === 0) {
+      return null;
+    }
+
+    // Find items that match the current selection
+    const matchingItems = items.filter(item => {
+      return Object.entries(selectedOptions).every(([attrName, attrValue]) => {
+        return item.itemDefiningSpecificationValues.some(spec =>
+          spec.name === attrName && spec.value === attrValue
+        );
+      });
+    });
+
+    if (matchingItems.length === 0) {
+      return null;
+    }
+
+    const totalInventory = matchingItems.reduce((sum, item) => sum + (item.inventoryQuantity || 0), 0);
+    const hasStock = matchingItems.some(item => item.isInStock && (item.inventoryQuantity || 0) > 0);
+
+    return { totalInventory, hasStock, matchingItems };
+  };
+
+  // Get CSS classes for option buttons (enhanced for inventory awareness)
   const getOptionClassName = (
     attributeName: string, 
     option: string, 
@@ -174,7 +215,19 @@ export default function AttributeSelector({
     }
     
     if (!state.isAvailable) {
-      return `${baseClasses} bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50`;
+      // Different styling for inventory vs compatibility issues
+      if (inventoryAware && state.hasStock === false) {
+        // Out of stock - different styling than incompatible
+        return `${baseClasses} bg-red-50 text-red-400 border-red-200 cursor-not-allowed opacity-75 relative`;
+      } else {
+        // Incompatible combination
+        return `${baseClasses} bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50`;
+      }
+    }
+    
+    // Available - show inventory hints if enabled
+    if (inventoryAware && state.hasStock === false) {
+      return `${baseClasses} bg-red-50 text-red-400 border-red-200 cursor-not-allowed opacity-75`;
     }
     
     return `${baseClasses} bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 cursor-pointer`;
@@ -212,31 +265,79 @@ export default function AttributeSelector({
               const displayName = getAttributeDisplayName(items, attributeName, option);
               
               return (
-                <button
-                  key={option}
-                  onClick={() => handleOptionChange(attributeName, option)}
-                  disabled={!state?.isAvailable}
-                  aria-pressed={state?.isSelected}
-                  aria-describedby={!state?.isAvailable ? `${attributeName}-${option}-unavailable` : undefined}
-                  className={getOptionClassName(attributeName, option, currentAvailability)}
-                  title={!state?.isAvailable ? 'Not available with current selection' : displayName || option}
-                >
-                  {displayName || option}
+                <div key={option} className="relative">
+                  <button
+                    onClick={() => handleOptionChange(attributeName, option)}
+                    disabled={!state?.isAvailable}
+                    aria-pressed={state?.isSelected}
+                    aria-describedby={!state?.isAvailable ? `${attributeName}-${option}-unavailable` : undefined}
+                    className={getOptionClassName(attributeName, option, currentAvailability)}
+                    title={
+                      !state?.isAvailable 
+                        ? (inventoryAware && state?.hasStock === false)
+                          ? 'Out of stock'
+                          : 'Not available with current selection'
+                        : displayName || option
+                    }
+                  >
+                    {displayName || option}
+                    {/* Out of stock indicator */}
+                    {inventoryAware && state?.hasStock === false && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    )}
+                  </button>
+                  
                   {/* Hidden description for screen readers */}
                   {!state?.isAvailable && (
                     <span 
                       id={`${attributeName}-${option}-unavailable`} 
                       className="sr-only"
                     >
-                      {option} is not available with your current selection
+                      {inventoryAware && state?.hasStock === false
+                        ? `${option} is out of stock`
+                        : `${option} is not available with your current selection`
+                      }
                     </span>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
         </div>
       ))}
+
+      {/* Inventory count display for selected combination */}
+      {showInventoryCount && inventoryAware && (() => {
+        const inventoryInfo = getSelectedCombinationInventory();
+        if (!inventoryInfo) return null;
+
+        const { totalInventory, hasStock } = inventoryInfo;
+        const allAttributesSelected = Object.keys(selectedOptions).length === Object.keys(allAttributes).length;
+
+        if (!allAttributesSelected) return null;
+
+        return (
+          <div className="mt-3 p-3 bg-gray-50 rounded-md">
+            <div className="flex items-center space-x-2 text-sm">
+              {hasStock ? (
+                <>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-700 font-medium">
+                    {totalInventory} in stock
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <span className="text-red-700 font-medium">
+                    Out of stock
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
       
       {/* Debug info in development */}
       {process.env.NODE_ENV === 'development' && (
@@ -247,6 +348,12 @@ export default function AttributeSelector({
               <div>Selected: {JSON.stringify(selectedOptions)}</div>
               <div>Available combinations: {Object.keys(combinationMatrix).length}</div>
               <div>Recently changed: {recentlyChanged || 'none'}</div>
+              <div>Inventory aware: {inventoryAware ? 'Yes' : 'No'}</div>
+              {inventoryAware && (
+                <div>
+                  Selected inventory: {JSON.stringify(getSelectedCombinationInventory())}
+                </div>
+              )}
             </div>
           </details>
         </div>

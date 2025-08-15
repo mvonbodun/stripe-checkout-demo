@@ -17,6 +17,8 @@ export interface AttributeAvailability {
     [attributeValue: string]: {
       isAvailable: boolean;
       isSelected: boolean;
+      hasStock?: boolean; // Phase 3C: Inventory awareness
+      inventoryCount?: number; // Phase 3C: Total inventory for this attribute value
     }
   }
 }
@@ -80,6 +82,26 @@ export function calculateAttributeAvailability(
   selectedOptions: Record<string, string>,
   allAttributes: Record<string, string[]>
 ): AttributeAvailability {
+  return calculateAttributeAvailabilityWithInventory(
+    matrix,
+    selectedOptions,
+    allAttributes,
+    [], // Empty items array for backward compatibility
+    false // Inventory not considered
+  );
+}
+
+/**
+ * Enhanced version that considers inventory when determining availability
+ * Phase 3C: Inventory-aware attribute selection
+ */
+export function calculateAttributeAvailabilityWithInventory(
+  matrix: AttributeCombinationMatrix,
+  selectedOptions: Record<string, string>,
+  allAttributes: Record<string, string[]>,
+  items: Item[],
+  inventoryAware: boolean = false
+): AttributeAvailability {
   const availability: AttributeAvailability = {};
   
   // Initialize all attributes as available
@@ -88,13 +110,34 @@ export function calculateAttributeAvailability(
     values.forEach(value => {
       availability[attrName][value] = {
         isAvailable: true,
-        isSelected: selectedOptions[attrName] === value
+        isSelected: selectedOptions[attrName] === value,
+        hasStock: true,
+        inventoryCount: 0
       };
     });
   });
   
-  // If no selections made, all options are available
+  // If no selections made, calculate availability for all options
   if (Object.keys(selectedOptions).length === 0) {
+    if (inventoryAware) {
+      // Calculate inventory for each attribute value
+      Object.entries(allAttributes).forEach(([attrName, values]) => {
+        values.forEach(value => {
+          const relevantItems = items.filter(item =>
+            item.itemDefiningSpecificationValues.some(spec =>
+              spec.name === attrName && spec.value === value
+            )
+          );
+          
+          const totalInventory = relevantItems.reduce((sum, item) => sum + (item.inventoryQuantity || 0), 0);
+          const hasStock = relevantItems.some(item => item.isInStock && (item.inventoryQuantity || 0) > 0);
+          
+          availability[attrName][value].hasStock = hasStock;
+          availability[attrName][value].inventoryCount = totalInventory;
+          availability[attrName][value].isAvailable = hasStock; // Disable if no stock
+        });
+      });
+    }
     return availability;
   }
   
@@ -106,7 +149,23 @@ export function calculateAttributeAvailability(
       
       // If no other selections exist, this value is available
       if (otherSelections.length === 0) {
-        availability[attrName][value].isAvailable = true;
+        if (inventoryAware) {
+          // Calculate inventory for this single attribute value
+          const relevantItems = items.filter(item =>
+            item.itemDefiningSpecificationValues.some(spec =>
+              spec.name === attrName && spec.value === value
+            )
+          );
+          
+          const totalInventory = relevantItems.reduce((sum, item) => sum + (item.inventoryQuantity || 0), 0);
+          const hasStock = relevantItems.some(item => item.isInStock && (item.inventoryQuantity || 0) > 0);
+          
+          availability[attrName][value].hasStock = hasStock;
+          availability[attrName][value].inventoryCount = totalInventory;
+          availability[attrName][value].isAvailable = hasStock;
+        } else {
+          availability[attrName][value].isAvailable = true;
+        }
         return;
       }
       
@@ -119,7 +178,34 @@ export function calculateAttributeAvailability(
         return validValues.includes(value);
       });
       
-      availability[attrName][value].isAvailable = isCompatible;
+      if (!isCompatible) {
+        availability[attrName][value].isAvailable = false;
+        availability[attrName][value].hasStock = false;
+        availability[attrName][value].inventoryCount = 0;
+        return;
+      }
+      
+      // If inventory aware, check if this combination has stock
+      if (inventoryAware) {
+        // Find items that match this potential selection combination
+        const testSelection = { ...selectedOptions, [attrName]: value };
+        const matchingItems = items.filter(item => {
+          return Object.entries(testSelection).every(([selAttr, selValue]) => {
+            return item.itemDefiningSpecificationValues.some(spec =>
+              spec.name === selAttr && spec.value === selValue
+            );
+          });
+        });
+        
+        const totalInventory = matchingItems.reduce((sum, item) => sum + (item.inventoryQuantity || 0), 0);
+        const hasStock = matchingItems.some(item => item.isInStock && (item.inventoryQuantity || 0) > 0);
+        
+        availability[attrName][value].hasStock = hasStock;
+        availability[attrName][value].inventoryCount = totalInventory;
+        availability[attrName][value].isAvailable = hasStock; // Only available if has stock
+      } else {
+        availability[attrName][value].isAvailable = true;
+      }
     });
   });
   

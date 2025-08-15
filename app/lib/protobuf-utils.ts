@@ -274,7 +274,7 @@ export class ProtobufUtils {
   }): Promise<Uint8Array> {
     try {
       const root = await loadInventoryProtoDefinitions();
-      const RequestType = root.lookupType('inventory.InventoryGetAllLocationsBySkuRequest');
+      const RequestType = root.lookupType('inventory_messages.InventoryGetAllLocationsBySkuRequest');
       
       const message = RequestType.create(requestData);
       return RequestType.encode(message).finish();
@@ -290,7 +290,7 @@ export class ProtobufUtils {
   static async decodeInventoryGetAllLocationsBySkuResponse(buffer: Uint8Array): Promise<unknown> {
     try {
       const root = await loadInventoryProtoDefinitions();
-      const ResponseType = root.lookupType('inventory.InventoryGetAllLocationsBySkuResponse');
+      const ResponseType = root.lookupType('inventory_messages.InventoryGetAllLocationsBySkuResponse');
       
       // Decode the buffer
       const message = ResponseType.decode(buffer);
