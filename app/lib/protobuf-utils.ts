@@ -76,6 +76,20 @@ export interface ProductGetBySlugResponse {
   status: Status;
 }
 
+export interface GetProductSlugsRequest {
+  batchSize?: number;
+  cursor?: string;
+  includeInactive?: boolean;
+}
+
+export interface GetProductSlugsResponse {
+  slugs: string[];
+  nextCursor?: string;
+  totalCount: number;
+  hasMore: boolean;
+  status: Status;
+}
+
 export interface Product {
   id?: string;
   name: string;
@@ -262,6 +276,50 @@ export class ProtobufUtils {
       return plainObject as ProductGetBySlugResponse;
     } catch (error) {
       console.error('Failed to decode ProductGetBySlugResponse:', error);
+      throw new Error('Failed to decode protobuf message');
+    }
+  }
+
+  /**
+   * Encode GetProductSlugsRequest to protobuf
+   */
+  static async encodeGetProductSlugsRequest(request: GetProductSlugsRequest): Promise<Uint8Array> {
+    try {
+      const root = await this.getRoot();
+      const GetProductSlugsRequestType = root.lookupType('catalog_messages.GetProductSlugsRequest');
+      
+      const message = GetProductSlugsRequestType.create(request);
+      return GetProductSlugsRequestType.encode(message).finish();
+    } catch (error) {
+      console.error('Failed to encode GetProductSlugsRequest:', error);
+      throw new Error('Failed to encode protobuf message');
+    }
+  }
+
+  /**
+   * Decode GetProductSlugsResponse from protobuf
+   */
+  static async decodeGetProductSlugsResponse(buffer: Uint8Array): Promise<GetProductSlugsResponse> {
+    try {
+      const root = await this.getRoot();
+      const GetProductSlugsResponseType = root.lookupType('catalog_messages.GetProductSlugsResponse');
+      
+      // Decode the buffer
+      const message = GetProductSlugsResponseType.decode(buffer);
+      
+      // Convert to plain object and return
+      const plainObject = GetProductSlugsResponseType.toObject(message, {
+        longs: String,
+        enums: String,
+        bytes: String,
+        defaults: true,
+        arrays: true,
+        objects: true
+      });
+
+      return plainObject as GetProductSlugsResponse;
+    } catch (error) {
+      console.error('Failed to decode GetProductSlugsResponse:', error);
       throw new Error('Failed to decode protobuf message');
     }
   }

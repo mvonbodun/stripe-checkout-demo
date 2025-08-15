@@ -7,6 +7,7 @@ import { natsClient } from './nats-client';
 import { 
   ProtobufUtils, 
   ProductGetBySlugRequest, 
+  GetProductSlugsRequest,
   // ProductGetBySlugResponse,
   Product as ProtoProduct,
   ProductVariant as ProtoProductVariant
@@ -113,21 +114,58 @@ export class ProductService {
 
   /**
    * Get all product slugs for static generation
-   * Falls back to hardcoded data if backend is unavailable
+   * Uses cursor-based pagination to retrieve all slugs from backend
    */
   async getAllProductSlugs(): Promise<string[]> {
     try {
       console.log('Fetching all product slugs for static generation...');
       
-      // TODO: Implement ProductExportRequest/Response when available
-      // For now, we'll try to get a limited set from backend or fallback
+      const allSlugs: string[] = [];
+      let cursor: string | undefined = undefined;
+      let hasMore = true;
+      const batchSize = 100; // Default batch size
       
-      // Fallback to hardcoded slugs for static generation
-      console.log('Using fallback hardcoded slugs for static generation');
-      return this.getFallbackProductSlugs();
+      while (hasMore) {
+        const request: GetProductSlugsRequest = {
+          batchSize,
+          cursor,
+          includeInactive: false // Only get active products for static generation
+        };
+
+        // Encode request
+        const requestBuffer = await ProtobufUtils.encodeGetProductSlugsRequest(request);
+
+        // Send NATS request
+        const subject = process.env.NATS_SUBJECT_CATALOG_GET_PRODUCT_SLUGS || 'catalog.get_product_slugs';
+        const responseBuffer = await natsClient.request(subject, requestBuffer, 10000);
+
+        // Decode response
+        const response = await ProtobufUtils.decodeGetProductSlugsResponse(responseBuffer);
+
+        // Check response status
+        if (response.status.code !== 0) {
+          console.warn(`Backend service error getting product slugs: ${response.status.message}`);
+          break;
+        }
+
+        // Add slugs to our collection
+        allSlugs.push(...response.slugs);
+        
+        // Update pagination variables
+        hasMore = response.hasMore;
+        cursor = response.nextCursor;
+        
+        console.log(`Fetched ${response.slugs.length} slugs, total so far: ${allSlugs.length}, hasMore: ${hasMore}`);
+      }
+      
+      console.log(`Successfully fetched ${allSlugs.length} product slugs from backend`);
+      return allSlugs;
       
     } catch (error) {
       console.error('Failed to fetch product slugs from backend:', error);
+      
+      // Fallback to hardcoded data only in case of complete failure
+      console.warn('Falling back to hardcoded product slugs due to backend error');
       return this.getFallbackProductSlugs();
     }
   }
