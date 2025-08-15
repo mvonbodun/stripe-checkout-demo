@@ -178,25 +178,17 @@ export default function ProductInfoMobileBottom({
         )}
       </div>
       
-      {/* Stock Status */}
-      <div className="flex items-center space-x-2 pt-2">
-        {product.inStock && (product.totalInventory ? product.totalInventory > 0 : true) ? (
-          <>
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-green-700 font-medium">
-              {product.totalInventory && product.totalInventory > 0 && product.totalInventory <= 10 
-                ? `Only ${product.totalInventory} left` 
-                : 'In Stock'
-              }
-            </span>
-          </>
-        ) : (
-          <>
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-red-700 font-medium">Out of Stock</span>
-          </>
-        )}
-      </div>
+      {/* Selected SKU Inventory Quantity */}
+      {selectedItem && (
+        <div className="pt-2">
+          <span className="text-sm text-gray-600">
+            {selectedItem.inventoryQuantity > 0 
+              ? `${selectedItem.inventoryQuantity} in stock` 
+              : 'Out of stock'
+            }
+          </span>
+        </div>
+      )}
       
       {/* Quantity & Add to Cart */}
       <div className="space-y-4 pt-4">

@@ -23,6 +23,26 @@ export default function ProductInfoMobile({ product }: ProductInfoMobileProps) {
       
       {/* Star Rating & Q&A */}
       <ProductRatingAndQA />
+      
+      {/* Stock Status - General product availability */}
+      <div className="flex items-center space-x-2">
+        {product.inStock && (product.totalInventory ? product.totalInventory > 0 : true) ? (
+          <>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-sm text-green-700 font-medium">
+              {product.totalInventory && product.totalInventory > 0 && product.totalInventory <= 10 
+                ? `Only ${product.totalInventory} left` 
+                : 'In Stock'
+              }
+            </span>
+          </>
+        ) : (
+          <>
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="text-sm text-red-700 font-medium">Out of Stock</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
