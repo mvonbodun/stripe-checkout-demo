@@ -16,6 +16,7 @@ import { Product, ProductVariant } from '../models/product';
 import { Status } from '../models/common';
 import { getProductBySlug as getHardcodedProduct } from '../models/product';
 import { InventoryService } from './inventory-service';
+import { PricingService } from './pricing-service';
 
 export class ProductService {
   private static instance: ProductService | null = null;
@@ -40,9 +41,10 @@ export class ProductService {
   async getProductBySlug(
     slug: string, 
     includeVariants: boolean = false, 
-    includeInventory: boolean = false
+    includeInventory: boolean = false,
+    includePricing: boolean = false
   ): Promise<Product | null> {
-    const cacheKey = `${slug}_${includeVariants}_${includeInventory}`;
+    const cacheKey = `${slug}_${includeVariants}_${includeInventory}_${includePricing}`;
     
     // Check cache first
     const cached = this.cache.get(cacheKey);
@@ -83,9 +85,37 @@ export class ProductService {
       // Transform to frontend Product format
       let product = this.transformToProduct(response.product, includeVariants);
 
-      // Integrate inventory data if requested
+      // Integrate inventory and pricing data if requested (can run in parallel)
+      const integrationPromises: Promise<Product>[] = [];
+      
       if (includeInventory && product) {
-        product = await this.integrateInventoryData(product);
+        integrationPromises.push(this.integrateInventoryData(product));
+      } else {
+        integrationPromises.push(Promise.resolve(product));
+      }
+      
+      if (includePricing && product) {
+        integrationPromises.push(this.integratePricingData(product));
+      } else {
+        integrationPromises.push(Promise.resolve(product));
+      }
+
+      // Wait for both integrations to complete
+      const [inventoryProduct, pricingProduct] = await Promise.all(integrationPromises);
+      
+      // Merge the results (pricing data takes precedence for price fields)
+      if (includePricing && includeInventory) {
+        product = {
+          ...inventoryProduct,
+          ...pricingProduct,
+          // Preserve inventory-specific fields from inventoryProduct
+          totalInventory: inventoryProduct.totalInventory,
+          inStock: inventoryProduct.inStock
+        };
+      } else if (includeInventory) {
+        product = inventoryProduct;
+      } else if (includePricing) {
+        product = pricingProduct;
       }
 
       // Cache the result
@@ -470,6 +500,94 @@ export class ProductService {
       // Return product without inventory data if integration fails
       return product;
     }
+  }
+
+  /**
+   * Integrate pricing data into product and variants
+   */
+  private async integratePricingData(product: Product): Promise<Product> {
+    try {
+      const pricingService = PricingService.getInstance();
+      
+      // Collect all SKUs from the product and its variants
+      const skus: string[] = [];
+      
+      // Check if this product has variants (ProductWithVariants type)
+      const productWithVariants = product as Product & { variants?: ProductVariant[] };
+      if (productWithVariants.variants && Array.isArray(productWithVariants.variants)) {
+        productWithVariants.variants.forEach((variant: ProductVariant) => {
+          if (variant.sku) {
+            skus.push(variant.sku);
+          }
+        });
+      }
+
+      if (skus.length === 0) {
+        console.log(`No SKUs found for product ${product.slug}, skipping pricing integration`);
+        return product;
+      }
+
+      // Get pricing data for all SKUs
+      const pricingData = await pricingService.getPricingBySKUs(skus, 1, 'USD');
+
+      // Update variants with pricing data if variants exist
+      if (productWithVariants.variants && Array.isArray(productWithVariants.variants)) {
+        productWithVariants.variants = productWithVariants.variants.map((variant: ProductVariant) => {
+          const pricingInfo = pricingData.get(variant.sku);
+          if (pricingInfo && pricingInfo.found) {
+            return {
+              ...variant,
+              price: pricingInfo.price,
+              compareAtPrice: pricingInfo.compareAtPrice
+            };
+          }
+          return variant;
+        });
+
+        // Calculate product-level pricing aggregates
+        const validPrices = productWithVariants.variants
+          .map((variant: ProductVariant) => variant.price || 0)
+          .filter(price => price > 0);
+        
+        const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : undefined;
+        const maxPrice = validPrices.length > 0 ? Math.max(...validPrices) : undefined;
+        
+        // Get pricing for default variant if available
+        const defaultVariantSku = this.getDefaultVariantSku(product, productWithVariants.variants);
+        const defaultPricing = defaultVariantSku ? pricingData.get(defaultVariantSku) : null;
+
+        // Update product with calculated pricing data
+        return {
+          ...product,
+          basePrice: defaultPricing?.price || minPrice || 0,
+          compareAtPrice: defaultPricing?.compareAtPrice,
+          minPrice,
+          maxPrice,
+          priceRange: minPrice && maxPrice && minPrice !== maxPrice ? { min: minPrice, max: maxPrice } : undefined
+        };
+      }
+
+      return product;
+
+    } catch (error) {
+      console.error('Failed to integrate pricing data:', error);
+      // Return product without pricing data if integration fails
+      return product;
+    }
+  }
+
+  /**
+   * Get the SKU for the default variant
+   */
+  private getDefaultVariantSku(product: Product, variants: ProductVariant[]): string | null {
+    // Try to find default variant from product data
+    const protoProduct = product as Product & { defaultVariant?: string };
+    if (protoProduct.defaultVariant) {
+      return protoProduct.defaultVariant;
+    }
+
+    // Fallback to first variant
+    return variants.length > 0 ? variants[0].sku : null;
   }
 
   /**

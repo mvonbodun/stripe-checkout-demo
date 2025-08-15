@@ -107,10 +107,15 @@ export default function ProductInfo({
     }
   }, [selectedOptions, product.id, items, hasValidData]);
 
-  // Calculate discount percentage
-  const discountPercentage = product.compareAtPrice && product.compareAtPrice > product.basePrice
-    ? Math.round(((product.compareAtPrice - product.basePrice) / product.compareAtPrice) * 100)
-    : null;
+  // Calculate discount percentage based on selected item or product
+  const discountPercentage = useMemo(() => {
+    const currentPrice = selectedItem?.price || product.basePrice;
+    const comparePrice = selectedItem?.compareAtPrice || product.compareAtPrice;
+    
+    return comparePrice && comparePrice > currentPrice
+      ? Math.round(((comparePrice - currentPrice) / comparePrice) * 100)
+      : null;
+  }, [selectedItem?.price, selectedItem?.compareAtPrice, product.basePrice, product.compareAtPrice]);
 
   // Validate Add to Cart button state
   const addToCartValidation = useMemo(() => {
@@ -142,13 +147,14 @@ export default function ProductInfo({
         {/* Price */}
       <div className="flex items-center space-x-3 sm:space-x-4">
         <Price 
-          amount={product.basePrice} 
+          amount={selectedItem?.price || product.basePrice} 
           className="text-2xl sm:text-3xl font-bold text-gray-900" 
         />
-        {product.compareAtPrice && product.compareAtPrice > product.basePrice && (
+        {(selectedItem?.compareAtPrice || product.compareAtPrice) && 
+         (selectedItem?.compareAtPrice || product.compareAtPrice)! > (selectedItem?.price || product.basePrice) && (
           <>
             <Price 
-              amount={product.compareAtPrice} 
+              amount={(selectedItem?.compareAtPrice || product.compareAtPrice) || 0} 
               className="text-lg sm:text-xl text-gray-500 line-through" 
             />
             {discountPercentage && (

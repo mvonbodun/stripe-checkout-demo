@@ -9,6 +9,7 @@ import path from 'path';
 // Load protocol buffer definitions
 let catalogRoot: protobuf.Root | null = null;
 let inventoryRoot: protobuf.Root | null = null;
+let pricingRoot: protobuf.Root | null = null;
 
 async function loadProtoDefinitions(): Promise<protobuf.Root> {
   if (catalogRoot) {
@@ -39,6 +40,22 @@ async function loadInventoryProtoDefinitions(): Promise<protobuf.Root> {
   } catch (error) {
     console.error('Failed to load inventory protobuf definitions:', error);
     throw new Error('Unable to load inventory protocol buffer definitions');
+  }
+}
+
+async function loadPricingProtoDefinitions(): Promise<protobuf.Root> {
+  if (pricingRoot) {
+    return pricingRoot;
+  }
+
+  try {
+    // Load the offer.proto file
+    const protoPath = path.join(process.cwd(), 'proto', 'price', 'offer.proto');
+    pricingRoot = await protobuf.load(protoPath);
+    return pricingRoot;
+  } catch (error) {
+    console.error('Failed to load pricing protobuf definitions:', error);
+    throw new Error('Unable to load pricing protocol buffer definitions');
   }
 }
 
@@ -87,6 +104,40 @@ export interface GetProductSlugsResponse {
   nextCursor?: string;
   totalCount: number;
   hasMore: boolean;
+  status: Status;
+}
+
+// Pricing interfaces
+export interface GetBestOfferPricesRequest {
+  skus: string[];
+  quantity: number;
+  date?: string;
+  currency: string;
+}
+
+export interface OfferPrice {
+  price: string;
+  currency: string;
+}
+
+export interface Offer {
+  id?: string;
+  sku: string;
+  startDate: string;
+  endDate: string;
+  minQuantity: number;
+  maxQuantity?: number;
+  offerPrices: OfferPrice[];
+}
+
+export interface SkuOfferResult {
+  sku: string;
+  offer?: Offer;
+  found: boolean;
+}
+
+export interface GetBestOfferPricesResponse {
+  skuResults: SkuOfferResult[];
   status: Status;
 }
 
@@ -364,6 +415,50 @@ export class ProtobufUtils {
       });
     } catch (error) {
       console.error('Failed to decode InventoryGetAllLocationsBySkuResponse:', error);
+      throw new Error('Failed to decode protobuf message');
+    }
+  }
+
+  /**
+   * Encode GetBestOfferPricesRequest to protobuf
+   */
+  static async encodeGetBestOfferPricesRequest(request: GetBestOfferPricesRequest): Promise<Uint8Array> {
+    try {
+      const root = await loadPricingProtoDefinitions();
+      const RequestType = root.lookupType('offer_messages.GetBestOfferPricesRequest');
+      
+      const message = RequestType.create(request);
+      return RequestType.encode(message).finish();
+    } catch (error) {
+      console.error('Failed to encode GetBestOfferPricesRequest:', error);
+      throw new Error('Failed to encode protobuf message');
+    }
+  }
+
+  /**
+   * Decode GetBestOfferPricesResponse from protobuf
+   */
+  static async decodeGetBestOfferPricesResponse(buffer: Uint8Array): Promise<GetBestOfferPricesResponse> {
+    try {
+      const root = await loadPricingProtoDefinitions();
+      const ResponseType = root.lookupType('offer_messages.GetBestOfferPricesResponse');
+      
+      // Decode the buffer
+      const message = ResponseType.decode(buffer);
+      
+      // Convert to plain object and return
+      const plainObject = ResponseType.toObject(message, {
+        longs: String,
+        enums: String,
+        bytes: String,
+        defaults: true,
+        arrays: true,
+        objects: true
+      });
+
+      return plainObject as GetBestOfferPricesResponse;
+    } catch (error) {
+      console.error('Failed to decode GetBestOfferPricesResponse:', error);
       throw new Error('Failed to decode protobuf message');
     }
   }

@@ -32,8 +32,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
   try {
     console.log(`Loading product page for slug: ${slug}`);
     
-    // Phase 3C: Fetch product with variants AND inventory data
-    const productData = await productService.getProductBySlug(slug, true, true); // Include variants + inventory
+    // Phase 3: Fetch product with variants, inventory, AND pricing data
+    const productData = await productService.getProductBySlug(slug, true, true, true); // Include variants + inventory + pricing
 
     if (!productData) {
       console.log(`Product not found for slug: ${slug}`);
