@@ -9,6 +9,7 @@ import { useProductPageContext } from './ProductPageContext';
 import QuantitySelector from './QuantitySelector';
 import AddToCartButton from './AddToCartButton';
 import AttributeSelector from './AttributeSelector';
+import Price from './Price';
 
 interface ProductInfoMobileBottomProps {
   product: Product;
@@ -146,6 +147,55 @@ export default function ProductInfoMobileBottom({
           onError={handleAttributeError}
           onStateChange={handleAttributeStateChange}
         />
+      </div>
+      
+      {/* Price */}
+      <div className="flex items-center space-x-3 pt-4">
+        <Price 
+          amount={selectedItem?.price || product.basePrice} 
+          className="text-2xl font-bold text-gray-900" 
+        />
+        {(selectedItem?.compareAtPrice || product.compareAtPrice) && 
+         (selectedItem?.compareAtPrice || product.compareAtPrice)! > (selectedItem?.price || product.basePrice) && (
+          <>
+            <Price 
+              amount={(selectedItem?.compareAtPrice || product.compareAtPrice) || 0} 
+              className="text-lg text-gray-500 line-through" 
+            />
+            {(() => {
+              const currentPrice = selectedItem?.price || product.basePrice;
+              const comparePrice = selectedItem?.compareAtPrice || product.compareAtPrice;
+              const discountPercentage = comparePrice && currentPrice 
+                ? Math.round(((comparePrice - currentPrice) / comparePrice) * 100)
+                : null;
+              return discountPercentage && (
+                <span className="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded-full">
+                  {discountPercentage}% OFF
+                </span>
+              );
+            })()}
+          </>
+        )}
+      </div>
+      
+      {/* Stock Status */}
+      <div className="flex items-center space-x-2 pt-2">
+        {product.inStock && (product.totalInventory ? product.totalInventory > 0 : true) ? (
+          <>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-sm text-green-700 font-medium">
+              {product.totalInventory && product.totalInventory > 0 && product.totalInventory <= 10 
+                ? `Only ${product.totalInventory} left` 
+                : 'In Stock'
+              }
+            </span>
+          </>
+        ) : (
+          <>
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="text-sm text-red-700 font-medium">Out of Stock</span>
+          </>
+        )}
       </div>
       
       {/* Quantity & Add to Cart */}
