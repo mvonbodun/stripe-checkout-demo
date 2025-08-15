@@ -101,6 +101,8 @@ export default function EnhancedProductCard({ hit, position, queryID }: Enhanced
             height={500}
             className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            crop="fill"
+            gravity="auto"
             format="auto"
             quality="auto"
           />

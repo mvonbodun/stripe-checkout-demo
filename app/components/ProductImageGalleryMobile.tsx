@@ -5,6 +5,8 @@ import { Item } from '../models/item';
 import { getItemForImages, getImagesForDisplay } from '../utils/attributeHelpers';
 import { useProductPageContext } from './ProductPageContext';
 import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
+import { isCloudinaryUrl, extractCloudinaryPublicId } from '../utils/cloudinaryHelpers';
 
 interface ProductImageGalleryMobileProps {
   product: Product;
@@ -75,16 +77,39 @@ export default function ProductImageGalleryMobile({
             </div>
           </div>
         ) : (
-          <Image
-            src={displayImages[selectedImageIndex]?.url}
-            alt={displayImages[selectedImageIndex]?.altText || product.name}
-            width={600}
-            height={600}
-            className="w-full h-full object-cover"
-            priority
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-          />
+          (() => {
+            const imageUrl = displayImages[selectedImageIndex]?.url;
+            const isCloudinary = isCloudinaryUrl(imageUrl);
+            const cloudinaryId = isCloudinary ? extractCloudinaryPublicId(imageUrl) : null;
+            
+            return isCloudinary && cloudinaryId ? (
+              <CldImage
+                src={cloudinaryId}
+                alt={displayImages[selectedImageIndex]?.altText || product.name}
+                width={600}
+                height={600}
+                className="w-full h-full object-cover"
+                crop="fill"
+                gravity="auto"
+                format="auto"
+                quality="auto"
+                priority
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+            ) : (
+              <Image
+                src={imageUrl}
+                alt={displayImages[selectedImageIndex]?.altText || product.name}
+                width={600}
+                height={600}
+                className="w-full h-full object-cover"
+                priority
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+            );
+          })()
         )}
       </div>
       
@@ -103,13 +128,33 @@ export default function ProductImageGalleryMobile({
               aria-label={`View image ${index + 1} of ${displayImages.length}`}
               aria-pressed={selectedImageIndex === index}
             >
-              <Image
-                src={image.url}
-                alt={image.altText || `${product.name} view ${index + 1}`}
-                width={64}
-                height={64}
-                className="w-full h-full object-cover"
-              />
+              {(() => {
+                const imageUrl = image.url;
+                const isCloudinary = isCloudinaryUrl(imageUrl);
+                const cloudinaryId = isCloudinary ? extractCloudinaryPublicId(imageUrl) : null;
+                
+                return isCloudinary && cloudinaryId ? (
+                  <CldImage
+                    src={cloudinaryId}
+                    alt={image.altText || `${product.name} view ${index + 1}`}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                    crop="fill"
+                    gravity="auto"
+                    format="auto"
+                    quality="auto"
+                  />
+                ) : (
+                  <Image
+                    src={imageUrl}
+                    alt={image.altText || `${product.name} view ${index + 1}`}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
+                );
+              })()}
             </button>
           ))}
         </div>
