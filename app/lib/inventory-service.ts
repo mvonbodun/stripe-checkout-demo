@@ -14,6 +14,7 @@ export interface InventoryInfo {
   reservedQuantity: number;
   inStock: boolean;
   locationCount: number;
+  isFallbackData?: boolean; // Flag to indicate if this is fallback data
 }
 
 export type InventoryMap = Map<string, InventoryInfo>;
@@ -65,7 +66,7 @@ export class InventoryService {
   private static instance: InventoryService | null = null;
   private cache: Map<string, CachedInventory> = new Map();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-  private readonly REQUEST_TIMEOUT = 5000; // 5 seconds
+  private readonly REQUEST_TIMEOUT = 3000; // 3 seconds (reduced from 5 seconds for faster failure)
 
   private constructor() {}
 
@@ -154,6 +155,9 @@ export class InventoryService {
   private transformInventoryResponse(response: InventoryGetAllLocationsBySkuResponse): InventoryMap {
     const inventoryMap = new Map<string, InventoryInfo>();
 
+    console.log(`📦 INVENTORY SERVICE RESPONSE: ${response.skuSummaries.length} successful SKUs, ${response.notFoundSkus.length} not found SKUs`);
+    console.log(`📦 INVENTORY MAP KEYS: [${response.skuSummaries.map(s => s.sku).join(', ')}]`);
+
     // Process successful SKU summaries
     response.skuSummaries.forEach(summary => {
       const inventory: InventoryInfo = {
@@ -165,18 +169,49 @@ export class InventoryService {
         locationCount: summary.totalInventory.locationCount
       };
       
+      console.log(`📦 SKU ${summary.sku} → INVENTORY: ${inventory.totalQuantity} total, ${inventory.availableQuantity} available, inStock: ${inventory.inStock}`);
       inventoryMap.set(summary.sku, inventory);
     });
 
     // Mark not found SKUs as out of stock
     response.notFoundSkus.forEach(sku => {
+      console.warn(`❌ SKU ${sku} → INVENTORY: NOT FOUND in service`);
       const inventory: InventoryInfo = {
         sku,
         totalQuantity: 0,
         availableQuantity: 0,
         reservedQuantity: 0,
         inStock: false,
-        locationCount: 0
+        locationCount: 0,
+        isFallbackData: true // Mark as fallback data since SKU wasn't found
+      };
+      
+      inventoryMap.set(sku, inventory);
+    });
+
+    console.log(`📦 FINAL INVENTORY MAP: ${inventoryMap.size} total entries, keys: [${Array.from(inventoryMap.keys()).join(', ')}]`);
+
+    return inventoryMap;
+  }
+
+  /**
+   * Get fallback inventory data (assume all SKUs are out of stock for safety)
+   * This is used when the inventory service is unavailable
+   */
+  private getFallbackInventory(skus: string[]): InventoryMap {
+    console.log(`Using fallback inventory data for ${skus.length} SKUs - marking as unavailable for safety`);
+    const inventoryMap = new Map<string, InventoryInfo>();
+
+    skus.forEach(sku => {
+      // Fallback: mark as out of stock for safety when inventory service is unavailable
+      const inventory: InventoryInfo = {
+        sku,
+        totalQuantity: 0,
+        availableQuantity: 0,
+        reservedQuantity: 0,
+        inStock: false,
+        locationCount: 0,
+        isFallbackData: true // Mark as fallback data
       };
       
       inventoryMap.set(sku, inventory);
@@ -186,28 +221,16 @@ export class InventoryService {
   }
 
   /**
-   * Get fallback inventory data (assume all SKUs are in stock)
-   * This is used when the inventory service is unavailable
+   * Check if inventory data is reliable (not fallback data)
    */
-  private getFallbackInventory(skus: string[]): InventoryMap {
-    console.log(`Using fallback inventory data for ${skus.length} SKUs`);
-    const inventoryMap = new Map<string, InventoryInfo>();
-
-    skus.forEach(sku => {
-      // Fallback: assume in stock with generic quantity
-      const inventory: InventoryInfo = {
-        sku,
-        totalQuantity: 100, // Generic fallback quantity
-        availableQuantity: 100,
-        reservedQuantity: 0,
-        inStock: true,
-        locationCount: 1
-      };
-      
-      inventoryMap.set(sku, inventory);
-    });
-
-    return inventoryMap;
+  isInventoryDataReliable(inventoryMap: InventoryMap): boolean {
+    // If any item is marked as fallback data, consider the entire set unreliable
+    for (const inventory of inventoryMap.values()) {
+      if (inventory.isFallbackData) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

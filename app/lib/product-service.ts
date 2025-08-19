@@ -12,7 +12,7 @@ import {
   Product as ProtoProduct,
   ProductVariant as ProtoProductVariant
 } from './protobuf-utils';
-import { Product, ProductVariant } from '../models/product';
+import { Product, ProductVariant, ProductWithVariants } from '../models/product';
 import { Status } from '../models/common';
 import { getProductBySlug as getHardcodedProduct } from '../models/product';
 import { InventoryService } from './inventory-service';
@@ -41,16 +41,23 @@ export class ProductService {
   async getProductBySlug(
     slug: string, 
     includeVariants: boolean = false, 
-    includeInventory: boolean = false,
-    includePricing: boolean = false
+    includeInventory: boolean = false, 
+    includePricing: boolean = false,
+    bustCache: boolean = false
   ): Promise<Product | null> {
+    console.log(`Fetching product by slug from backend service: ${slug}`);
+    
     const cacheKey = `${slug}_${includeVariants}_${includeInventory}_${includePricing}`;
     
-    // Check cache first
-    const cached = this.cache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp) < this.CACHE_TTL) {
-      console.log(`Returning cached product for slug: ${slug}`);
-      return cached.data;
+    // Check cache first (unless cache busting is requested)
+    if (!bustCache) {
+      const cached = this.cache.get(cacheKey);
+      if (cached && (Date.now() - cached.timestamp) < this.CACHE_TTL) {
+        console.log(`Returning cached product for slug: ${slug}`);
+        return cached.data;
+      }
+    } else {
+      console.log(`Cache busting requested for slug: ${slug}`);
     }
 
     try {
@@ -64,9 +71,9 @@ export class ProductService {
       // Encode request
       const requestBuffer = await ProtobufUtils.encodeProductGetBySlugRequest(request);
 
-      // Send NATS request
+            // Send NATS request
       const subject = process.env.NATS_SUBJECT_CATALOG_GET_PRODUCT_BY_SLUG || 'catalog.get_product_by_slug';
-      const responseBuffer = await natsClient.request(subject, requestBuffer, 10000);
+      const responseBuffer = await natsClient.request(subject, requestBuffer, 8000); // Reduced from 10000
 
       // Decode response
       const response = await ProtobufUtils.decodeProductGetBySlugResponse(responseBuffer);
@@ -85,37 +92,39 @@ export class ProductService {
       // Transform to frontend Product format
       let product = this.transformToProduct(response.product, includeVariants);
 
-      // Integrate inventory and pricing data if requested (can run in parallel)
-      const integrationPromises: Promise<Product>[] = [];
-      
+      console.log(`🛍️ PRODUCT ${slug} → LOADED: "${product.name}" with ${(product as ProductWithVariants).variants?.length || 0} variants`);
+
+      // Log all SKUs for this product
+      const productWithVariants = product as Product & { variants?: ProductVariant[] };
+      if (productWithVariants.variants && Array.isArray(productWithVariants.variants)) {
+        console.log(`🛍️ PRODUCT ${slug} → SKUs: [${productWithVariants.variants.map(v => v.sku).join(', ')}]`);
+      }
+
+      // Integrate inventory and pricing data sequentially for better reliability
       if (includeInventory && product) {
-        integrationPromises.push(this.integrateInventoryData(product));
-      } else {
-        integrationPromises.push(Promise.resolve(product));
+        console.log(`🔄 PRODUCT ${slug} → FETCHING INVENTORY for ${productWithVariants.variants?.length || 0} variants`);
+        const startTime = Date.now();
+        
+        try {
+          product = await this.integrateInventoryData(product);
+          const duration = Date.now() - startTime;
+          console.log(`✅ PRODUCT ${slug} → INVENTORY INTEGRATION completed in ${duration}ms`);
+        } catch (error) {
+          console.warn('Inventory integration failed, continuing without inventory data:', error);
+        }
       }
       
       if (includePricing && product) {
-        integrationPromises.push(this.integratePricingData(product));
-      } else {
-        integrationPromises.push(Promise.resolve(product));
-      }
-
-      // Wait for both integrations to complete
-      const [inventoryProduct, pricingProduct] = await Promise.all(integrationPromises);
-      
-      // Merge the results (pricing data takes precedence for price fields)
-      if (includePricing && includeInventory) {
-        product = {
-          ...inventoryProduct,
-          ...pricingProduct,
-          // Preserve inventory-specific fields from inventoryProduct
-          totalInventory: inventoryProduct.totalInventory,
-          inStock: inventoryProduct.inStock
-        };
-      } else if (includeInventory) {
-        product = inventoryProduct;
-      } else if (includePricing) {
-        product = pricingProduct;
+        console.log(`� PRODUCT ${slug} → FETCHING PRICING for ${productWithVariants.variants?.length || 0} variants`);
+        const startTime = Date.now();
+        
+        try {
+          product = await this.integratePricingData(product);
+          const duration = Date.now() - startTime;
+          console.log(`✅ PRODUCT ${slug} → PRICING INTEGRATION completed in ${duration}ms`);
+        } catch (error) {
+          console.warn('Pricing integration failed, continuing without pricing data:', error);
+        }
       }
 
       // Cache the result
@@ -123,6 +132,14 @@ export class ProductService {
         data: product,
         timestamp: Date.now()
       });
+
+      // Final summary log
+      const finalProductWithVariants = product as Product & { variants?: ProductVariant[] };
+      if (finalProductWithVariants.variants) {
+        const variantsWithInventory = finalProductWithVariants.variants.filter(v => (v.inventoryQuantity || 0) > 0);
+        const variantsWithPricing = finalProductWithVariants.variants.filter(v => (v.price || 0) > 0);
+        console.log(`🎯 PRODUCT ${slug} → FINAL: ${finalProductWithVariants.variants.length} variants, ${variantsWithInventory.length} with inventory, ${variantsWithPricing.length} with pricing, hasReliableInventoryData: ${(product as Product & { hasReliableInventoryData?: boolean }).hasReliableInventoryData}`);
+      }
 
       console.log(`Successfully fetched product: ${product.name}`);
       return product;
@@ -167,7 +184,7 @@ export class ProductService {
 
         // Send NATS request
         const subject = process.env.NATS_SUBJECT_CATALOG_GET_PRODUCT_SLUGS || 'catalog.get_product_slugs';
-        const responseBuffer = await natsClient.request(subject, requestBuffer, 10000);
+        const responseBuffer = await natsClient.request(subject, requestBuffer, 3000); // Reduced timeout
 
         // Decode response
         const response = await ProtobufUtils.decodeGetProductSlugsResponse(responseBuffer);
@@ -462,11 +479,27 @@ export class ProductService {
       // Get inventory data for all SKUs
       const inventoryData = await inventoryService.getInventoryBySKUs(skus);
 
+      console.log(`🔧 INVENTORY INTEGRATION: Received inventory map with ${inventoryData.size} entries`);
+      console.log(`🔧 INVENTORY MAP KEYS: [${Array.from(inventoryData.keys()).join(', ')}]`);
+
+      // Check if inventory data is reliable
+      const isInventoryReliable = inventoryService.isInventoryDataReliable(inventoryData);
+      if (!isInventoryReliable) {
+        console.warn(`Inventory data for product ${product.slug} is unreliable (fallback data), AttributeSelector should not render`);
+      }
+
       // Update variants with inventory data if variants exist
       if (productWithVariants.variants && Array.isArray(productWithVariants.variants)) {
+        console.log(`🔧 INVENTORY INTEGRATION: Processing ${productWithVariants.variants.length} variants for product ${product.slug}`);
+        console.log(`🔧 INVENTORY MAP: Has ${inventoryData.size} inventory records`);
+        
+        let variantsUpdated = 0;
         productWithVariants.variants = productWithVariants.variants.map((variant: ProductVariant) => {
           const inventoryInfo = inventoryData.get(variant.sku);
+          console.log(`🔧 VARIANT ${variant.sku}: inventory found = ${!!inventoryInfo}, quantity = ${inventoryInfo?.totalQuantity || 0}`);
+          
           if (inventoryInfo) {
+            variantsUpdated++;
             return {
               ...variant,
               inventoryQuantity: inventoryInfo.totalQuantity,
@@ -475,6 +508,8 @@ export class ProductService {
           }
           return variant;
         });
+
+        console.log(`🔧 INVENTORY INTEGRATION: Updated ${variantsUpdated} of ${productWithVariants.variants.length} variants`);
 
         // Calculate product-level inventory aggregates
         const totalInventory = productWithVariants.variants.reduce((sum: number, variant: ProductVariant) => 
@@ -485,15 +520,21 @@ export class ProductService {
           (variant.inventoryQuantity || 0) > 0
         );
 
-        // Update product with calculated inventory data
+        console.log(`🔧 INVENTORY TOTALS: totalInventory=${totalInventory}, inStock=${inStock}, isReliable=${isInventoryReliable}`);
+
+        // Update product with calculated inventory data and reliability flag
         return {
           ...product,
           totalInventory,
-          inStock
+          inStock,
+          hasReliableInventoryData: isInventoryReliable
         };
       }
 
-      return product;
+      return {
+        ...product,
+        hasReliableInventoryData: isInventoryReliable
+      };
 
     } catch (error) {
       console.error('Failed to integrate inventory data:', error);

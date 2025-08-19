@@ -48,8 +48,8 @@ export class NatsClient {
       
       this.connection = await connect({
         servers: [serverUrl],
-        timeout: 5000, // 5 second connection timeout
-        reconnectTimeWait: 2000, // 2 seconds between reconnect attempts
+        timeout: 3000, // 3 second connection timeout (reduced from 5)
+        reconnectTimeWait: 1000, // 1 second between reconnect attempts (reduced from 2)
         maxReconnectAttempts: 5,
         pingInterval: 30000, // 30 seconds
         maxPingOut: 3
@@ -91,7 +91,7 @@ export class NatsClient {
   /**
    * Send request and wait for response
    */
-  async request(subject: string, data: Uint8Array, timeout: number = 10000): Promise<Uint8Array> {
+  async request(subject: string, data: Uint8Array, timeout: number = 3000): Promise<Uint8Array> {
     await this.connect();
 
     if (!this.connection || this.connection.isClosed()) {

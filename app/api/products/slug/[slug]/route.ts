@@ -9,10 +9,13 @@ export async function GET(
     const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const includeVariants = searchParams.get('includeVariants') === 'true';
+    const includeInventory = searchParams.get('includeInventory') === 'true';
+    const includePricing = searchParams.get('includePricing') === 'true';
+    const bustCache = searchParams.has('_cache_bust');
 
-    console.log(`API: Fetching product by slug: ${slug}, includeVariants: ${includeVariants}`);
+    console.log(`API: Fetching product by slug: ${slug}, includeVariants: ${includeVariants}, includeInventory: ${includeInventory}, includePricing: ${includePricing}, bustCache: ${bustCache}`);
 
-    const product = await productService.getProductBySlug(slug, includeVariants);
+    const product = await productService.getProductBySlug(slug, includeVariants, includeInventory, includePricing, bustCache);
     
     if (!product) {
       console.log(`API: Product not found for slug: ${slug}`);

@@ -37,32 +37,45 @@ export default function ProductInfo({
   const { updateSelectedAttributes } = useProductPageContext();
 
   // Pre-calculate combination matrix and attributes (Phase 3 enhancement)
-  const { combinationMatrix, allAttributes, hasValidData } = useMemo(() => {
+  const { combinationMatrix, allAttributes, hasValidData, hasInventoryData } = useMemo(() => {
     // Use provided data if available (Phase 3)
     if (providedMatrix && providedAttributes) {
+      // Check if items have inventory data loaded
+      const itemsWithInventory = items.some(item => 
+        item.inventoryQuantity !== undefined && item.inventoryQuantity !== null
+      );
+      
       return { 
         combinationMatrix: providedMatrix, 
         allAttributes: providedAttributes, 
-        hasValidData: Object.keys(providedAttributes).length > 0 
+        hasValidData: Object.keys(providedAttributes).length > 0,
+        hasInventoryData: itemsWithInventory
       };
     }
 
     // Fallback to original calculation for backward compatibility
     if (items.length === 0) {
-      return { combinationMatrix: {}, allAttributes: {}, hasValidData: false };
+      return { combinationMatrix: {}, allAttributes: {}, hasValidData: false, hasInventoryData: false };
     }
 
     try {
       const allAttributes = getAttributesForProduct(product, items);
       const combinationMatrix = buildAttributeCombinationMatrix(product.id, items);
+      
+      // Check if items have inventory data loaded
+      const itemsWithInventory = items.some(item => 
+        item.inventoryQuantity !== undefined && item.inventoryQuantity !== null
+      );
+      
       return { 
         allAttributes, 
         combinationMatrix, 
-        hasValidData: Object.keys(allAttributes).length > 0 
+        hasValidData: Object.keys(allAttributes).length > 0,
+        hasInventoryData: itemsWithInventory
       };
     } catch (error) {
       console.error('Error pre-calculating attribute data:', error);
-      return { combinationMatrix: {}, allAttributes: {}, hasValidData: false };
+      return { combinationMatrix: {}, allAttributes: {}, hasValidData: false, hasInventoryData: false };
     }
   }, [providedMatrix, providedAttributes, product, items]);
 
@@ -221,7 +234,15 @@ export default function ProductInfo({
           </div>
         )}
         
-        {/* Loading State */}
+        {/* Loading State - Show when we have attributes but no inventory data yet */}
+        {hasValidData && !hasInventoryData && (
+          <div className="mb-4 flex items-center space-x-2 text-sm text-gray-500">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+            <span>Loading inventory information...</span>
+          </div>
+        )}
+        
+        {/* AttributeSelector State Loading */}
         {attributeState.isLoading && (
           <div className="mb-4 flex items-center space-x-2 text-sm text-gray-500">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
@@ -229,18 +250,28 @@ export default function ProductInfo({
           </div>
         )}
         
-        <AttributeSelector 
-          product={product}
-          items={items}
-          selectedOptions={selectedOptions}
-          onOptionsChange={handleOptionsChange}
-          combinationMatrix={combinationMatrix}
-          allAttributes={allAttributes}
-          onError={handleAttributeError}
-          onStateChange={handleAttributeStateChange}
-          inventoryAware={true}
-          showInventoryCount={true}
-        />
+        {/* Only render AttributeSelector when we have valid data AND inventory data */}
+        {hasValidData && hasInventoryData && (
+          <AttributeSelector 
+            product={product}
+            items={items}
+            selectedOptions={selectedOptions}
+            onOptionsChange={handleOptionsChange}
+            combinationMatrix={combinationMatrix}
+            allAttributes={allAttributes}
+            onError={handleAttributeError}
+            onStateChange={handleAttributeStateChange}
+            inventoryAware={true}
+            showInventoryCount={true}
+          />
+        )}
+        
+        {/* Show message if no valid attribute data */}
+        {!hasValidData && (
+          <div className="text-sm text-gray-500">
+            No product options available.
+          </div>
+        )}
       </div>
       
       {/* Quantity & Add to Cart */}

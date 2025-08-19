@@ -39,6 +39,7 @@ export interface Product extends BaseModel, SEOFields {
   maxPrice?: number;
   inStock?: boolean;
   totalInventory?: number;
+  hasReliableInventoryData?: boolean; // Flag to indicate if inventory data is from backend service or fallback
 }
 
 export interface ProductWithVariants extends Product {

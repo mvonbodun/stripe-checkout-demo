@@ -25,6 +25,8 @@ interface AttributeSelectorProps {
   // Phase 3C: Inventory awareness
   inventoryAware?: boolean; // Enable inventory-aware selection
   showInventoryCount?: boolean; // Show inventory count for selected combination
+  // Timing fix: Optimistic loading
+  optimisticLoading?: boolean; // Show attributes as available while loading inventory
 }
 
 export default function AttributeSelector({ 

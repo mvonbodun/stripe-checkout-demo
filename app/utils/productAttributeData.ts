@@ -22,6 +22,17 @@ export function buildProductAttributeData(
   items: Item[]
 ): ProductAttributeData {
   try {
+    // Check if inventory data is reliable before building attribute data
+    if (product.hasReliableInventoryData === false) {
+      console.warn('Product has unreliable inventory data, not building attribute data');
+      return {
+        combinationMatrix: {},
+        allAttributes: {},
+        hasValidData: false,
+        error: 'Inventory data is not available or unreliable. Please try refreshing the page.'
+      };
+    }
+
     if (items.length === 0) {
       return {
         combinationMatrix: {},

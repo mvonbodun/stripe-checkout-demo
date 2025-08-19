@@ -133,6 +133,8 @@ export class PricingService {
   private transformToPricingMap(skuResults: SkuOfferResult[], currency: string): Map<string, PricingInfo> {
     const pricingMap = new Map<string, PricingInfo>();
 
+    console.log(`💰 PRICING SERVICE RESPONSE: ${skuResults.length} SKU results`);
+
     for (const result of skuResults) {
       const pricingInfo: PricingInfo = {
         sku: result.sku,
@@ -142,6 +144,12 @@ export class PricingService {
         offer: result.offer,
         found: result.found
       };
+
+      if (result.found) {
+        console.log(`💰 SKU ${result.sku} → PRICING: $${pricingInfo.price.toFixed(2)} ${currency} (found: ${result.found})`);
+      } else {
+        console.warn(`❌ SKU ${result.sku} → PRICING: NOT FOUND in service`);
+      }
 
       pricingMap.set(result.sku, pricingInfo);
     }
