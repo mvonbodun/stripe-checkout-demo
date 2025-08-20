@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "app/api/catalog-categories/route.js": {
+      "includeFiles": "proto/**"
+    },
+    "app/api/products/slug/[slug]/route.js": {
+      "includeFiles": "proto/**"
+    }
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build"
+}

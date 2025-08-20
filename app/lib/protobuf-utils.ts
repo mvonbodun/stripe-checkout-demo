@@ -17,9 +17,18 @@ async function loadProtoDefinitions(): Promise<protobuf.Root> {
   }
 
   try {
-    // Load the catalog.proto file (includes both category and product definitions)
-    const protoPath = path.join(process.cwd(), 'proto', 'catalog', 'catalog.proto');
-    catalogRoot = await protobuf.load(protoPath);
+    // Try loading from the original proto directory first
+    let protoPath = path.join(process.cwd(), 'proto', 'catalog', 'catalog.proto');
+    
+    // If that fails in production (like on Vercel), try the public directory
+    try {
+      catalogRoot = await protobuf.load(protoPath);
+    } catch (firstError) {
+      console.log('Failed to load from proto directory, trying public directory...', String(firstError));
+      protoPath = path.join(process.cwd(), 'public', 'proto', 'catalog', 'catalog.proto');
+      catalogRoot = await protobuf.load(protoPath);
+    }
+    
     return catalogRoot;
   } catch (error) {
     console.error('Failed to load protobuf definitions:', error);
@@ -33,9 +42,18 @@ async function loadInventoryProtoDefinitions(): Promise<protobuf.Root> {
   }
 
   try {
-    // Load the inventory.proto file
-    const protoPath = path.join(process.cwd(), 'proto', 'inventory', 'inventory.proto');
-    inventoryRoot = await protobuf.load(protoPath);
+    // Try loading from the original proto directory first
+    let protoPath = path.join(process.cwd(), 'proto', 'inventory', 'inventory.proto');
+    
+    // If that fails in production (like on Vercel), try the public directory
+    try {
+      inventoryRoot = await protobuf.load(protoPath);
+    } catch (firstError) {
+      console.log('Failed to load inventory proto from proto directory, trying public directory...', String(firstError));
+      protoPath = path.join(process.cwd(), 'public', 'proto', 'inventory', 'inventory.proto');
+      inventoryRoot = await protobuf.load(protoPath);
+    }
+    
     return inventoryRoot;
   } catch (error) {
     console.error('Failed to load inventory protobuf definitions:', error);
@@ -49,9 +67,18 @@ async function loadPricingProtoDefinitions(): Promise<protobuf.Root> {
   }
 
   try {
-    // Load the offer.proto file
-    const protoPath = path.join(process.cwd(), 'proto', 'price', 'offer.proto');
-    pricingRoot = await protobuf.load(protoPath);
+    // Try loading from the original proto directory first
+    let protoPath = path.join(process.cwd(), 'proto', 'price', 'offer.proto');
+    
+    // If that fails in production (like on Vercel), try the public directory
+    try {
+      pricingRoot = await protobuf.load(protoPath);
+    } catch (firstError) {
+      console.log('Failed to load pricing proto from proto directory, trying public directory...', String(firstError));
+      protoPath = path.join(process.cwd(), 'public', 'proto', 'price', 'offer.proto');
+      pricingRoot = await protobuf.load(protoPath);
+    }
+    
     return pricingRoot;
   } catch (error) {
     console.error('Failed to load pricing protobuf definitions:', error);

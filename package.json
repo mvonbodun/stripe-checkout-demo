@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
+    "prebuild": "scripts/copy-proto.sh",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -51,6 +52,7 @@
     "eslint-config-next": "15.3.2",
     "jest": "^30.0.3",
     "jest-environment-jsdom": "^30.0.2",
+    "raw-loader": "^4.0.2",
     "typescript": "^5"
   }
 }
