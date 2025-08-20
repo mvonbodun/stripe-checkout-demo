@@ -17,19 +17,22 @@ async function loadProtoDefinitions(): Promise<protobuf.Root> {
   }
 
   try {
-    // Try loading from the original proto directory first
-    let protoPath = path.join(process.cwd(), 'proto', 'catalog', 'catalog.proto');
+    // First try the public directory (for Vercel deployment)
+    let protoPath = path.join(process.cwd(), 'public', 'proto', 'catalog', 'catalog.proto');
     
-    // If that fails in production (like on Vercel), try the public directory
     try {
       catalogRoot = await protobuf.load(protoPath);
-    } catch (firstError) {
-      console.log('Failed to load from proto directory, trying public directory...', String(firstError));
-      protoPath = path.join(process.cwd(), 'public', 'proto', 'catalog', 'catalog.proto');
+      console.log('Successfully loaded catalog proto from public directory');
+      return catalogRoot;
+    } catch (publicError) {
+      console.log('Failed to load from public directory, trying original proto directory...', String(publicError));
+      
+      // Fallback to original proto directory (for local development)
+      protoPath = path.join(process.cwd(), 'proto', 'catalog', 'catalog.proto');
       catalogRoot = await protobuf.load(protoPath);
+      console.log('Successfully loaded catalog proto from proto directory');
+      return catalogRoot;
     }
-    
-    return catalogRoot;
   } catch (error) {
     console.error('Failed to load protobuf definitions:', error);
     throw new Error('Unable to load protocol buffer definitions');
@@ -42,19 +45,22 @@ async function loadInventoryProtoDefinitions(): Promise<protobuf.Root> {
   }
 
   try {
-    // Try loading from the original proto directory first
-    let protoPath = path.join(process.cwd(), 'proto', 'inventory', 'inventory.proto');
+    // First try the public directory (for Vercel deployment)
+    let protoPath = path.join(process.cwd(), 'public', 'proto', 'inventory', 'inventory.proto');
     
-    // If that fails in production (like on Vercel), try the public directory
     try {
       inventoryRoot = await protobuf.load(protoPath);
-    } catch (firstError) {
-      console.log('Failed to load inventory proto from proto directory, trying public directory...', String(firstError));
-      protoPath = path.join(process.cwd(), 'public', 'proto', 'inventory', 'inventory.proto');
+      console.log('Successfully loaded inventory proto from public directory');
+      return inventoryRoot;
+    } catch (publicError) {
+      console.log('Failed to load inventory proto from public directory, trying original proto directory...', String(publicError));
+      
+      // Fallback to original proto directory (for local development)
+      protoPath = path.join(process.cwd(), 'proto', 'inventory', 'inventory.proto');
       inventoryRoot = await protobuf.load(protoPath);
+      console.log('Successfully loaded inventory proto from proto directory');
+      return inventoryRoot;
     }
-    
-    return inventoryRoot;
   } catch (error) {
     console.error('Failed to load inventory protobuf definitions:', error);
     throw new Error('Unable to load inventory protocol buffer definitions');
@@ -67,19 +73,22 @@ async function loadPricingProtoDefinitions(): Promise<protobuf.Root> {
   }
 
   try {
-    // Try loading from the original proto directory first
-    let protoPath = path.join(process.cwd(), 'proto', 'price', 'offer.proto');
+    // First try the public directory (for Vercel deployment)
+    let protoPath = path.join(process.cwd(), 'public', 'proto', 'price', 'offer.proto');
     
-    // If that fails in production (like on Vercel), try the public directory
     try {
       pricingRoot = await protobuf.load(protoPath);
-    } catch (firstError) {
-      console.log('Failed to load pricing proto from proto directory, trying public directory...', String(firstError));
-      protoPath = path.join(process.cwd(), 'public', 'proto', 'price', 'offer.proto');
+      console.log('Successfully loaded pricing proto from public directory');
+      return pricingRoot;
+    } catch (publicError) {
+      console.log('Failed to load pricing proto from public directory, trying original proto directory...', String(publicError));
+      
+      // Fallback to original proto directory (for local development)
+      protoPath = path.join(process.cwd(), 'proto', 'price', 'offer.proto');
       pricingRoot = await protobuf.load(protoPath);
+      console.log('Successfully loaded pricing proto from proto directory');
+      return pricingRoot;
     }
-    
-    return pricingRoot;
   } catch (error) {
     console.error('Failed to load pricing protobuf definitions:', error);
     throw new Error('Unable to load pricing protocol buffer definitions');
