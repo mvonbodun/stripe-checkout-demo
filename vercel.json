@@ -1,16 +1,10 @@
 {
   "functions": {
     "app/api/catalog-categories/route.js": {
-      "includeFiles": [
-        "proto/**",
-        "app/lib/proto-descriptors/*.json"
-      ]
+  "includeFiles": "{proto/**,app/lib/proto-descriptors/*.json}"
     },
     "app/api/products/slug/[slug]/route.js": {
-      "includeFiles": [
-        "proto/**",
-        "app/lib/proto-descriptors/*.json"
-      ]
+  "includeFiles": "{proto/**,app/lib/proto-descriptors/*.json}"
     }
   },
   "build": {
