@@ -5,6 +5,14 @@
 
 import * as protobuf from 'protobufjs';
 import path from 'path';
+import catalogJsonRaw from './proto-descriptors/catalog.json';
+import inventoryJsonRaw from './proto-descriptors/inventory.json';
+import pricingJsonRaw from './proto-descriptors/price.json';
+
+// Prebuilt JSON descriptors (generated at build time) bundled with the function
+const catalogJson = catalogJsonRaw as unknown as protobuf.INamespace;
+const inventoryJson = inventoryJsonRaw as unknown as protobuf.INamespace;
+const pricingJson = pricingJsonRaw as unknown as protobuf.INamespace;
 
 // Load protocol buffer definitions
 let catalogRoot: protobuf.Root | null = null;
@@ -13,6 +21,12 @@ let pricingRoot: protobuf.Root | null = null;
 
 async function loadProtoDefinitions(): Promise<protobuf.Root> {
   if (catalogRoot) {
+    return catalogRoot;
+  }
+
+  // Prefer in-bundle JSON descriptors to avoid runtime fs access
+  if (catalogJson) {
+    catalogRoot = protobuf.Root.fromJSON(catalogJson);
     return catalogRoot;
   }
 
@@ -50,6 +64,12 @@ async function loadInventoryProtoDefinitions(): Promise<protobuf.Root> {
     return inventoryRoot;
   }
 
+  // Prefer in-bundle JSON descriptors to avoid runtime fs access
+  if (inventoryJson) {
+    inventoryRoot = protobuf.Root.fromJSON(inventoryJson);
+    return inventoryRoot;
+  }
+
   // List of paths to try in order of preference
   const pathsToTry = [
     // Vercel specific paths
@@ -81,6 +101,12 @@ async function loadInventoryProtoDefinitions(): Promise<protobuf.Root> {
 
 async function loadPricingProtoDefinitions(): Promise<protobuf.Root> {
   if (pricingRoot) {
+    return pricingRoot;
+  }
+
+  // Prefer in-bundle JSON descriptors to avoid runtime fs access
+  if (pricingJson) {
+    pricingRoot = protobuf.Root.fromJSON(pricingJson);
     return pricingRoot;
   }
 

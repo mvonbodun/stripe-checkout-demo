@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+  "predev": "node scripts/generate-proto-descriptors.js",
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
-    "prebuild": "scripts/copy-proto.sh && echo 'Proto files after copy:' && find public/proto -name '*.proto' 2>/dev/null || echo 'No proto files found'",
+  "prebuild": "node scripts/generate-proto-descriptors.js && scripts/copy-proto.sh && echo 'Proto files after copy:' && find public/proto -name '*.proto' 2>/dev/null || echo 'No proto files found'",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

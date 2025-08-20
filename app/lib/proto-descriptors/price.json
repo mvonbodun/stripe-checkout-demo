@@ -1,0 +1,373 @@
+{
+  "nested": {
+    "offer_messages": {
+      "nested": {
+        "OfferCreateRequest": {
+          "oneofs": {
+            "_maxQuantity": {
+              "oneof": [
+                "maxQuantity"
+              ]
+            }
+          },
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            },
+            "startDate": {
+              "type": "google.protobuf.Timestamp",
+              "id": 2
+            },
+            "endDate": {
+              "type": "google.protobuf.Timestamp",
+              "id": 3
+            },
+            "minQuantity": {
+              "type": "int32",
+              "id": 4
+            },
+            "maxQuantity": {
+              "type": "int32",
+              "id": 5,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "offerPrices": {
+              "rule": "repeated",
+              "type": "OfferPrice",
+              "id": 6
+            }
+          }
+        },
+        "OfferCreateResponse": {
+          "oneofs": {
+            "_offer": {
+              "oneof": [
+                "offer"
+              ]
+            }
+          },
+          "fields": {
+            "offer": {
+              "type": "Offer",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "status": {
+              "type": "Status",
+              "id": 2
+            }
+          }
+        },
+        "OfferGetRequest": {
+          "fields": {
+            "id": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "OfferGetResponse": {
+          "oneofs": {
+            "_offer": {
+              "oneof": [
+                "offer"
+              ]
+            }
+          },
+          "fields": {
+            "offer": {
+              "type": "Offer",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "status": {
+              "type": "Status",
+              "id": 2
+            }
+          }
+        },
+        "OfferDeleteRequest": {
+          "fields": {
+            "id": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "OfferDeleteResponse": {
+          "fields": {
+            "status": {
+              "type": "Status",
+              "id": 1
+            }
+          }
+        },
+        "Offer": {
+          "oneofs": {
+            "_id": {
+              "oneof": [
+                "id"
+              ]
+            },
+            "_maxQuantity": {
+              "oneof": [
+                "maxQuantity"
+              ]
+            }
+          },
+          "fields": {
+            "id": {
+              "type": "string",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "sku": {
+              "type": "string",
+              "id": 2
+            },
+            "startDate": {
+              "type": "google.protobuf.Timestamp",
+              "id": 3
+            },
+            "endDate": {
+              "type": "google.protobuf.Timestamp",
+              "id": 4
+            },
+            "minQuantity": {
+              "type": "int32",
+              "id": 5
+            },
+            "maxQuantity": {
+              "type": "int32",
+              "id": 6,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "offerPrices": {
+              "rule": "repeated",
+              "type": "OfferPrice",
+              "id": 7
+            }
+          }
+        },
+        "OfferPrice": {
+          "fields": {
+            "price": {
+              "type": "string",
+              "id": 1
+            },
+            "currency": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "GetBestOfferPriceRequest": {
+          "oneofs": {
+            "_date": {
+              "oneof": [
+                "date"
+              ]
+            }
+          },
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            },
+            "quantity": {
+              "type": "int32",
+              "id": 2
+            },
+            "date": {
+              "type": "string",
+              "id": 3,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "currency": {
+              "type": "string",
+              "id": 4
+            }
+          }
+        },
+        "GetBestOfferPriceResponse": {
+          "oneofs": {
+            "_offer": {
+              "oneof": [
+                "offer"
+              ]
+            }
+          },
+          "fields": {
+            "offer": {
+              "type": "Offer",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "found": {
+              "type": "bool",
+              "id": 2
+            }
+          }
+        },
+        "GetBestOfferPricesRequest": {
+          "oneofs": {
+            "_date": {
+              "oneof": [
+                "date"
+              ]
+            }
+          },
+          "fields": {
+            "skus": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 1
+            },
+            "quantity": {
+              "type": "int32",
+              "id": 2
+            },
+            "date": {
+              "type": "string",
+              "id": 3,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "currency": {
+              "type": "string",
+              "id": 4
+            }
+          }
+        },
+        "SkuOfferResult": {
+          "oneofs": {
+            "_offer": {
+              "oneof": [
+                "offer"
+              ]
+            }
+          },
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            },
+            "offer": {
+              "type": "Offer",
+              "id": 2,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "found": {
+              "type": "bool",
+              "id": 3
+            }
+          }
+        },
+        "GetBestOfferPricesResponse": {
+          "fields": {
+            "skuResults": {
+              "rule": "repeated",
+              "type": "SkuOfferResult",
+              "id": 1
+            },
+            "status": {
+              "type": "Status",
+              "id": 2
+            }
+          }
+        },
+        "OfferService": {
+          "methods": {
+            "CreateOffer": {
+              "requestType": "OfferCreateRequest",
+              "responseType": "OfferCreateResponse"
+            },
+            "GetOffer": {
+              "requestType": "OfferGetRequest",
+              "responseType": "OfferGetResponse"
+            },
+            "DeleteOffer": {
+              "requestType": "OfferDeleteRequest",
+              "responseType": "OfferDeleteResponse"
+            },
+            "GetBestOfferPrice": {
+              "requestType": "GetBestOfferPriceRequest",
+              "responseType": "GetBestOfferPriceResponse"
+            },
+            "GetBestOfferPrices": {
+              "requestType": "GetBestOfferPricesRequest",
+              "responseType": "GetBestOfferPricesResponse"
+            }
+          }
+        },
+        "Status": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "message": {
+              "type": "string",
+              "id": 2
+            },
+            "details": {
+              "rule": "repeated",
+              "type": "google.protobuf.Any",
+              "id": 3
+            }
+          }
+        }
+      }
+    },
+    "google": {
+      "nested": {
+        "protobuf": {
+          "nested": {
+            "Timestamp": {
+              "fields": {
+                "seconds": {
+                  "type": "int64",
+                  "id": 1
+                },
+                "nanos": {
+                  "type": "int32",
+                  "id": 2
+                }
+              }
+            },
+            "Any": {
+              "fields": {
+                "type_url": {
+                  "type": "string",
+                  "id": 1
+                },
+                "value": {
+                  "type": "bytes",
+                  "id": 2
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

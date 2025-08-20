@@ -1,0 +1,337 @@
+{
+  "nested": {
+    "inventory_messages": {
+      "nested": {
+        "InventoryCreateRequest": {
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            },
+            "quantity": {
+              "type": "int32",
+              "id": 2
+            },
+            "reservedQuantity": {
+              "type": "int32",
+              "id": 3
+            },
+            "minStockLevel": {
+              "type": "int32",
+              "id": 4
+            },
+            "location": {
+              "type": "string",
+              "id": 5
+            }
+          }
+        },
+        "InventoryCreateResponse": {
+          "oneofs": {
+            "_item": {
+              "oneof": [
+                "item"
+              ]
+            }
+          },
+          "fields": {
+            "item": {
+              "type": "InventoryItem",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "status": {
+              "type": "Status",
+              "id": 2
+            }
+          }
+        },
+        "InventoryGetRequest": {
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "InventoryGetResponse": {
+          "oneofs": {
+            "_item": {
+              "oneof": [
+                "item"
+              ]
+            }
+          },
+          "fields": {
+            "item": {
+              "type": "InventoryItem",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "status": {
+              "type": "Status",
+              "id": 2
+            }
+          }
+        },
+        "InventoryUpdateStockRequest": {
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            },
+            "quantityChange": {
+              "type": "int32",
+              "id": 2
+            },
+            "reason": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "InventoryUpdateStockResponse": {
+          "oneofs": {
+            "_item": {
+              "oneof": [
+                "item"
+              ]
+            }
+          },
+          "fields": {
+            "item": {
+              "type": "InventoryItem",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "status": {
+              "type": "Status",
+              "id": 2
+            }
+          }
+        },
+        "InventoryDeleteRequest": {
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "InventoryDeleteResponse": {
+          "fields": {
+            "status": {
+              "type": "Status",
+              "id": 1
+            }
+          }
+        },
+        "InventoryGetAllLocationsBySkuRequest": {
+          "fields": {
+            "skus": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "InventoryGetAllLocationsBySkuResponse": {
+          "fields": {
+            "skuSummaries": {
+              "rule": "repeated",
+              "type": "SkuInventorySummary",
+              "id": 1
+            },
+            "notFoundSkus": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 2
+            },
+            "status": {
+              "type": "Status",
+              "id": 3
+            }
+          }
+        },
+        "SkuInventorySummary": {
+          "fields": {
+            "sku": {
+              "type": "string",
+              "id": 1
+            },
+            "totalInventory": {
+              "type": "InventoryAggregation",
+              "id": 2
+            },
+            "locationDetails": {
+              "rule": "repeated",
+              "type": "InventoryLocationDetail",
+              "id": 3
+            }
+          }
+        },
+        "InventoryAggregation": {
+          "fields": {
+            "totalQuantity": {
+              "type": "int32",
+              "id": 1
+            },
+            "totalReservedQuantity": {
+              "type": "int32",
+              "id": 2
+            },
+            "totalAvailableQuantity": {
+              "type": "int32",
+              "id": 3
+            },
+            "minStockLevelAcrossLocations": {
+              "type": "int32",
+              "id": 4
+            },
+            "locationCount": {
+              "type": "int32",
+              "id": 5
+            }
+          }
+        },
+        "InventoryLocationDetail": {
+          "fields": {
+            "location": {
+              "type": "string",
+              "id": 1
+            },
+            "quantity": {
+              "type": "int32",
+              "id": 2
+            },
+            "reservedQuantity": {
+              "type": "int32",
+              "id": 3
+            },
+            "availableQuantity": {
+              "type": "int32",
+              "id": 4
+            },
+            "minStockLevel": {
+              "type": "int32",
+              "id": 5
+            },
+            "lastUpdated": {
+              "type": "google.protobuf.Timestamp",
+              "id": 6
+            },
+            "createdAt": {
+              "type": "google.protobuf.Timestamp",
+              "id": 7
+            }
+          }
+        },
+        "InventoryItem": {
+          "oneofs": {
+            "_id": {
+              "oneof": [
+                "id"
+              ]
+            }
+          },
+          "fields": {
+            "id": {
+              "type": "string",
+              "id": 1,
+              "options": {
+                "proto3_optional": true
+              }
+            },
+            "sku": {
+              "type": "string",
+              "id": 2
+            },
+            "quantity": {
+              "type": "int32",
+              "id": 3
+            },
+            "reservedQuantity": {
+              "type": "int32",
+              "id": 4
+            },
+            "availableQuantity": {
+              "type": "int32",
+              "id": 5
+            },
+            "minStockLevel": {
+              "type": "int32",
+              "id": 6
+            },
+            "location": {
+              "type": "string",
+              "id": 7
+            },
+            "lastUpdated": {
+              "type": "google.protobuf.Timestamp",
+              "id": 8
+            },
+            "createdAt": {
+              "type": "google.protobuf.Timestamp",
+              "id": 9
+            }
+          }
+        },
+        "Status": {
+          "fields": {
+            "code": {
+              "type": "int32",
+              "id": 1
+            },
+            "message": {
+              "type": "string",
+              "id": 2
+            },
+            "details": {
+              "rule": "repeated",
+              "type": "google.protobuf.Any",
+              "id": 3
+            }
+          }
+        }
+      }
+    },
+    "google": {
+      "nested": {
+        "protobuf": {
+          "nested": {
+            "Timestamp": {
+              "fields": {
+                "seconds": {
+                  "type": "int64",
+                  "id": 1
+                },
+                "nanos": {
+                  "type": "int32",
+                  "id": 2
+                }
+              }
+            },
+            "Any": {
+              "fields": {
+                "type_url": {
+                  "type": "string",
+                  "id": 1
+                },
+                "value": {
+                  "type": "bytes",
+                  "id": 2
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
