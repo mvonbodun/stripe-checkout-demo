@@ -1,10 +1,10 @@
 {
   "functions": {
     "app/api/catalog-categories/route.js": {
-      "includeFiles": "**"
+      "includeFiles": "public/proto/**"
     },
     "app/api/products/slug/[slug]/route.js": {
-      "includeFiles": "**"
+      "includeFiles": "public/proto/**"
     }
   },
   "build": {
